@@ -12,7 +12,9 @@ Rails.application.routes.draw do
   end
 
   resources :announcements, only: [:index, :show]
-  resources :companies
+  resources :companies do
+    resources :contacts
+  end
 
   namespace :action_text do
     resources :embeds, only: [:create], constraints: {id: /[^\/]+/} do

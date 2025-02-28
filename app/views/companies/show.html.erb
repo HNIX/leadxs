@@ -92,4 +92,48 @@
       </dl>
     </div>
   </div>
+  
+  <div class="mt-8">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-xl font-medium text-gray-900 dark:text-white">Contacts</h3>
+      <%= link_to "Manage Contacts", company_contacts_path(@company), class: "btn btn-primary" %>
+    </div>
+    
+    <% contacts = @company.contacts.sorted.limit(5) %>
+    
+    <% if contacts.any? %>
+      <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700 list-none">
+          <% contacts.each do |contact| %>
+            <li class="px-6 py-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900 dark:text-white"><%= contact.full_name %></h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <%= contact.email %> <%= "• #{contact.phone}" if contact.phone.present? %>
+                  </p>
+                </div>
+                <div>
+                  <%= link_to "View", company_contact_path(@company, contact), class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      
+      <% if @company.contacts.count > 5 %>
+        <div class="mt-4 text-center">
+          <%= link_to "View all #{@company.contacts.count} contacts", company_contacts_path(@company), class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="bg-white dark:bg-gray-900 shadow sm:rounded-lg p-6 text-center">
+        <p class="text-gray-500 dark:text-gray-400">No contacts found for this company.</p>
+        <p class="mt-2">
+          <%= link_to "Add your first contact", new_company_contact_path(@company), class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+        </p>
+      </div>
+    <% end %>
+  </div>
 </div>
