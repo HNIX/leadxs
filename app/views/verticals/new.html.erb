@@ -1,0 +1,14 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <%= link_to "&larr; Back to Verticals".html_safe, verticals_path, class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+  </div>
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">New Vertical</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create a new vertical to define fields and requirements for your lead generation.</p>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg p-6">
+    <%= render "form", vertical: @vertical %>
+  </div>
+</div>

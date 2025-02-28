@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_28_204857) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_28_212229) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -436,6 +436,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_204857) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "verticals", force: :cascade do |t|
+    t.string "name"
+    t.string "primary_category"
+    t.string "secondary_category"
+    t.text "description"
+    t.boolean "archived", default: false
+    t.boolean "base", default: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "name"], name: "index_verticals_on_account_id_and_name", unique: true
+    t.index ["account_id", "primary_category"], name: "index_verticals_on_account_id_and_primary_category"
+    t.index ["account_id"], name: "index_verticals_on_account_id"
+  end
+
   add_foreign_key "account_invitations", "accounts"
   add_foreign_key "account_invitations", "users", column: "invited_by_id"
   add_foreign_key "account_users", "accounts"
@@ -450,4 +465,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_204857) do
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
   add_foreign_key "refer_visits", "refer_referral_codes", column: "referral_code_id"
+  add_foreign_key "verticals", "accounts"
 end

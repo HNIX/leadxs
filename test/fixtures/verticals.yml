@@ -1,0 +1,46 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+insurance:
+  name: Auto Insurance
+  primary_category: Insurance
+  secondary_category: Auto
+  description: Lead generation for auto insurance quotes
+  archived: false
+  base: true
+  account: one
+
+home_services:
+  name: Home Remodeling
+  primary_category: Home Services
+  secondary_category: Remodeling
+  description: Lead generation for home remodeling contractors
+  archived: false
+  base: true
+  account: one
+
+custom:
+  name: Custom Vertical
+  primary_category: Finance
+  secondary_category: Personal Loans
+  description: Custom vertical for account one
+  archived: false
+  base: false
+  account: one
+
+archived:
+  name: Archived Vertical
+  primary_category: Education
+  secondary_category: Online Courses
+  description: This is an archived vertical
+  archived: true
+  base: false
+  account: one
+
+other_account:
+  name: Other Account Vertical
+  primary_category: Legal
+  secondary_category: Personal Injury
+  description: This belongs to another account
+  archived: false
+  base: false
+  account: two

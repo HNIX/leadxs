@@ -15,6 +15,13 @@ Rails.application.routes.draw do
   resources :companies do
     resources :contacts
   end
+  
+  resources :verticals do
+    member do
+      patch :archive
+      patch :unarchive
+    end
+  end
 
   namespace :action_text do
     resources :embeds, only: [:create], constraints: {id: /[^\/]+/} do

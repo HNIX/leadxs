@@ -15,7 +15,7 @@ omniauth_providers:
 payment_processors:
 - stripe
 multitenancy:
-- subdomain
+- path
 gems:
 - acts_as_tenant
 - refer
