@@ -1,0 +1,79 @@
+<%= form_with(model: company) do |form| %>
+  <%= render "application/error_messages", resource: form.object %>
+
+  <div class="form-group">
+    <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.text_field :name, class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :address, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.text_field :address, class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="form-group">
+      <%= form.label :city, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.text_field :city, class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :state, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.text_field :state, class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :zip_code, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.text_field :zip_code, class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="form-group">
+      <%= form.label :billing_cycle, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.select :billing_cycle, 
+                      Company::BILLING_CYCLES.map { |c| [c.titleize, c] }, 
+                      { include_blank: "Select billing cycle" }, 
+                      class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :payment_terms, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.select :payment_terms, 
+                     Company::PAYMENT_TERMS.map { |t| [t.titleize.gsub('_', ' '), t] },
+                     { include_blank: "Select payment terms" }, 
+                     class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :currency, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.select :currency, 
+                     Company::CURRENCIES,
+                     { include_blank: "Select currency" }, 
+                     class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :tax_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.text_field :tax_id, class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :notes, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.text_area :notes, rows: 4, class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :status, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.select :status, 
+                   [["Active", "active"], ["Inactive", "inactive"]],
+                   { include_blank: false }, 
+                   class: "form-control dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+  </div>
+
+  <div class="mt-6">
+    <%= form.button class: "btn btn-primary" %>
+    <%= link_to "Cancel", companies_path, class: "btn btn-link dark:text-gray-300 dark:hover:text-white" %>
+  </div>
+<% end %>

@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_09_212429) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_28_052308) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "account_invitations", force: :cascade do |t|
     t.bigint "account_id", null: false
@@ -96,6 +96,21 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_212429) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "addresses", force: :cascade do |t|
+    t.string "addressable_type", null: false
+    t.bigint "addressable_id", null: false
+    t.integer "address_type"
+    t.string "line1"
+    t.string "line2"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.string "postal_code"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["addressable_type", "addressable_id"], name: "index_addresses_on_addressable"
+  end
+
   create_table "announcements", force: :cascade do |t|
     t.string "kind"
     t.string "title"
@@ -116,6 +131,25 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_212429) do
     t.datetime "updated_at", null: false
     t.index ["token"], name: "index_api_tokens_on_token", unique: true
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "companies", force: :cascade do |t|
+    t.string "name"
+    t.string "address"
+    t.string "city"
+    t.string "state"
+    t.string "zip_code"
+    t.string "billing_cycle"
+    t.string "payment_terms"
+    t.string "currency"
+    t.string "tax_id"
+    t.text "notes"
+    t.string "status", default: "active"
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "name"], name: "index_companies_on_account_id_and_name"
+    t.index ["account_id"], name: "index_companies_on_account_id"
   end
 
   create_table "connected_accounts", force: :cascade do |t|
@@ -146,9 +180,9 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_212429) do
     t.string "record_type"
     t.bigint "record_id"
     t.jsonb "params"
+    t.integer "notifications_count"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "notifications_count"
     t.index ["account_id"], name: "index_noticed_events_on_account_id"
     t.index ["record_type", "record_id"], name: "index_noticed_events_on_record"
   end
@@ -309,6 +343,43 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_212429) do
     t.string "contact_url"
   end
 
+  create_table "refer_referral_codes", force: :cascade do |t|
+    t.string "referrer_type", null: false
+    t.bigint "referrer_id", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "referrals_count", default: 0
+    t.integer "visits_count", default: 0
+    t.index ["code"], name: "index_refer_referral_codes_on_code", unique: true
+    t.index ["referrer_type", "referrer_id"], name: "index_refer_referral_codes_on_referrer"
+  end
+
+  create_table "refer_referrals", force: :cascade do |t|
+    t.string "referrer_type", null: false
+    t.bigint "referrer_id", null: false
+    t.string "referee_type", null: false
+    t.bigint "referee_id", null: false
+    t.bigint "referral_code_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "completed_at"
+    t.index ["referee_type", "referee_id"], name: "index_refer_referrals_on_referee"
+    t.index ["referral_code_id"], name: "index_refer_referrals_on_referral_code_id"
+    t.index ["referrer_type", "referrer_id"], name: "index_refer_referrals_on_referrer"
+  end
+
+  create_table "refer_visits", force: :cascade do |t|
+    t.bigint "referral_code_id", null: false
+    t.string "ip"
+    t.text "user_agent"
+    t.text "referrer"
+    t.string "referring_domain"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["referral_code_id"], name: "index_refer_visits_on_referral_code_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -358,7 +429,9 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_212429) do
   add_foreign_key "accounts", "users", column: "owner_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "companies", "accounts"
   add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
+  add_foreign_key "refer_visits", "refer_referral_codes", column: "referral_code_id"
 end

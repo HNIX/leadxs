@@ -1,0 +1,22 @@
+---
+application_name: LeadXS
+business_name: Swayed
+business_address: 
+domain: example.com
+support_email: hunter@imswayed.com
+default_from_email: My App <no-reply@example.com>
+background_job_processor: sidekiq
+email_provider: 
+account_types: team
+apns: false
+fcm: false
+integrations:
+omniauth_providers:
+payment_processors:
+- stripe
+multitenancy:
+- subdomain
+gems:
+- acts_as_tenant
+- refer
+- whenever

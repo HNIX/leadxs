@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  has_referrals
   has_prefix_id :user
 
   include Accounts

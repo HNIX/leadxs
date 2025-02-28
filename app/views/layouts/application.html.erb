@@ -3,17 +3,61 @@
   <head>
     <%= render "head" %>
   </head>
-  <body data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %>" data-theme-preference-value="<%= current_user&.theme %>">
-    <header>
+  <body data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %> sidebar" data-theme-preference-value="<%= current_user&.theme %>">
+    </div>
+    <!-- Sidebar overlay - only visible on mobile when sidebar is open -->
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity opacity-0 hidden z-20 lg:hidden" 
+         data-sidebar-target="overlay" 
+         data-action="click->sidebar#closeFromOverlay"></div>
+    
+    <!-- Sidebar - hidden by default on mobile -->
+    <aside class="fixed inset-y-0 left-0 z-30 w-72 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm overflow-y-auto h-screen"
+           data-sidebar-target="sidebar"
+           data-state="closed">
+      <div class="flex flex-col h-full gap-y-5">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <%= link_to root_path, class: "flex items-center" do %>
+            <%= render_svg "logo", styles: "h-6 w-auto fill-current text-blue-600 dark:text-blue-400" %>
+          <% end %>
+          <button data-action="sidebar#toggleSidebar" class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class=" overflow-y-auto px-6 pb-4" >
+          <%= render 'sidebar_menu' %>
+        </div>
+      
+      </div>
+    </aside>
+    
+    <%= render "sidebar_nav" %>
+
+    <!-- Main content area - shifted right on desktop to make room for sidebar -->
+    <div class="lg:pl-72 flex flex-col h-screen transition-all duration-300 ease-in-out" data-sidebar-target="content">
       <%= impersonation_banner %>
       <%= render "flash" %>
       <%= render "navbar" %>
-    </header>
 
-    <main>
-      <%= yield %>
-    </main>
+      <main class="py-10 mb-auto">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <%= yield %>
+        </div>
+      </main>
 
-    <%= render "footer" unless hotwire_native_app? %>
+      <%= render "footer" unless hotwire_native_app? %>
+    </div>
+    
+    <!-- Mobile sidebar toggle button -->
+    <button class="fixed bottom-4 left-4 z-40 lg:hidden p-3 bg-blue-600 dark:bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            data-action="sidebar#toggleSidebar">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
+  <div>
   </body>
 </html>
+
