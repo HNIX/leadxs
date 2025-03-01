@@ -21,6 +21,12 @@ Rails.application.routes.draw do
       patch :archive
       patch :unarchive
     end
+    
+    resources :vertical_fields do
+      member do
+        post :move
+      end
+    end
   end
 
   namespace :action_text do

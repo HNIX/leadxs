@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+option_one:
+  list_owner: list_field (VerticalField)
+  account: one
+  list_value: Kitchen Remodel
+  value_type: 0  # string
+  position: 1
+
+option_two:
+  list_owner: list_field (VerticalField)
+  account: one
+  list_value: Bathroom Remodel
+  value_type: 0  # string
+  position: 2
+
+option_three:
+  list_owner: list_field (VerticalField)
+  account: one
+  list_value: Basement Finishing
+  value_type: 0  # string
+  position: 3
+
+option_four:
+  list_owner: list_field (VerticalField)
+  account: one
+  list_value: Room Addition
+  value_type: 0  # string
+  position: 4

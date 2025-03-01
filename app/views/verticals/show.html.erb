@@ -3,7 +3,7 @@
     <%= link_to "&larr; Back to Verticals".html_safe, verticals_path, class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
   </div>
 
-  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+  <div class="bg-white dark:bg-gray-700 shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
       <div>
         <h3 class="text-xl leading-6 font-medium text-gray-900 dark:text-white">
@@ -27,7 +27,7 @@
         <% if @vertical.archived? %>
           <%= button_to "Unarchive", unarchive_vertical_path(@vertical), method: :patch, class: "btn btn-success mr-2" %>
         <% else %>
-          <%= button_to "Archive", archive_vertical_path(@vertical), method: :patch, class: "btn btn-warning mr-2" %>
+          <%= button_to "Archive", archive_vertical_path(@vertical), method: :patch, class: "btn btn-secondary mr-2" %>
         <% end %>
         
         <% unless @vertical.base? %>
@@ -38,35 +38,35 @@
         <% end %>
       </div>
     </div>
-    <div class="border-t border-gray-200 dark:border-gray-700">
+    <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 ">
       <dl>
-        <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Name</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2"><%= @vertical.name %></dd>
         </div>
-        <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Primary Category</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2"><%= @vertical.primary_category %></dd>
         </div>
-        <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Secondary Category</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
             <%= @vertical.secondary_category.present? ? @vertical.secondary_category : "Not specified" %>
           </dd>
         </div>
-        <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Description</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
             <%= @vertical.description.present? ? @vertical.description : "No description provided" %>
           </dd>
         </div>
-        <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Status</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
             <%= @vertical.archived? ? "Archived" : "Active" %>
           </dd>
         </div>
-        <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Type</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
             <%= @vertical.base? ? "Base Vertical" : "Custom Vertical" %>
@@ -77,7 +77,40 @@
   </div>
 
   <div class="mt-8">
-    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Vertical Fields</h3>
-    <p class="text-gray-500 dark:text-gray-400 mb-4">This section will contain the fields associated with this vertical (coming soon).</p>
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Vertical Fields</h3>
+      <%= link_to "Manage Fields", vertical_vertical_fields_path(@vertical), class: "btn btn-primary" %>
+    </div>
+    <p class="text-gray-500 dark:text-gray-400 mb-4">Configure the fields required for this vertical. Fields define what data is collected and how it's validated.</p>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <% fields_count = @vertical.vertical_fields.count %>
+      <% if fields_count > 0 %>
+        <div class="flex items-center mb-4">
+          <div class="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 dark:text-blue-300" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white"><%= fields_count %> <%= "Field".pluralize(fields_count) %> Configured</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">This vertical has <%= fields_count %> custom <%= "field".pluralize(fields_count) %> defined.</p>
+          </div>
+        </div>
+      <% else %>
+        <div class="text-center py-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No fields configured</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new field for this vertical.</p>
+          <div class="mt-6">
+            <%= link_to "Create Field", vertical_vertical_fields_path(@vertical), class: "btn btn-primary" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
+  
+  <%= turbo_frame_tag "modal" %>
 </div>

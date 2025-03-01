@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_28_212229) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_28_222432) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -186,6 +186,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_212229) do
     t.text "body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "list_values", force: :cascade do |t|
+    t.string "list_owner_type"
+    t.bigint "list_owner_id"
+    t.bigint "account_id", null: false
+    t.string "list_value", null: false
+    t.integer "value_type", default: 0
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "list_owner_type", "list_owner_id", "position"], name: "idx_on_account_id_list_owner_type_list_owner_id_pos_6c38036597"
+    t.index ["account_id"], name: "index_list_values_on_account_id"
+    t.index ["list_owner_type", "list_owner_id"], name: "index_list_values_on_list_owner"
   end
 
   create_table "noticed_events", force: :cascade do |t|
@@ -436,6 +450,32 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_212229) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "vertical_fields", force: :cascade do |t|
+    t.bigint "vertical_id", null: false
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.string "label"
+    t.integer "data_type", null: false
+    t.integer "position"
+    t.boolean "required", default: false
+    t.boolean "is_pii", default: false
+    t.boolean "ping_required", default: false
+    t.boolean "post_required", default: false
+    t.boolean "post_only", default: false
+    t.boolean "hide", default: false
+    t.string "default_value"
+    t.string "example_value"
+    t.integer "value_acceptance"
+    t.decimal "min_value"
+    t.decimal "max_value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "position"], name: "index_vertical_fields_on_account_id_and_position"
+    t.index ["account_id", "vertical_id", "name"], name: "index_vertical_fields_on_account_id_and_vertical_id_and_name", unique: true
+    t.index ["account_id"], name: "index_vertical_fields_on_account_id"
+    t.index ["vertical_id"], name: "index_vertical_fields_on_vertical_id"
+  end
+
   create_table "verticals", force: :cascade do |t|
     t.string "name"
     t.string "primary_category"
@@ -461,9 +501,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_212229) do
   add_foreign_key "companies", "accounts"
   add_foreign_key "contacts", "accounts"
   add_foreign_key "contacts", "companies"
+  add_foreign_key "list_values", "accounts"
   add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
   add_foreign_key "refer_visits", "refer_referral_codes", column: "referral_code_id"
+  add_foreign_key "vertical_fields", "accounts"
+  add_foreign_key "vertical_fields", "verticals"
   add_foreign_key "verticals", "accounts"
 end

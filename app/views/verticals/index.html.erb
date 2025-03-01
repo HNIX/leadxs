@@ -39,7 +39,7 @@
         </thead>
         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
           <% @verticals.each do |vertical| %>
-            <tr class="<%= vertical.archived? ? 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400' : '' %>">
+            <tr class="<%= vertical.archived? ? 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400' : '' %>">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900 dark:text-white <%= vertical.archived? ? 'line-through opacity-70' : '' %>">
                   <%= vertical.name %>

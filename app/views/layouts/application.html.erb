@@ -3,8 +3,7 @@
   <head>
     <%= render "head" %>
   </head>
-  <body data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %> sidebar" data-theme-preference-value="<%= current_user&.theme %>">
-    </div>
+  <body class="dark:bg-gray-900" data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %> sidebar" data-theme-preference-value="<%= current_user&.theme %>">
     <!-- Sidebar overlay - only visible on mobile when sidebar is open -->
     <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity opacity-0 hidden z-20 lg:hidden" 
          data-sidebar-target="overlay" 
@@ -32,16 +31,15 @@
       </div>
     </aside>
     
-    <%= render "sidebar_nav" %>
-
     <!-- Main content area - shifted right on desktop to make room for sidebar -->
     <div class="lg:pl-72 flex flex-col h-screen transition-all duration-300 ease-in-out" data-sidebar-target="content">
       <%= impersonation_banner %>
       <%= render "flash" %>
       <%= render "navbar" %>
 
-      <main class="py-10 mb-auto">
+      <main class="mb-auto">
         <div class="px-4 sm:px-6 lg:px-8">
+          <%= turbo_frame_tag "modal" %>
           <%= yield %>
         </div>
       </main>
@@ -57,7 +55,6 @@
       </svg>
     </button>
 
-  <div>
   </body>
 </html>
 

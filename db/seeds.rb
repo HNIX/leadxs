@@ -179,5 +179,15 @@ if Rails.env.development?
     end
   end
   
+  # Create standard fields for the verticals
+  require_relative "seeds/standard_vertical_fields"
+  
+  ActsAsTenant.with_tenant(account) do
+    Vertical.all.each do |vertical|
+      Seeds::StandardVerticalFields.create_standard_fields(vertical)
+      puts "Created standard fields for vertical: #{vertical.name}"
+    end
+  end
+  
   puts "Development seed data created successfully!"
 end

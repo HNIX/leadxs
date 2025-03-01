@@ -1,0 +1,78 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+text_field:
+  vertical: insurance
+  account: one
+  name: description
+  label: Description
+  data_type: 0  # text
+  position: 1
+  required: true
+  is_pii: false
+  ping_required: false
+  post_required: true
+  post_only: false
+  hide: false
+  value_acceptance: 0  # any
+
+number_field:
+  vertical: insurance
+  account: one
+  name: budget
+  label: Budget
+  data_type: 1  # number
+  position: 2
+  required: true
+  is_pii: false
+  ping_required: true
+  post_required: true
+  post_only: false
+  hide: false
+  value_acceptance: 2  # range
+  min_value: 1000
+  max_value: 100000
+
+boolean_field:
+  vertical: insurance
+  account: one
+  name: is_homeowner
+  label: Is Homeowner
+  data_type: 2  # boolean
+  position: 3
+  required: true
+  is_pii: false
+  ping_required: true
+  post_required: true
+  post_only: false
+  hide: false
+  value_acceptance: 0  # any
+
+list_field:
+  vertical: home_services
+  account: one
+  name: project_type
+  label: Project Type
+  data_type: 0  # text
+  position: 1
+  required: true
+  is_pii: false
+  ping_required: true
+  post_required: true
+  post_only: false
+  hide: false
+  value_acceptance: 1  # list
+
+pii_field:
+  vertical: home_services
+  account: one
+  name: drivers_license
+  label: Driver's License Number
+  data_type: 0  # text
+  position: 2
+  required: false
+  is_pii: true
+  ping_required: false
+  post_required: true
+  post_only: true
+  hide: false
+  value_acceptance: 0  # any
