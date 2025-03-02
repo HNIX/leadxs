@@ -1,17 +1,32 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="mb-6">
-    <div class="flex items-center space-x-2">
-      <%= link_to campaign_path(@campaign), class: "text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-      <% end %>
-      <h1 class="text-2xl font-bold dark:text-white">Edit Field</h1>
-    </div>
-    <p class="text-gray-500 dark:text-gray-400 mt-2">Update field attributes for <%= @campaign_field.name %>.</p>
-  </div>
+<%= turbo_frame_tag "modal" do %>
+  <div class="fixed inset-0 bg-gray-700/75 bg-opacity-75 transition-opacity z-50"></div>
 
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-    <%= render 'form', campaign: @campaign, campaign_field: @campaign_field %>
-  </div>
-</div>
+  <%= tag.div data: { controller: "turbo-modal" }, class: "fixed inset-0 overflow-y-auto z-50" do %>
+  
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-700  text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
+        <div class="absolute top-0 right-0 p-4">
+          <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none" data-action="click->turbo-modal#close">
+            <span class="sr-only">Close</span>
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 sm:mt-0 sm:ml-4 w-full">
+              <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white"><%= @modal_title %></h3>
+              
+              <div class="mt-4">
+                <%= render "form", field: @field, campaign: @campaign %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

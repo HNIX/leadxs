@@ -1,0 +1,108 @@
+<%= form_with(model: [campaign, calculated_field], class: "space-y-6") do |form| %>
+  <%= render "application/error_messages", resource: form.object %>
+
+  <div class="form-group">
+    <%= form.label :name, class: "block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200" %>
+    <%= form.text_field :name, class: "mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6", placeholder: "Age" %>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter a name for the calculated field</p>
+  </div>
+
+  <div class="form-group" data-controller="formula-editor" data-formula-editor-campaign-id-value="<%= campaign.id %>" data-formula-editor-dark-mode-value="<%= dark_mode? %>">
+    <div class="flex justify-between items-center">
+      <%= form.label :formula, class: "block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200" %>
+      <button type="button" class="text-sm text-indigo-600 dark:text-indigo-400" data-action="formula-editor#toggleDocumentation">
+        Toggle Documentation
+      </button>
+    </div>
+    
+    <div class="flex flex-col md:flex-row gap-3 mt-2">
+      <!-- Campaign Field Selector -->
+      <div class="w-full md:w-1/4">
+        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 mb-1">Campaign Fields</label>
+        <select data-formula-editor-target="fields" class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <option value="">-- Select a field --</option>
+        </select>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select a field to insert it into your formula</p>
+      </div>
+      
+      <!-- Formula Editor -->
+      <div class="w-full md:w-3/4">
+        <%= form.hidden_field :formula, data: { formula_editor_target: "input" } %>
+        <div data-formula-editor-target="editor" class="border rounded-md border-gray-300 dark:border-gray-700 min-h-[200px]"></div>
+        <div data-formula-editor-target="errors" class="mt-2 text-red-600 text-sm hidden"></div>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter the formula for calculation. Press Ctrl+Space for function suggestions.</p>
+      </div>
+    </div>
+    
+    <!-- Documentation Panel -->
+    <div data-formula-editor-target="documentation" class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md shadow-sm hidden">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Formula Functions Documentation</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h4 class="font-medium text-gray-900 dark:text-gray-200 mb-1">Field Access</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <li><code>field('fieldName')</code> - Access a campaign field value</li>
+          </ul>
+          
+          <h4 class="font-medium text-gray-900 dark:text-gray-200 mt-3 mb-1">Text Operations</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <li><code>concat(a, b)</code> - Concatenate two values</li>
+            <li><code>uppercase(text)</code> - Convert text to uppercase</li>
+            <li><code>lowercase(text)</code> - Convert text to lowercase</li>
+            <li><code>trim(text)</code> - Remove whitespace from start and end</li>
+            <li><code>length(text)</code> - Get the length of a text string</li>
+          </ul>
+          
+          <h4 class="font-medium text-gray-900 dark:text-gray-200 mt-3 mb-1">Type Conversion</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <li><code>toString(value)</code> - Convert value to string</li>
+            <li><code>toNumber(value)</code> - Convert value to number</li>
+            <li><code>toDate(value)</code> - Convert value to date</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-medium text-gray-900 dark:text-gray-200 mb-1">Math Operations</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <li><code>add(a, b)</code> - Add two numbers</li>
+            <li><code>subtract(a, b)</code> - Subtract b from a</li>
+            <li><code>multiply(a, b)</code> - Multiply two numbers</li>
+            <li><code>divide(a, b)</code> - Divide a by b</li>
+            <li><code>round(value, decimals)</code> - Round to specified decimal places</li>
+          </ul>
+          
+          <h4 class="font-medium text-gray-900 dark:text-gray-200 mt-3 mb-1">Date Operations</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <li><code>now()</code> - Current date and time</li>
+            <li><code>today()</code> - Current date</li>
+            <li><code>formatDate(date, format)</code> - Format a date</li>
+          </ul>
+          
+          <h4 class="font-medium text-gray-900 dark:text-gray-200 mt-3 mb-1">Conditional Logic</h4>
+          <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+            <li><code>if(condition, trueValue, falseValue)</code> - Conditional result</li>
+          </ul>
+        </div>
+      </div>
+      
+      <h4 class="font-medium text-gray-900 dark:text-gray-200 mt-3 mb-1">Examples</h4>
+      <div class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+        <p><strong>Calculate age:</strong> <code>subtract(toNumber(formatDate(today(), 'YYYY')), toNumber(formatDate(toDate(field('date_of_birth')), 'YYYY')))</code></p>
+        <p><strong>Full name:</strong> <code>concat(concat(field('first_name'), ' '), field('last_name'))</code></p>
+        <p><strong>Order total:</strong> <code>add(multiply(field('quantity'), field('unit_price')), field('shipping'))</code></p>
+        <p><strong>Registration fee:</strong> <code>if(field('is_student'), 25, 50)</code></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :status, class: "block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200" %>
+    <%= form.select :status, options_for_select([["Active", "active"], ["Inactive", "inactive"]], calculated_field.status), {}, class: "mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" %>
+  </div>
+
+  <div class="form-group flex items-center justify-end gap-x-4">
+    <%= link_to "Cancel", campaign_calculated_fields_path(campaign), class: "text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400" %>
+    <%= form.submit class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+  </div>
+<% end %>

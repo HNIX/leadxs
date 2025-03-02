@@ -14,6 +14,13 @@ pin "@rails/actioncable", to: "actioncable.esm.js"
 pin "@rails/activestorage", to: "activestorage.esm.js"
 pin "trix" # @2.1.11
 
+# # CodeMirror for formula editor
+# pin "codemirror", to: "https://unpkg.com/codemirror@5.65.13/lib/codemirror.js"
+# pin "codemirror/mode/javascript/javascript", to: "https://unpkg.com/codemirror@5.65.13/mode/javascript/javascript.js"
+# pin "codemirror/addon/hint/show-hint", to: "https://unpkg.com/codemirror@5.65.13/addon/hint/show-hint.js"
+# pin "codemirror/addon/edit/matchbrackets", to: "https://unpkg.com/codemirror@5.65.13/addon/edit/matchbrackets.js"
+# pin "codemirror/addon/edit/closebrackets", to: "https://unpkg.com/codemirror@5.65.13/addon/edit/closebrackets.js"
+
 # Vendor libraries
 pin "@hotwired/hotwire-native-bridge", to: "@hotwired--hotwire-native-bridge.js" # @1.0.0
 pin "clipboard" # @2.0.11

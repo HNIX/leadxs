@@ -1,0 +1,75 @@
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold leading-7 text-gray-900 dark:text-white">Calculated Fields</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">A list of all calculated fields for campaign "<%= @campaign.name %>"</p>
+    </div>
+    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+      <%= link_to new_campaign_calculated_field_path(@campaign), class: "block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" do %>
+        Add calculated field
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="mt-8 flow-root">
+    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+        <% if @calculated_fields.any? %>
+          <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
+            <thead>
+              <tr>
+                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-0">Name</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Formula</th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Status</th>
+                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                  <span class="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <% @calculated_fields.each do |calculated_field| %>
+                <tr>
+                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:pl-0">
+                    <%= link_to calculated_field.name, campaign_calculated_field_path(@campaign, calculated_field), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
+                  </td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400"><%= calculated_field.formula %></td>
+                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="<%= calculated_field.status == 'active' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>">
+                      <%= calculated_field.status.capitalize %>
+                    </span>
+                  </td>
+                  <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                    <div class="flex items-center justify-end space-x-2">
+                      <%= link_to "Edit", edit_campaign_calculated_field_path(@campaign, calculated_field), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
+                      <%= button_to "Delete", campaign_calculated_field_path(@campaign, calculated_field), method: :delete, class: "text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300", form: { data: { turbo_confirm: "Are you sure you want to delete this calculated field?" } } %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <div class="text-center py-10">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No calculated fields</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new calculated field.</p>
+            <div class="mt-6">
+              <%= link_to new_campaign_calculated_field_path(@campaign), class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" do %>
+                <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                </svg>
+                Add calculated field
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mt-8">
+    <%= link_to "Back to Campaign", campaign_path(@campaign), class: "text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200 hover:text-gray-700 dark:hover:text-gray-400" %>
+  </div>
+</div>

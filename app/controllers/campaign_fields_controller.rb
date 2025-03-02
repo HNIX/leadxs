@@ -8,44 +8,47 @@ class CampaignFieldsController < ApplicationController
   end
 
   def new
-    @campaign_field = @campaign.campaign_fields.new
+    @field = CampaignField.new
+    @field.list_values.build
+    @modal_title = "Add a new field"
   end
 
   def create
-    @campaign_field = @campaign.campaign_fields.new(campaign_field_params)
-    @campaign_field.position = @campaign.campaign_fields.count
-
+    @field = @campaign.campaign_fields.new(campaign_field_params)
+    
     respond_to do |format|
-      if @campaign_field.save
+      if @field.save
         format.html { redirect_to campaign_path(@campaign), notice: "Field was successfully added." }
-        format.json { render :show, status: :created, location: @campaign_field }
+        format.json { render :show, status: :created, location: @field }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @campaign_field.errors, status: :unprocessable_entity }
+        format.json { render json: @field.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def edit
+    @field.list_values.build if @field.list_values.empty?
+    @modal_title = "Edit field"
   end
 
   def update
     respond_to do |format|
-      if @campaign_field.update(campaign_field_params)
+      if @field.update(campaign_field_params)
         format.html { redirect_to campaign_path(@campaign), notice: "Field was successfully updated." }
-        format.json { render :show, status: :ok, location: @campaign_field }
+        format.json { render :show, status: :ok, location: @field }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @campaign_field.errors, status: :unprocessable_entity }
+        format.json { render json: @field.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def destroy
-    @campaign_field.destroy
-    respond_to do |format|
-      format.html { redirect_to campaign_path(@campaign), notice: "Field was successfully removed." }
-      format.json { head :no_content }
+    if @field.destroy
+      redirect_to campaign_path(@campaign), notice: "Field was successfully deleted."
+    else
+      redirect_to campaign_path(@campaign), alert: "Error deleting field."
     end
   end
 
@@ -56,14 +59,15 @@ class CampaignFieldsController < ApplicationController
   end
 
   def set_campaign_field
-    @campaign_field = @campaign.campaign_fields.find(params[:id])
+    @field = @campaign.campaign_fields.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to campaign_path(@campaign), notice: "Field not found."
   end
 
   def campaign_field_params
     params.require(:campaign_field).permit(
       :name,
       :label,
-      :field_type,
       :data_type,
       :required,
       :default_value,

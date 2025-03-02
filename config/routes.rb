@@ -4,6 +4,15 @@ Rails.application.routes.draw do
     resources :campaign_fields do
       resource :positions, only: [:update], module: :campaign_fields
     end
+    
+    # Get fields in JSON format for the formula editor
+    get 'fields', to: 'campaign_fields#index', defaults: { format: :json }
+    
+    resources :calculated_fields do
+      collection do
+        post :validate
+      end
+    end
   end
 
   draw :accounts

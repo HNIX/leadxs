@@ -1,7 +1,7 @@
 class VerticalFieldsController < ApplicationController
     before_action :authenticate_user!
     before_action :set_vertical
-    before_action :set_field, only: [:show, :edit, :update, :destroy, :move]
+    before_action :set_field, only: [:show, :edit, :update, :destroy]
   
     def new
       @field = VerticalField.new
@@ -53,11 +53,6 @@ class VerticalFieldsController < ApplicationController
       else
         redirect_to vertical_path(@vertical), alert: "Error deleting field."
       end
-    end
-  
-    def move
-      @field.insert_at(params[:position].to_i)
-      head :ok
     end
   
     private

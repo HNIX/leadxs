@@ -27,6 +27,7 @@ class CampaignsController < ApplicationController
 
   def show
     @campaign_fields = @campaign.campaign_fields.ordered
+    @calculated_fields = @campaign.calculated_fields.ordered
   end
 
   def edit

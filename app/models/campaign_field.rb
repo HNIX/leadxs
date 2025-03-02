@@ -20,6 +20,7 @@ class CampaignField < ApplicationRecord
   validates :position, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :validate_list_values_if_list
   validate :validate_range_if_range
+  validates :data_type, presence: true
   
   # For legacy field_type validation
   validates :field_type, presence: true, inclusion: { in: FIELD_TYPES }, if: -> { data_type.nil? }
@@ -37,6 +38,7 @@ class CampaignField < ApplicationRecord
     # Reject if list_value is blank 
     attributes['list_value'].blank? 
   }
+  
   
   # Scopes
   scope :ordered, -> { order(position: :asc) }
@@ -181,4 +183,6 @@ class CampaignField < ApplicationRecord
       errors.add(:max_value, "must be provided when value acceptance is set to range") if max_value.blank?
     end
   end
+
+  
 end

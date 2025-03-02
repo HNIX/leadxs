@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_02_042656) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_02_163853) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -131,6 +131,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_02_042656) do
     t.datetime "updated_at", null: false
     t.index ["token"], name: "index_api_tokens_on_token", unique: true
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "calculated_fields", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.text "formula"
+    t.text "clean_formula"
+    t.string "status", default: "active"
+    t.jsonb "error_log", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_calculated_fields_on_account_id"
+    t.index ["campaign_id", "name"], name: "index_calculated_fields_on_campaign_id_and_name", unique: true
+    t.index ["campaign_id"], name: "index_calculated_fields_on_campaign_id"
   end
 
   create_table "campaign_fields", force: :cascade do |t|
@@ -551,6 +566,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_02_042656) do
   add_foreign_key "accounts", "users", column: "owner_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "calculated_fields", "accounts"
+  add_foreign_key "calculated_fields", "campaigns", on_delete: :cascade
   add_foreign_key "campaign_fields", "accounts"
   add_foreign_key "campaign_fields", "campaigns", on_delete: :cascade
   add_foreign_key "campaign_fields", "vertical_fields"
