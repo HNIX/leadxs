@@ -1,4 +1,4 @@
-<tr id="<%= dom_id(field, :index) %>" data-id="<%= field.id %>" data-sortable-update-url="<%= move_vertical_vertical_field_path(vertical, field) %>" class="sortable-item">
+<tr id="<%= dom_id(field, :index) %>" data-id="<%= field.id %>" data-sortable-url="<%= vertical_vertical_field_positions_path(@vertical, field) %>" class="sortable-item">
   <td class="px-6 py-4 whitespace-nowrap">
     <div class="text-sm font-medium text-gray-900 dark:text-white">
       <%= field.name %> 
@@ -47,7 +47,7 @@
         </button>
       <% end %>
       <div class="cursor-grab handle mr-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" data-sortable-handle class="h-5 w-5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
         </svg>
       </div>

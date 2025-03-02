@@ -1,0 +1,40 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Test Campaign One
+  status: draft
+  campaign_type: ping_post
+  description: A test campaign for ping post leads
+  distribution_method: highest_bid
+  distribution_schedule_enabled: false
+  distribution_schedule_days: '["monday","wednesday","friday"]'
+  distribution_schedule_start_time: 2025-02-28 09:00:00
+  distribution_schedule_end_time: 2025-02-28 17:00:00
+  vertical: home_services
+  account: one
+
+two:
+  name: Test Campaign Two
+  status: active
+  campaign_type: direct
+  description: A test campaign for direct leads
+  distribution_method: round_robin
+  distribution_schedule_enabled: true
+  distribution_schedule_days: '["monday","tuesday","wednesday","thursday","friday"]'
+  distribution_schedule_start_time: 2025-02-28 08:00:00
+  distribution_schedule_end_time: 2025-02-28 20:00:00
+  vertical: insurance
+  account: two
+
+calls_campaign:
+  name: Calls Campaign
+  status: draft
+  campaign_type: calls
+  description: A test campaign for call leads
+  distribution_method: waterfall
+  distribution_schedule_enabled: false
+  distribution_schedule_days: '["monday","wednesday","friday"]'
+  distribution_schedule_start_time: 2025-02-28 09:00:00
+  distribution_schedule_end_time: 2025-02-28 17:00:00
+  vertical: insurance
+  account: one

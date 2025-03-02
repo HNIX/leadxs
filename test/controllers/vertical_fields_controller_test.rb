@@ -37,7 +37,7 @@ class VerticalFieldsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to vertical_fields_path(@vertical)
+    assert_redirected_to vertical_path(@vertical)
   end
 
   test "should create vertical field with list values" do
@@ -57,7 +57,7 @@ class VerticalFieldsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to vertical_fields_path(@vertical)
+    assert_redirected_to vertical_path(@vertical)
     field = VerticalField.find_by(name: "list_field_test")
     assert_equal 2, field.list_values.count
   end
@@ -77,7 +77,7 @@ class VerticalFieldsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to vertical_fields_path(@vertical)
+    assert_redirected_to vertical_path(@vertical)
     field = VerticalField.find_by(name: "range_field_test")
     assert_equal 10.0, field.min_value.to_f
     assert_equal 100.0, field.max_value.to_f
@@ -96,7 +96,7 @@ class VerticalFieldsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to vertical_fields_path(@vertical)
+    assert_redirected_to vertical_path(@vertical)
     @field.reload
     assert_equal "Updated Label", @field.label
     assert_equal false, @field.required
@@ -107,14 +107,14 @@ class VerticalFieldsControllerTest < ActionDispatch::IntegrationTest
       delete vertical_vertical_field_url(@vertical, @field)
     end
 
-    assert_redirected_to vertical_fields_path(@vertical)
+    assert_redirected_to vertical_path(@vertical)
   end
 
   test "should move vertical field" do
     original_position = @field.position
     new_position = original_position + 2
     
-    post move_vertical_vertical_field_url(@vertical, @field), params: { position: new_position }
+    patch vertical_vertical_field_positions_path(@vertical, @field), params: { position: new_position }
     
     assert_response :success
     @field.reload

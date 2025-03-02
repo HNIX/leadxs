@@ -2,7 +2,7 @@ class Vertical < AccountRecord
   # Associations
   acts_as_tenant :account
 
-  #has_many :campaigns
+  has_many :campaigns, dependent: :destroy
   has_many :vertical_fields, -> { order(position: :asc) }, dependent: :destroy
 
   # Validations

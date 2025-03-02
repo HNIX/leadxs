@@ -1,0 +1,110 @@
+<%= form_with(model: campaign, local: true, data: { turbo: false }) do |form| %>
+  <div class="space-y-6">
+    <% if campaign.errors.any? %>
+      <div class="bg-red-50 dark:bg-red-900/50 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded relative">
+        <h2 class="font-medium mb-1"><%= pluralize(campaign.errors.count, "error") %> prohibited this campaign from being saved:</h2>
+        <ul class="list-disc list-inside text-sm">
+          <% campaign.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-6">
+        <div>
+          <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+        </div>
+
+        <div>
+          <%= form.label :vertical_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.select :vertical_id, @verticals.collect { |v| [ v.name, v.id ] }, { include_blank: "Select a vertical" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        </div>
+
+        <div>
+          <%= form.label :status, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.select :status, Campaign::STATUSES.map { |s| [s.titleize, s] }, { include_blank: "Select a status" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        </div>
+
+        <div>
+          <%= form.label :campaign_type, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.select :campaign_type, Campaign::CAMPAIGN_TYPES.map { |t| [t.titleize, t] }, { include_blank: "Select a campaign type" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <%= form.label :description, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.text_area :description, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+        </div>
+
+        <div>
+          <%= form.label :distribution_method, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.select :distribution_method, Campaign::DISTRIBUTION_METHODS.map { |d| [d.titleize, d] }, { include_blank: "Select a distribution method" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
+      <div class="mb-4">
+        <div class="flex items-center">
+          <%= form.check_box :distribution_schedule_enabled, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" %>
+          <%= form.label :distribution_schedule_enabled, "Enable Distribution Schedule", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        </div>
+      </div>
+
+      <div id="schedule_options" class="pl-6 space-y-4 mt-2" data-controller="toggle" data-toggle-target="toggleable" data-toggle-active-class="block" data-toggle-inactive-class="hidden" data-toggle-show-value="<%= campaign.distribution_schedule_enabled? || false %>">
+        <div>
+          <%= form.label :distribution_schedule_days, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <div class="mt-2 space-y-2">
+            <% ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].each do |day| %>
+              <div class="flex items-center">
+                <%= form.check_box :distribution_schedule_days, { multiple: true, checked: campaign.distribution_schedule_days&.include?(day.downcase), class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" }, day.downcase, nil %>
+                <%= form.label "distribution_schedule_days_#{day.downcase}", day, class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <%= form.label :distribution_schedule_start_time, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.time_field :distribution_schedule_start_time, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+
+          <div>
+            <%= form.label :distribution_schedule_end_time, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.time_field :distribution_schedule_end_time, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end space-x-3">
+      <%= link_to "Cancel", campaigns_path, class: "btn btn-white" %>
+      <%= form.submit class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<%= javascript_tag do %>
+  document.addEventListener('turbo:load', function() {
+    const scheduleCheckbox = document.querySelector('#campaign_distribution_schedule_enabled');
+    const scheduleOptions = document.querySelector('#schedule_options');
+    
+    if (scheduleCheckbox && scheduleOptions) {
+      function toggleScheduleOptions() {
+        if (scheduleCheckbox.checked) {
+          scheduleOptions.classList.remove('hidden');
+        } else {
+          scheduleOptions.classList.add('hidden');
+        }
+      }
+      
+      toggleScheduleOptions();
+      scheduleCheckbox.addEventListener('change', toggleScheduleOptions);
+    }
+  });
+<% end %>

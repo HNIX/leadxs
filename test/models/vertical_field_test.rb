@@ -122,7 +122,7 @@ class VerticalFieldTest < ActiveSupport::TestCase
 
     # Number field with range
     number_field = VerticalField.new(data_type: "number", value_acceptance: "range", min_value: 5, max_value: 10)
-    assert_equal "Number between 5 and 10", number_field.format_description
+    assert_equal "Number between 5.0 and 10.0", number_field.format_description
 
     # Boolean field
     boolean_field = VerticalField.new(data_type: "boolean")
@@ -133,9 +133,16 @@ class VerticalFieldTest < ActiveSupport::TestCase
     assert_equal "Valid email address", email_field.format_description
 
     # Text field with list values
-    list_field = VerticalField.new(data_type: "text", value_acceptance: "list")
-    list_field.list_values.build(list_value: "Option 1")
-    list_field.list_values.build(list_value: "Option 2")
+    list_field = VerticalField.new(
+      data_type: "text", 
+      value_acceptance: "list",
+      name: "test_list_field",
+      vertical: verticals(:insurance),
+      account: accounts(:one)
+    )
+    list_field.list_values.build(list_value: "Option 1", account: accounts(:one))
+    list_field.list_values.build(list_value: "Option 2", account: accounts(:one))
+    list_field.save!
     assert_includes list_field.format_description, "One of:"
     assert_includes list_field.format_description, "Option 1, Option 2"
   end

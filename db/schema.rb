@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_28_222432) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_02_042656) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -133,6 +133,58 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_222432) do
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
+  create_table "campaign_fields", force: :cascade do |t|
+    t.string "name"
+    t.string "field_type"
+    t.boolean "required"
+    t.string "default_value"
+    t.text "description"
+    t.string "validation_regex"
+    t.integer "min_length"
+    t.integer "max_length"
+    t.float "min_value"
+    t.float "max_value"
+    t.text "options"
+    t.integer "position"
+    t.bigint "campaign_id", null: false
+    t.bigint "vertical_field_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "label"
+    t.integer "data_type"
+    t.boolean "is_pii", default: false
+    t.boolean "ping_required", default: false
+    t.boolean "post_required", default: false
+    t.boolean "post_only", default: false
+    t.boolean "hide", default: false
+    t.string "example_value"
+    t.integer "value_acceptance", default: 0
+    t.bigint "account_id", null: false
+    t.index ["account_id", "campaign_id", "name"], name: "index_campaign_fields_on_account_campaign_and_name"
+    t.index ["account_id"], name: "index_campaign_fields_on_account_id"
+    t.index ["campaign_id", "position"], name: "index_campaign_fields_on_campaign_id_and_position"
+    t.index ["campaign_id"], name: "index_campaign_fields_on_campaign_id"
+    t.index ["vertical_field_id"], name: "index_campaign_fields_on_vertical_field_id"
+  end
+
+  create_table "campaigns", force: :cascade do |t|
+    t.string "name"
+    t.string "status"
+    t.string "campaign_type"
+    t.text "description"
+    t.string "distribution_method"
+    t.boolean "distribution_schedule_enabled"
+    t.string "distribution_schedule_days"
+    t.time "distribution_schedule_start_time"
+    t.time "distribution_schedule_end_time"
+    t.bigint "vertical_id", null: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_campaigns_on_account_id"
+    t.index ["vertical_id"], name: "index_campaigns_on_vertical_id"
+  end
+
   create_table "companies", force: :cascade do |t|
     t.string "name"
     t.string "address"
@@ -199,6 +251,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_222432) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "list_owner_type", "list_owner_id", "position"], name: "idx_on_account_id_list_owner_type_list_owner_id_pos_6c38036597"
     t.index ["account_id"], name: "index_list_values_on_account_id"
+    t.index ["list_owner_type", "list_owner_id", "position"], name: "index_list_values_on_owner_and_position"
     t.index ["list_owner_type", "list_owner_id"], name: "index_list_values_on_list_owner"
   end
 
@@ -498,6 +551,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_28_222432) do
   add_foreign_key "accounts", "users", column: "owner_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "campaign_fields", "accounts"
+  add_foreign_key "campaign_fields", "campaigns", on_delete: :cascade
+  add_foreign_key "campaign_fields", "vertical_fields"
+  add_foreign_key "campaigns", "accounts"
+  add_foreign_key "campaigns", "verticals", on_delete: :cascade
   add_foreign_key "companies", "accounts"
   add_foreign_key "contacts", "accounts"
   add_foreign_key "contacts", "companies"

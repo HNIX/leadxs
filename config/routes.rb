@@ -1,5 +1,11 @@
 # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  resources :campaigns do
+    resources :campaign_fields do
+      resource :positions, only: [:update], module: :campaign_fields
+    end
+  end
+
   draw :accounts
   draw :api
   draw :billing
@@ -21,11 +27,9 @@ Rails.application.routes.draw do
       patch :archive
       patch :unarchive
     end
-    
+
     resources :vertical_fields do
-      member do
-        post :move
-      end
+      resource :positions, only: [:update], module: :vertical_fields
     end
   end
 

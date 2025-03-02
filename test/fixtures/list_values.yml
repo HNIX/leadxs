@@ -1,5 +1,6 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+# Vertical field list values
 option_one:
   list_owner: list_field (VerticalField)
   account: one
@@ -27,3 +28,25 @@ option_four:
   list_value: Room Addition
   value_type: 0  # string
   position: 4
+
+# Campaign field list values
+campaign_option_one:
+  list_owner: campaign_two_field (CampaignField)
+  account: two
+  list_value: Renovation
+  value_type: 0  # string
+  position: 1
+
+campaign_option_two:
+  list_owner: campaign_two_field (CampaignField)
+  account: two
+  list_value: New Construction
+  value_type: 0  # string
+  position: 2
+
+campaign_option_three:
+  list_owner: campaign_two_field (CampaignField)
+  account: two
+  list_value: Repair
+  value_type: 0  # string
+  position: 3

@@ -1,0 +1,176 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: first_name
+  label: First Name
+  field_type: text
+  data_type: 0 # text
+  required: true
+  default_value: 
+  description: Customer's first name
+  validation_regex: 
+  min_length: 2
+  max_length: 50
+  min_value: 
+  max_value: 
+  options: '[]'
+  position: 1
+  ping_required: true
+  post_required: true
+  is_pii: true
+  post_only: false
+  hide: false
+  value_acceptance: 0 # any
+  campaign: one
+  vertical_field: text_field
+  account: one
+
+two:
+  name: last_name
+  label: Last Name
+  field_type: text
+  data_type: 0 # text
+  required: true
+  default_value: 
+  description: Customer's last name
+  validation_regex: 
+  min_length: 2
+  max_length: 50
+  min_value: 
+  max_value: 
+  options: '[]'
+  position: 2
+  ping_required: true
+  post_required: true
+  is_pii: true
+  post_only: false
+  hide: false
+  value_acceptance: 0 # any
+  campaign: one
+  vertical_field: 
+  account: one
+
+email:
+  name: email
+  label: Email Address
+  field_type: email
+  data_type: 5 # email
+  required: true
+  default_value: 
+  description: Customer's email address
+  validation_regex: 
+  min_length: 
+  max_length: 
+  min_value: 
+  max_value: 
+  options: '[]'
+  position: 3
+  ping_required: false
+  post_required: true
+  is_pii: true
+  post_only: true
+  hide: false
+  value_acceptance: 0 # any
+  campaign: one
+  vertical_field: 
+  account: one
+
+phone:
+  name: phone
+  label: Phone Number
+  field_type: phone
+  data_type: 6 # phone
+  required: true
+  default_value: 
+  description: Customer's phone number
+  validation_regex: 
+  min_length: 
+  max_length: 
+  min_value: 
+  max_value: 
+  options: '[]'
+  position: 4
+  ping_required: false
+  post_required: true
+  is_pii: true
+  post_only: true
+  hide: false
+  value_acceptance: 0 # any
+  campaign: one
+  vertical_field: 
+  account: one
+
+budget:
+  name: budget
+  label: Budget
+  field_type: number
+  data_type: 1 # number
+  required: true
+  default_value: 
+  description: Customer's budget amount
+  validation_regex: 
+  min_length: 
+  max_length: 
+  min_value: 1000
+  max_value: 100000
+  options: '[]'
+  position: 5
+  ping_required: true
+  post_required: true
+  is_pii: false
+  post_only: false
+  hide: false
+  value_acceptance: 2 # range
+  campaign: one
+  vertical_field: number_field
+  account: one
+
+is_homeowner:
+  name: is_homeowner
+  label: Is Homeowner
+  field_type: checkbox
+  data_type: 2 # boolean
+  required: true
+  default_value: 
+  description: Is the customer a homeowner?
+  validation_regex: 
+  min_length: 
+  max_length: 
+  min_value: 
+  max_value: 
+  options: '[]'
+  position: 6
+  ping_required: true
+  post_required: true
+  is_pii: false
+  post_only: false
+  hide: false
+  value_acceptance: 0 # any
+  campaign: one
+  vertical_field: boolean_field
+  account: one
+
+campaign_two_field:
+  name: project_type
+  label: Project Type
+  field_type: select
+  data_type: 0 # text
+  required: true
+  default_value: 
+  description: Type of project
+  validation_regex: 
+  min_length: 
+  max_length: 
+  min_value: 
+  max_value: 
+  options: '["Renovation", "New Construction", "Repair"]'
+  position: 1
+  ping_required: true
+  post_required: true
+  is_pii: false
+  post_only: false
+  hide: false
+  value_acceptance: 1 # list
+  campaign: two
+  vertical_field: list_field
+  account: two

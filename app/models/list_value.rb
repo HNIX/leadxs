@@ -1,4 +1,7 @@
 class ListValue < ApplicationRecord
+    # Associations
+    acts_as_tenant :account
+
     belongs_to :list_owner, polymorphic: true
     
     validates :list_value, presence: true

@@ -3,7 +3,7 @@ class VerticalField < ApplicationRecord
     acts_as_list scope: :vertical
     
     belongs_to :vertical
-    #has_many :campaign_fields
+    has_many :campaign_fields, dependent: :destroy
     has_many :list_values, as: :list_owner, dependent: :destroy
     has_rich_text :notes
     

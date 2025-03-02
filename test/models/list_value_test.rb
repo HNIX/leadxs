@@ -2,13 +2,24 @@ require "test_helper"
 
 class ListValueTest < ActiveSupport::TestCase
   setup do
-    @vertical_field = VerticalField.create!(
+    @vertical_field = VerticalField.new(
       name: "test_field_with_list",
       data_type: "text",
       value_acceptance: "list",
       vertical: verticals(:insurance),
       account: accounts(:one)
     )
+
+    list_value = ListValue.new(
+      list_value: "Option 1",
+      value_type: "string",
+      list_owner: @vertical_field,
+      account: accounts(:one)
+    )
+
+    @vertical_field.list_values << list_value
+
+    @vertical_field.save!
   end
 
   test "should create a valid list value" do

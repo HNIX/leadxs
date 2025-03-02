@@ -12,8 +12,8 @@
 
   <% if @fields.any? %>
     <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
-      <div id="vertical_fields" class="field-list" data-controller="sortable" data-sortable-resource-url-value="/verticals/<%= @vertical.id %>/vertical_fields">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <div id="vertical_fields" class="field-list">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" >
           <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th scope="col" class="w-2/12 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
@@ -24,7 +24,7 @@
               <th scope="col" class="w-3/12 px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody id="sortable-fields" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody id="sortable-fields" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" data-controller="sortable">
             <% @fields.each do |field| %>
               <%= render partial: "vertical_fields/field", locals: { field: field, vertical: @vertical } %>
             <% end %>
