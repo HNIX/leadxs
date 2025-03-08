@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_07_155547) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -476,6 +476,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_07_155547) do
     t.index ["referral_code_id"], name: "index_refer_visits_on_referral_code_id"
   end
 
+  create_table "sources", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "token", null: false
+    t.string "status", default: "active", null: false
+    t.string "integration_type", null: false
+    t.string "payout_method"
+    t.string "payout_structure"
+    t.decimal "minimum_acceptable_bid", precision: 10, scale: 2
+    t.decimal "margin", precision: 10, scale: 2
+    t.decimal "payout", precision: 10, scale: 2
+    t.decimal "daily_budget", precision: 10, scale: 2
+    t.decimal "monthly_budget", precision: 10, scale: 2
+    t.text "notes"
+    t.bigint "campaign_id", null: false
+    t.bigint "company_id", null: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_sources_on_account_id"
+    t.index ["campaign_id"], name: "index_sources_on_campaign_id"
+    t.index ["company_id"], name: "index_sources_on_company_id"
+    t.index ["name", "account_id"], name: "index_sources_on_name_and_account_id", unique: true
+    t.index ["token"], name: "index_sources_on_token", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -604,6 +629,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_07_155547) do
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
   add_foreign_key "refer_visits", "refer_referral_codes", column: "referral_code_id"
+  add_foreign_key "sources", "accounts"
+  add_foreign_key "sources", "campaigns"
+  add_foreign_key "sources", "companies"
   add_foreign_key "validation_rules", "accounts"
   add_foreign_key "vertical_fields", "accounts"
   add_foreign_key "vertical_fields", "verticals"

@@ -24,6 +24,16 @@ Rails.application.routes.draw do
         post :validate
       end
     end
+    
+    # Sources for lead acquisition
+    resources :sources, shallow: true, only: [:index, :new, :create]
+  end
+  
+  # Sources with their own routes for show, edit, update, delete actions
+  resources :sources, except: [:index, :new, :create] do
+    member do
+      post :regenerate_token
+    end
   end
 
   draw :accounts

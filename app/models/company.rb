@@ -2,6 +2,7 @@ class Company < AccountRecord
   # Associations
   acts_as_tenant :account
   has_many :contacts, dependent: :destroy
+  has_many :sources, dependent: :destroy
   
   # Validations
   validates :name, presence: true

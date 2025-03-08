@@ -14,6 +14,7 @@ class Account < ApplicationRecord
   has_many :companies, dependent: :destroy
   has_many :verticals, dependent: :destroy
   has_many :campaigns, dependent: :destroy
+  has_many :sources, dependent: :destroy
 
   scope :personal, -> { where(personal: true) }
   scope :team, -> { where(personal: false) }

@@ -1,0 +1,69 @@
+# Sources Fixture
+
+one:
+  name: Source One
+  token: unique_token_one_1234567890
+  status: active
+  integration_type: affiliate
+  payout_method: fixed
+  payout_structure: per_lead
+  minimum_acceptable_bid: 5.00
+  margin: 2.00
+  payout: 3.00
+  daily_budget: 100.00
+  monthly_budget: 3000.00
+  notes: This is a test source for affiliates
+  campaign: one
+  company: one
+  account: one
+
+two:
+  name: Source Two
+  token: unique_token_two_1234567890
+  status: active
+  integration_type: web_form
+  payout_method: percentage
+  payout_structure: per_conversion
+  minimum_acceptable_bid: 10.00
+  margin: 3.00
+  payout: 7.00
+  daily_budget: 200.00
+  monthly_budget: 6000.00
+  notes: This is a test source for web forms
+  campaign: two
+  company: two
+  account: two
+
+paused:
+  name: Paused Source
+  token: unique_token_paused_1234567890
+  status: paused
+  integration_type: affiliate
+  payout_method: fixed
+  payout_structure: per_lead
+  minimum_acceptable_bid: 8.00
+  margin: 2.50
+  payout: 5.50
+  daily_budget: 150.00
+  monthly_budget: 4500.00
+  notes: This is a paused source
+  campaign: one
+  company: one
+  account: one
+
+archived:
+  name: Archived Source
+  token: unique_token_archived_1234567890
+  status: archived
+  integration_type: web_form
+  payout_method: percentage
+  payout_structure: per_call
+  minimum_acceptable_bid: 15.00
+  margin: 5.00
+  payout: 10.00
+  daily_budget: null
+  monthly_budget: null
+  notes: This is an archived source
+  campaign: two
+  company: two
+  account: two

@@ -157,8 +157,8 @@ class CampaignTest < ActiveSupport::TestCase
       distribution_method: "highest_bid",
       distribution_schedule_enabled: true,
       distribution_schedule_days: days,
-      distribution_schedule_start_time: Time.current,
-      distribution_schedule_end_time: Time.current + 8.hours
+      distribution_schedule_start_time: Time.current.beginning_of_day + 9.hours,
+      distribution_schedule_end_time: Time.current.beginning_of_day + 17.hours
     )
     
     # Reload to ensure persistence
