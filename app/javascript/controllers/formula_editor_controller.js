@@ -1,58 +1,44 @@
-import { Controller } from "@hotwired/stimulus";
-import {EditorView, basicSetup} from "codemirror"
-//import {javascript} from "@codemirror/lang-javascript"
-//import { autocompletion } from "@codemirror/autocomplete"
+import { Controller } from "@hotwired/stimulus"
+import {basicSetup, EditorView} from "codemirror"
+import {autocompletion} from "@codemirror/autocomplete"
+import { json } from "@codemirror/lang-json"
 
-// import "codemirror/mode/javascript/javascript";
-// import "codemirror/addon/hint/show-hint";
-// import "codemirror/addon/edit/matchbrackets";
-// import "codemirror/addon/edit/closebrackets";
+//import {StreamLanguage} from "@codemirror/language"
+//import {ruby} from "@codemirror/legacy-modes/mode/ruby"
 
 export default class extends Controller {
-  static targets = ["editor", "input", "fields", "errors", "documentation"];
+  static targets = ["editor", "input", "fields", "errors", "documentation"]
   static values = {
+    doc: String,
     campaignId: String,
     darkMode: Boolean
   }
 
   connect() {
-    this.initializeEditor();
+    console.log("Formula editor controller connected");
+    console.log("Campaign ID:", this.campaignIdValue);
     this.fetchCampaignFields();
-    this.setupFieldsDropdown();
   }
 
+  disconnect() {
+    this.editor.destroy()
+  }
 
-  initializeEditor() {
-    const theme = this.darkModeValue ? "dracula" : "default";
-    
-    this.editor = new EditorView(this.inputTarget, {
-      mode: "javascript",
-      theme: theme,
-      lineNumbers: true,
-      autoCloseBrackets: true, 
-      //matchBrackets: true,
-      extraKeys: {
-        "Ctrl-Space": this.showHint.bind(this),
-        "Tab": function(cm) {
-          const spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-          cm.replaceSelection(spaces);
-        }
-      }
-     });
+  sync() {
+    this.inputTarget.value = this.editor.state.doc.toString()
+  }
 
-    // Initialize with existing value
-    if (this.inputTarget.value) {
-      this.editor.setValue(this.inputTarget.value);
+  completions(context) {
+    let word = context.matchBefore(/\w*/)
+    if (word.from == word.to && !context.explicit)
+      return null
+
+    return {
+      from: word.from,
+      options: [
+        { label: "User", type: "constant", info: "The User model" }
+      ]
     }
-
-    // Update hidden input when editor changes
-    this.editor.on("change", () => {
-      this.inputTarget.value = this.editor.getValue();
-      //this.validateFormula();
-    });
-
-    // Initial validation
-    //this.validateFormula();
   }
 
   setupFieldsDropdown() {
@@ -66,19 +52,58 @@ export default class extends Controller {
   }
 
   insertField(fieldName) {
-    const cursor = this.editor.getCursor();
-    this.editor.replaceRange(`field('${fieldName}')`, cursor);
-    this.editor.focus();
+    // Get the current selection or cursor position
+    const start = this.textarea.selectionStart;
+    const end = this.textarea.selectionEnd;
+    const formula = this.textarea.value;
+    
+    // Insert the field function at the cursor position
+    const insertText = `field('${fieldName}')`;
+    this.textarea.value = formula.substring(0, start) + insertText + formula.substring(end);
+    
+    // Update the hidden input
+    this.inputTarget.value = this.textarea.value;
+    
+    // Update syntax highlighting
+    this.highlightCode(this.textarea.value, this.highlightLayer);
+    
+    // Move the cursor after the inserted text
+    this.textarea.focus();
+    this.textarea.selectionStart = start + insertText.length;
+    this.textarea.selectionEnd = start + insertText.length;
   }
 
   fetchCampaignFields() {
-    fetch(`/campaigns/${this.campaignIdValue}/fields.json`)
-      .then(response => response.json())
+    const campaignId = this.campaignIdValue;
+    if (!campaignId) {
+      console.error("No campaign ID provided");
+      return;
+    }
+    
+    console.log(`Fetching campaign fields for campaign ID: ${campaignId}`);
+    
+    fetch(`/campaigns/${campaignId}/fields.json`)
+      .then(response => {
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(data => {
+        console.log("Campaign fields loaded:", data);
         this.campaignFields = data;
         this.updateFieldsDropdown();
       })
-      .catch(error => console.error("Error fetching campaign fields:", error));
+      .catch(error => {
+        console.error("Error fetching campaign fields:", error);
+        const dropdown = this.fieldsTarget;
+        const option = document.createElement("option");
+        option.value = "";
+        option.text = "Error loading fields";
+        option.disabled = true;
+        dropdown.appendChild(option);
+      });
   }
 
   updateFieldsDropdown() {
@@ -89,7 +114,7 @@ export default class extends Controller {
     }
 
     // Add field options grouped by data type
-    if (this.campaignFields) {
+    if (this.campaignFields && this.campaignFields.length > 0) {
       // Group fields by data type
       const fieldsByType = this.campaignFields.reduce((acc, field) => {
         const type = field.data_type || "other";
@@ -122,107 +147,18 @@ export default class extends Controller {
         
         dropdown.appendChild(optgroup);
       });
+    } else {
+      console.warn("No campaign fields found or empty array received");
+      const option = document.createElement("option");
+      option.value = "";
+      option.text = "No fields available";
+      option.disabled = true;
+      dropdown.appendChild(option);
     }
-  }
-
-  showHint() {
-    this.editor.showHint({
-      hint: this.createHintFunction(),
-      completeSingle: false
-    });
-  }
-
-  createHintFunction() {
-    const functions = [
-      { text: "field('fieldName')", displayText: "field()" },
-      { text: "concat(a, b)", displayText: "concat()" },
-      { text: "toString(value)", displayText: "toString()" },
-      { text: "toNumber(value)", displayText: "toNumber()" },
-      { text: "toDate(value)", displayText: "toDate()" },
-      { text: "formatDate(date, format)", displayText: "formatDate()" },
-      { text: "now()", displayText: "now()" },
-      { text: "today()", displayText: "today()" },
-      { text: "if(condition, trueValue, falseValue)", displayText: "if()" },
-      { text: "add(a, b)", displayText: "add()" },
-      { text: "subtract(a, b)", displayText: "subtract()" },
-      { text: "multiply(a, b)", displayText: "multiply()" },
-      { text: "divide(a, b)", displayText: "divide()" },
-      { text: "round(value, decimals)", displayText: "round()" },
-      { text: "uppercase(text)", displayText: "uppercase()" },
-      { text: "lowercase(text)", displayText: "lowercase()" },
-      { text: "trim(text)", displayText: "trim()" },
-      { text: "length(text)", displayText: "length()" }
-    ];
-
-    const fieldOptions = this.campaignFields ? 
-      this.campaignFields.map(field => ({ 
-        text: `field('${field.name}')`, 
-        displayText: `field('${field.name}')` 
-      })) : [];
-
-    return (cm) => {
-      const cursor = cm.getCursor();
-      const line = cm.getLine(cursor.line);
-      const start = cursor.ch;
-      const end = start;
-
-      return {
-        list: [...functions, ...fieldOptions],
-        from: CM.Pos(cursor.line, start),
-        to: CM.Pos(cursor.line, end)
-      };
-    };
-  }
-
-  // validateFormula() {
-  //   const formula = this.editor.getValue();
-    
-  //   // Skip validation if empty
-  //   if (!formula.trim()) {
-  //     this.clearErrors();
-  //     return;
-  //   }
-
-  //   fetch(`/campaigns/${this.campaignIdValue}/calculated_fields/validate`, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-  //     },
-  //     body: JSON.stringify({ formula })
-  //   })
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     if (data.valid) {
-  //       this.clearErrors();
-  //     } else {
-  //       this.showErrors(data.errors);
-  //     }
-  //   })
-  //   .catch(error => {
-  //     console.error("Error validating formula:", error);
-  //     this.showErrors(["An error occurred during validation"]);
-  //   });
-  // }
-
-  clearErrors() {
-    this.errorsTarget.innerHTML = "";
-    this.errorsTarget.classList.add("hidden");
-  }
-
-  showErrors(errors) {
-    this.errorsTarget.innerHTML = "";
-    this.errorsTarget.classList.remove("hidden");
-    
-    errors.forEach(error => {
-      const errorElement = document.createElement("div");
-      errorElement.textContent = error;
-      errorElement.classList.add("text-red-600", "text-sm", "mt-1");
-      this.errorsTarget.appendChild(errorElement);
-    });
   }
 
   toggleDocumentation() {
     this.documentationTarget.classList.toggle("hidden");
   }
+
 }

@@ -8,6 +8,17 @@ Rails.application.routes.draw do
     # Get fields in JSON format for the formula editor
     get 'fields', to: 'campaign_fields#index', defaults: { format: :json }
     
+    # Validation rules at the campaign level (new approach)
+    resources :validation_rules do
+      resource :positions, only: [:update], module: :validation_rules
+      member do
+        patch :toggle_active
+      end
+      collection do
+        post :test
+      end
+    end
+    
     resources :calculated_fields do
       collection do
         post :validate
@@ -40,6 +51,17 @@ Rails.application.routes.draw do
     resources :vertical_fields do
       resource :positions, only: [:update], module: :vertical_fields
     end
+    
+    # Validation rules at the vertical level (new approach)
+    resources :validation_rules do
+      resource :positions, only: [:update], module: :validation_rules
+      member do
+        patch :toggle_active
+      end
+      collection do
+        post :test
+      end
+    end
   end
 
   namespace :action_text do
@@ -57,6 +79,9 @@ Rails.application.routes.draw do
     get :pricing
     get :reset_app
   end
+  
+  # Validation rules documentation
+  get 'validation_rules/documentation', to: 'validation_rules#documentation', as: :validation_rules_documentation
 
   match "/404", via: :all, to: "errors#not_found"
   match "/500", via: :all, to: "errors#internal_server_error"

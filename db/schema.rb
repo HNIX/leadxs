@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_02_163853) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_07_155547) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -518,6 +518,29 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_02_163853) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "validation_rules", force: :cascade do |t|
+    t.string "rule_type", null: false
+    t.string "validatable_type", null: false
+    t.bigint "validatable_id", null: false
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.text "condition", null: false
+    t.string "error_message", null: false
+    t.string "severity", default: "error"
+    t.integer "position", default: 0
+    t.boolean "active", default: true
+    t.jsonb "parameters", default: {}
+    t.jsonb "test_data", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "legacy", default: false
+    t.index ["account_id"], name: "index_validation_rules_on_account_id"
+    t.index ["rule_type"], name: "index_validation_rules_on_rule_type"
+    t.index ["validatable_type", "validatable_id", "name"], name: "index_validation_rules_on_validatable_and_name", unique: true
+    t.index ["validatable_type", "validatable_id"], name: "index_validation_rules_on_validatable"
+  end
+
   create_table "vertical_fields", force: :cascade do |t|
     t.bigint "vertical_id", null: false
     t.bigint "account_id", null: false
@@ -581,6 +604,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_02_163853) do
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
   add_foreign_key "refer_visits", "refer_referral_codes", column: "referral_code_id"
+  add_foreign_key "validation_rules", "accounts"
   add_foreign_key "vertical_fields", "accounts"
   add_foreign_key "vertical_fields", "verticals"
   add_foreign_key "verticals", "accounts"

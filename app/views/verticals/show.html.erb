@@ -112,5 +112,41 @@
     </div>
   </div>
   
+  <div class="mt-8">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Validation Rules</h3>
+      <%= link_to "Manage Rules", vertical_validation_rules_path(@vertical), class: "btn btn-primary" %>
+    </div>
+    <p class="text-gray-500 dark:text-gray-400 mb-4">Configure validation rules for this vertical. Rules define how data is validated across fields.</p>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <% rules_count = @vertical.validation_rules.count %>
+      <% if rules_count > 0 %>
+        <div class="flex items-center mb-4">
+          <div class="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white"><%= rules_count %> <%= "Rule".pluralize(rules_count) %> Configured</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">This vertical has <%= rules_count %> validation <%= "rule".pluralize(rules_count) %> defined.</p>
+          </div>
+        </div>
+      <% else %>
+        <div class="text-center py-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No validation rules configured</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating validation rules for this vertical.</p>
+          <div class="mt-6">
+            <%= link_to "Create Validation Rules", vertical_validation_rules_path(@vertical), class: "btn btn-primary" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
   <%= turbo_frame_tag "modal" %>
 </div>

@@ -11,6 +11,8 @@ class CalculatedFieldsController < ApplicationController
   end
   
   def new
+    # Ensure campaign fields are loaded for the form
+    @campaign_fields = @campaign.campaign_fields.ordered
     @calculated_field = @campaign.calculated_fields.new
   end
   

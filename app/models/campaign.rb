@@ -5,6 +5,7 @@ class Campaign < ApplicationRecord
   belongs_to :vertical
   has_many :campaign_fields, -> { order(position: :asc) }, dependent: :destroy
   has_many :calculated_fields, dependent: :destroy
+  has_many :validation_rules, -> { order(position: :asc) }, as: :validatable, dependent: :destroy
   
   # Constants for campaign types and distribution methods
   CAMPAIGN_TYPES = ['ping_post', 'direct', 'calls'].freeze

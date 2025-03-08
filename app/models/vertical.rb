@@ -4,6 +4,7 @@ class Vertical < AccountRecord
 
   has_many :campaigns, dependent: :destroy
   has_many :vertical_fields, -> { order(position: :asc) }, dependent: :destroy
+  has_many :validation_rules, -> { order(position: :asc) }, as: :validatable, dependent: :destroy
 
   # Validations
   validates :name, presence: true
@@ -66,7 +67,7 @@ class Vertical < AccountRecord
     end
   end
 
-  # Method to duplicate vertical with its fields
+  # Method to duplicate vertical with its fields and validation rules
   def duplicate
     new_vertical = self.dup
     new_vertical.secondary_category = "#{secondary_category} (Copy)"
@@ -86,6 +87,13 @@ class Vertical < AccountRecord
           new_list_value.list_owner = new_field
           new_list_value.save!
         end
+      end
+      
+      # Duplicate all validation rules
+      validation_rules.each do |rule|
+        new_rule = rule.dup
+        new_rule.vertical = new_vertical
+        new_rule.save!
       end
       
       new_vertical

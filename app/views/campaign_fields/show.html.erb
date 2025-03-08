@@ -1,0 +1,170 @@
+<% content_for :title, @campaign_field.label.presence || @campaign_field.name %>
+
+<div class="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
+  <div class="border-b border-gray-200 dark:border-gray-700 pb-5 sm:flex sm:items-center sm:justify-between">
+    <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+      <div class="flex items-center">
+        <%= link_to @campaign.name, campaign_path(@campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+        <svg class="h-5 w-5 text-gray-400 dark:text-gray-600 mx-2" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+        </svg>
+        <span>Field Details</span>
+      </div>
+    </h3>
+    <div class="mt-3 flex sm:ml-4 sm:mt-0">
+      <%= link_to edit_campaign_campaign_field_path(@campaign, @campaign_field), 
+                  class: "inline-flex items-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700" do %>
+        <svg class="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+        </svg>
+        Edit Field
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-6 bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
+        <%= @campaign_field.label.presence || @campaign_field.name %>
+      </h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+        Field details and properties
+      </p>
+    </div>
+    <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-0">
+      <dl class="sm:divide-y sm:divide-gray-200 sm:dark:divide-gray-700">
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Field name</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0"><%= @campaign_field.name %></dd>
+        </div>
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Field label</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0"><%= @campaign_field.label.presence || "—" %></dd>
+        </div>
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Field type</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0">
+            <span class="inline-flex items-center rounded-md px-2.5 py-0.5 text-sm font-medium
+              <%= case @campaign_field.field_type 
+                  when 'text' then 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                  when 'number' then 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                  when 'date', 'datetime' then 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+                  when 'email' then 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                  when 'phone' then 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300'
+                  when 'select', 'radio', 'checkbox', 'multi_select' then 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                  when 'address' then 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300'
+                  else 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                  end %>">
+              <%= @campaign_field.field_type.humanize %>
+            </span>
+          </dd>
+        </div>
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Data type</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0"><%= @campaign_field.data_type.humanize %></dd>
+        </div>
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Required</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0">
+            <% if @campaign_field.required? %>
+              <span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-200">Yes</span>
+            <% else %>
+              <span class="inline-flex items-center rounded-md bg-gray-50 dark:bg-gray-700 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">No</span>
+            <% end %>
+          </dd>
+        </div>
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Value acceptance</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0"><%= @campaign_field.value_acceptance.humanize %></dd>
+        </div>
+        
+        <% if @campaign_field.value_acceptance == 'list' && @campaign_field.list_values.any? %>
+          <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Allowed values</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0">
+              <div class="flex flex-wrap gap-2">
+                <% @campaign_field.list_values.each do |value| %>
+                  <span class="inline-flex items-center rounded-md bg-gray-50 dark:bg-gray-700 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <%= value.list_value %>
+                  </span>
+                <% end %>
+              </div>
+            </dd>
+          </div>
+        <% end %>
+        
+        <% if @campaign_field.value_acceptance == 'range' %>
+          <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Value range</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0">
+              <% if @campaign_field.min_value.present? && @campaign_field.max_value.present? %>
+                <%= @campaign_field.min_value %> to <%= @campaign_field.max_value %>
+              <% elsif @campaign_field.min_value.present? %>
+                Min: <%= @campaign_field.min_value %>
+              <% elsif @campaign_field.max_value.present? %>
+                Max: <%= @campaign_field.max_value %>
+              <% else %>
+                —
+              <% end %>
+            </dd>
+          </div>
+        <% end %>
+        
+        <% if @campaign_field.description.present? %>
+          <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0"><%= @campaign_field.description %></dd>
+          </div>
+        <% end %>
+        
+        <% if @campaign_field.notes.present? %>
+          <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Notes</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0">
+              <%= @campaign_field.notes %>
+            </dd>
+          </div>
+        <% end %>
+        
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Validation rules</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:col-span-2 sm:mt-0">
+            <div class="flex items-center">
+              <span class="mr-2"><%= @campaign_field.validation_rules.count %> rules</span>
+              <%= link_to campaign_campaign_field_validation_rules_path(@campaign, @campaign_field), 
+                          class: "inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-200" do %>
+                <svg class="-ml-0.5 mr-1.5 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Manage validation rules
+              <% end %>
+            </div>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+  
+  <div class="mt-6 flex justify-between">
+    <%= link_to campaign_path(@campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
+      <div class="flex items-center">
+        <svg class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" />
+        </svg>
+        Back to campaign
+      </div>
+    <% end %>
+    
+    <%= button_to campaign_campaign_field_path(@campaign, @campaign_field), 
+                  method: :delete, 
+                  class: "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300", 
+                  form: { data: { turbo_confirm: "Are you sure you want to delete this field?" } } do %>
+      <div class="flex items-center">
+        <svg class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+        </svg>
+        Delete field
+      </div>
+    <% end %>
+  </div>
+</div>
