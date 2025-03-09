@@ -34,10 +34,15 @@ class SourcesController < ApplicationController
 
   # PATCH/PUT /sources/:id
   def update
-    if @source.update(source_params)
-      redirect_to source_path(@source), notice: "Source was successfully updated."
-    else
-      render :edit, status: :unprocessable_entity
+    respond_to do |format|
+      if @source.update(source_params)
+        format.html { redirect_to source_path(@source), notice: "Source was successfully updated." }
+        format.json { render :show, status: :ok, location: @source }
+        format.turbo_stream
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @source.errors, status: :unprocessable_entity }
+      end
     end
   end
 

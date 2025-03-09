@@ -24,12 +24,19 @@ class Campaign < ApplicationRecord
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :campaign_type, presence: true, inclusion: { in: CAMPAIGN_TYPES }
   validates :distribution_method, presence: true, inclusion: { in: DISTRIBUTION_METHODS }
+  validates :bid_timeout_seconds, numericality: { greater_than_or_equal_to: 5, less_than_or_equal_to: 300 }, if: :use_bidding_system?
   
   # Validate schedule times if scheduling is enabled
   validates :distribution_schedule_days, presence: true, if: :distribution_schedule_enabled?
   validates :distribution_schedule_start_time, presence: true, if: :distribution_schedule_enabled?
   validates :distribution_schedule_end_time, presence: true, if: :distribution_schedule_enabled?
   validate :validate_schedule_times, if: :distribution_schedule_enabled?
+  
+  # Check if bidding system should be used
+  def use_bidding_system?
+    # Bidding is used for ping-post campaigns with a bidding distribution method
+    campaign_type == 'ping_post' && distribution_method.in?(['highest_bid', 'weighted_random', 'waterfall'])
+  end
   
   # Handle days as array
   def distribution_schedule_days

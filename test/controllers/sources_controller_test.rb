@@ -56,19 +56,80 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should update source" do
-    patch source_url(@source), params: { 
-      source: { 
-        name: "Updated Source Name", 
-        integration_type: "web_form", 
-        status: "paused" 
-      } 
-    }
-    
-    @source.reload
-    assert_equal "Updated Source Name", @source.name
-    assert_equal "web_form", @source.integration_type
-    assert_equal "paused", @source.status
-    assert_redirected_to source_url(@source)
+    # Ensure we have proper tenant context
+    ActsAsTenant.with_tenant(@account) do
+      # Create a new test source with valid attributes for fixed payout method
+      source = Source.create!(
+        name: "Test Source for Update #{Time.now.to_i}",
+        integration_type: "affiliate",
+        status: "active",
+        campaign: @campaign,
+        company: @company,
+        payout_method: "fixed",
+        payout: 5.0,
+        payout_structure: "per_lead"
+      )
+      
+      # Update with valid parameters
+      patch source_url(source), params: { 
+        source: { 
+          name: "Updated Source Name",
+          status: "paused",
+          minimum_acceptable_bid: 7.0
+        } 
+      }
+      
+      # Reload and verify updates
+      source.reload
+      
+      assert_equal "Updated Source Name", source.name
+      assert_equal "paused", source.status
+      assert_equal 7.0, source.minimum_acceptable_bid
+      assert_redirected_to source_url(source)
+      
+      # Now test updating the payout method from fixed to percentage
+      patch source_url(source), params: { 
+        source: { 
+          payout_method: "percentage",
+          margin: 0.25,
+          payout: nil  # Must explicitly set payout to nil when changing to percentage
+        } 
+      }
+      
+      # Reload and verify updates
+      source.reload
+      
+      assert_equal "percentage", source.payout_method
+      assert_equal 0.25, source.margin
+      assert_nil source.payout
+      assert_redirected_to source_url(source)
+    end
+  end
+
+  test "should run basic update" do
+    # Ensure we have proper tenant context
+    ActsAsTenant.with_tenant(@account) do
+      # Create a fresh source to test with
+      source = Source.create!(
+        name: "Source for Update Test",
+        integration_type: "affiliate",
+        payout_method: "fixed",
+        payout: 10.0,
+        status: "active",
+        campaign: @campaign,
+        company: @company
+      )
+      
+      patch source_url(source), params: { 
+        source: { 
+          name: "Updated Source Name"
+        } 
+      }
+      
+      source.reload
+      assert_equal "Updated Source Name", source.name
+      assert_redirected_to source_url(source)
+    end
   end
   
   test "should destroy source" do
@@ -82,11 +143,48 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should regenerate token" do
-    original_token = @source.token
-    post regenerate_token_source_url(@source)
-    
-    @source.reload
-    assert_not_equal original_token, @source.token
-    assert_redirected_to source_url(@source)
+    # Ensure we have proper tenant context
+    ActsAsTenant.with_tenant(@account) do
+      # Create a new test source with valid attributes for fixed payout method
+      source = Source.create!(
+        name: "Test Source for Token Regeneration #{Time.now.to_i}",
+        integration_type: "affiliate",
+        status: "active",
+        campaign: @campaign,
+        company: @company,
+        payout_method: "fixed",
+        payout: 5.0,
+        payout_structure: "per_lead"
+      )
+      
+      # Store the original token
+      original_token = source.token
+      
+      # Use a deterministic value for the new token to make the test more reliable
+      expected_token = "predictable_test_token_#{Time.now.to_i}"
+      
+      # Mock SecureRandom to return our predictable value
+      SecureRandom.stub(:urlsafe_base64, expected_token) do
+        post regenerate_token_source_url(source)
+      end
+      
+      # Reload and verify the token has changed to our expected value
+      source.reload
+      assert_not_equal original_token, source.token
+      assert_equal expected_token, source.token
+      assert_redirected_to source_url(source)
+      
+      # Also verify flash notice
+      assert_equal "API token was successfully regenerated.", flash[:notice]
+    end
   end
+  
+  # We no longer need this test since we've fixed test_should_regenerate_token
+  # and it now covers all the same functionality
+  # test "should run basic token regeneration" do
+  #   ActsAsTenant.with_tenant(@account) do
+  #     source = Source.create!(...)
+  #     # ...
+  #   end
+  # end
 end

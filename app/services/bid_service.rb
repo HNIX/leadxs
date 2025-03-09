@@ -36,6 +36,9 @@ class BidService
       BidRequestJob.perform_later(@bid_request.id, distribution.id)
     end
     
+    # Schedule job to process the bid request after it expires
+    ProcessBidRequestJob.set(wait_until: @bid_request.expires_at + 2.seconds).perform_later(@bid_request.id)
+    
     @bid_request
   end
   

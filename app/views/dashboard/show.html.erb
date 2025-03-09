@@ -1,4 +1,31 @@
 <div class="container mx-auto p-4">
+  <!-- Documentation Banner -->
+  <div class="my-6 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-800 dark:to-indigo-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="px-6 py-5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-white dark:bg-gray-800 rounded-md p-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h2 class="text-xl font-bold text-white">Lead Submission & Bidding System</h2>
+            <p class="text-blue-100">Learn how to use our new lead submission API and bidding features</p>
+          </div>
+        </div>
+        <div>
+          <%= link_to lead_bidding_docs_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:border-gray-700" do %>
+            View Documentation
+            <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="my-8">
     <h1><%= t(".title") %></h1>
 

@@ -2,6 +2,11 @@ require "test_helper"
 
 class CampaignDistributionTest < ActiveSupport::TestCase
   setup do
+    @account = accounts(:one)
+    
+    # Set current tenant for testing
+    ActsAsTenant.current_tenant = @account
+    
     @campaign = campaigns(:one)
     @distribution = distributions(:one)
     @campaign_field = campaign_fields(:one)
@@ -17,6 +22,10 @@ class CampaignDistributionTest < ActiveSupport::TestCase
       active: true,
       priority: 1
     )
+  end
+  
+  teardown do
+    ActsAsTenant.current_tenant = nil
   end
 
   test "valid campaign distribution" do
@@ -44,90 +53,129 @@ class CampaignDistributionTest < ActiveSupport::TestCase
   end
 
   test "validates priority is a positive integer" do
-    Campaign.transaction do
-      campaign = Campaign.create!(
-        name: "Another Test Campaign",
-        account: @campaign.account,
-        vertical: @campaign.vertical,
-        campaign_type: "direct",
-        distribution_method: "highest_bid",
-        status: "draft"
-      )
-      
-      cd = campaign.campaign_distributions.build(
-        distribution: distributions(:paused),
-        priority: -1
-      )
-      assert_not cd.valid?
-      assert_includes cd.errors[:priority], "must be greater than or equal to 0"
+    ActsAsTenant.with_tenant(@account) do
+      Campaign.transaction do
+        # Create a unique campaign with timestamp to avoid conflicts
+        campaign = Campaign.create!(
+          name: "Test Campaign #{Time.now.to_i}",
+          account: @account,
+          vertical: @campaign.vertical,
+          campaign_type: "direct",
+          distribution_method: "highest_bid",
+          status: "draft"
+        )
+        
+        # Test negative priority (should fail)
+        cd = CampaignDistribution.new(
+          campaign: campaign,
+          distribution: distributions(:paused),
+          priority: -1
+        )
+        assert_not cd.valid?
+        assert_includes cd.errors[:priority], "must be greater than or equal to 0"
 
-      cd = campaign.campaign_distributions.build(
-        distribution: distributions(:paused),
-        priority: 1.5
-      )
-      assert_not cd.valid?
-      assert_includes cd.errors[:priority], "must be an integer"
+        # Test non-integer priority (should fail)
+        cd = CampaignDistribution.new(
+          campaign: campaign,
+          distribution: distributions(:paused),
+          priority: 1.5
+        )
+        assert_not cd.valid?
+        assert_includes cd.errors[:priority], "must be an integer"
 
-      cd = campaign.campaign_distributions.build(
-        distribution: distributions(:paused),
-        priority: 0
-      )
-      assert cd.valid?
+        # Test zero priority (should pass)
+        cd = CampaignDistribution.new(
+          campaign: campaign,
+          distribution: distributions(:two), # Use a different distribution to avoid uniqueness constraint
+          priority: 0
+        )
+        assert cd.valid?, cd.errors.full_messages.join(", ")
 
-      cd = campaign.campaign_distributions.build(
-        distribution: distributions(:paused),
-        priority: nil
-      )
-      assert cd.valid?
-      
-      raise ActiveRecord::Rollback
+        # Test nil priority (should pass, as allow_nil is true in validation)
+        cd = CampaignDistribution.new(
+          campaign: campaign,
+          distribution: distributions(:one), # Use a different distribution
+          priority: nil
+        )
+        assert cd.valid?, cd.errors.full_messages.join(", ")
+        
+        raise ActiveRecord::Rollback
+      end
     end
   end
 
   test "allows priority to be nil" do
-    Campaign.transaction do
-      campaign = Campaign.create!(
-        name: "Yet Another Test Campaign",
-        account: @campaign.account,
-        vertical: @campaign.vertical,
-        campaign_type: "direct",
-        distribution_method: "highest_bid",
-        status: "draft"
-      )
-      
-      cd = campaign.campaign_distributions.build(
-        distribution: distributions(:paused),
-        priority: nil
-      )
-      assert cd.valid?
-      
-      raise ActiveRecord::Rollback
+    ActsAsTenant.with_tenant(@account) do
+      Campaign.transaction do
+        campaign = Campaign.create!(
+          name: "Yet Another Test Campaign",
+          account: @account,
+          vertical: @campaign.vertical,
+          campaign_type: "direct",
+          distribution_method: "highest_bid",
+          status: "draft"
+        )
+        
+        cd = CampaignDistribution.new(
+          campaign: campaign,
+          distribution: distributions(:paused),
+          priority: nil
+        )
+        assert cd.valid?, cd.errors.full_messages.join(", ")
+        
+        raise ActiveRecord::Rollback
+      end
     end
   end
 
   test "creates default field mappings after create" do
     # Need a campaign and distribution not already linked
-    Campaign.transaction do
-      # Create a new campaign using existing account
-      campaign = Campaign.create!(
-        name: "Test Campaign for Distribution",
-        account: @campaign.account,
-        vertical: @campaign.vertical,
-        campaign_type: "direct",
-        distribution_method: "highest_bid",
-        status: "draft"
-      )
-      
-      # Create the campaign distribution with the paused distribution
-      assert_difference "MappedField.count", campaign.campaign_fields.count do
-        campaign.campaign_distributions.create!(
-          distribution: distributions(:paused),
-          active: true
+    ActsAsTenant.with_tenant(@account) do
+      Campaign.transaction do
+        # Create a new campaign with unique name using existing account
+        campaign = Campaign.create!(
+          name: "Test Campaign for Distribution #{Time.now.to_i}",
+          account: @account,
+          vertical: @campaign.vertical,
+          campaign_type: "direct",
+          distribution_method: "highest_bid",
+          status: "draft"
         )
+        
+        # Create at least one campaign field for testing
+        # This ensures campaign.campaign_fields.count > 0
+        test_field_name = "Test Field"
+        campaign_field = campaign.campaign_fields.create!(
+          name: test_field_name,
+          data_type: "text",
+          required: true,
+          account: @account
+        )
+        
+        # Create the campaign distribution with the paused distribution
+        assert_difference "MappedField.count", campaign.campaign_fields.count do
+          @cd = campaign.campaign_distributions.create!(
+            distribution: distributions(:paused),
+            active: true
+          )
+        end
+        
+        # Verify the mapped field was created with correct attributes
+        mapped_field = @cd.mapped_fields.first
+        # Make sure a mapped field exists
+        assert_not_nil mapped_field, "Mapped field should exist"
+        
+        # Find the mapped field that corresponds to our campaign field
+        mapped_field = @cd.mapped_fields.find { |mf| mf.campaign_field_id == campaign_field.id }
+        assert_not_nil mapped_field, "Mapped field for campaign field should exist"
+        
+        assert_equal "test_field", mapped_field.distribution_field_name
+        assert_equal "dynamic", mapped_field.value_type
+        assert_equal campaign_field.required, mapped_field.required
+        
+        # Roll back this test to not affect other tests
+        raise ActiveRecord::Rollback
       end
-      
-      # Roll back this test to not affect other tests
-      raise ActiveRecord::Rollback
     end
   end
 

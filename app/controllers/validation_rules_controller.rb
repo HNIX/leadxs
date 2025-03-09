@@ -37,14 +37,32 @@ class ValidationRulesController < ApplicationController
   
   def destroy
     @validation_rule.destroy
-    redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
-                notice: "Validation rule was successfully deleted."
+    # For campaign or vertical validation rules, return to the appropriate index
+    if @validatable.is_a?(Campaign)
+      redirect_to campaign_validation_rules_path(@validatable), notice: "Validation rule was successfully deleted."
+    elsif @validatable.is_a?(Vertical)
+      redirect_to vertical_validation_rules_path(@validatable), notice: "Validation rule was successfully deleted."
+    else
+      # Legacy support for field-level rules
+      redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
+                  notice: "Validation rule was successfully deleted."
+    end
   end
   
   def toggle_active
     @validation_rule.update(active: !@validation_rule.active)
-    redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
-                notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+    # For campaign or vertical validation rules, return to the appropriate index
+    if @validatable.is_a?(Campaign)
+      redirect_to campaign_validation_rules_path(@validatable), 
+                  notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+    elsif @validatable.is_a?(Vertical)
+      redirect_to vertical_validation_rules_path(@validatable), 
+                  notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+    else
+      # Legacy support for field-level rules
+      redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
+                  notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+    end
   end
   
   def documentation

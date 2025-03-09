@@ -35,11 +35,17 @@ class CampaignFieldsController < ApplicationController
   def create
     @campaign_field = @campaign.campaign_fields.new(campaign_field_params)
     
+    # Debug output for tests
+    Rails.logger.debug("Creating campaign field with params: #{campaign_field_params.inspect}")
+    Rails.logger.debug("Campaign Field: #{@campaign_field.inspect}")
+    
     respond_to do |format|
       if @campaign_field.save
+        Rails.logger.debug("Campaign field saved successfully: #{@campaign_field.id}")
         format.html { redirect_to campaign_path(@campaign), notice: "Field was successfully added." }
         format.json { render :show, status: :created, location: @campaign_field }
       else
+        Rails.logger.debug("Failed to save campaign field. Errors: #{@campaign_field.errors.full_messages}")
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @campaign_field.errors, status: :unprocessable_entity }
       end
@@ -87,6 +93,7 @@ class CampaignFieldsController < ApplicationController
     params.require(:campaign_field).permit(
       :name,
       :label,
+      :field_type,  # Adding field_type explicitly to permit list
       :data_type,
       :required,
       :default_value,

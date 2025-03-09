@@ -105,33 +105,36 @@ class CalculatedFieldTest < ActiveSupport::TestCase
   end
   
   test "name must be unique per campaign" do
-    account = accounts(:one)
-    campaign = Campaign.create!(
-      name: "Test Campaign",
-      status: "active", 
-      campaign_type: "ping_post",
-      distribution_method: "highest_bid",
-      vertical: verticals(:insurance),
-      account: account
-    )
-    
-    CalculatedField.create!(
-      name: "Age",
-      formula: "YEAR(NOW()) - YEAR(date_of_birth)",
-      status: "active",
-      campaign: campaign,
-      account: account
-    )
-    
-    duplicate = CalculatedField.new(
-      name: "Age",
-      formula: "YEAR(NOW()) - YEAR(date_of_birth)",
-      status: "active",
-      campaign: campaign,
-      account: account
-    )
-    
-    assert_not duplicate.valid?
-    assert_includes duplicate.errors[:name], "has already been taken"
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      campaign = Campaign.create!(
+        name: "Test Campaign",
+        status: "active", 
+        campaign_type: "ping_post",
+        distribution_method: "highest_bid",
+        vertical: verticals(:insurance),
+        account: accounts(:one)
+      )
+      
+      # Create initial calculated field
+      cf = CalculatedField.create!(
+        name: "Age",
+        formula: "YEAR(NOW()) - YEAR(date_of_birth)",
+        status: "active",
+        campaign: campaign,
+        account: accounts(:one)
+      )
+      
+      # Create duplicate with same name
+      duplicate = CalculatedField.new(
+        name: "Age",
+        formula: "YEAR(NOW()) - YEAR(date_of_birth)",
+        status: "active",
+        campaign: campaign,
+        account: accounts(:one)
+      )
+      
+      assert_not duplicate.valid?
+      assert_includes duplicate.errors[:name], "has already been taken"
+    end
   end
 end

@@ -2,7 +2,39 @@ class BidRequestsController < ApplicationController
   before_action :set_bid_request, only: [:show, :edit, :update, :destroy]
   
   def index
-    @pagy, @bid_requests = pagy(current_account.bid_requests.recent)
+    @pagy, @bid_requests = pagy(BidRequest.recent)
+  end
+  
+  def dashboard
+    # Active bid requests count
+    @active_bid_requests_count = BidRequest.active.count
+    
+    # Bids received today
+    @bids_today_count = Bid.where('created_at > ?', 24.hours.ago).count
+    
+    # Average bid amount
+    @average_bid_amount = Bid.where(status: [:pending, :accepted]).average(:amount) || 0
+    
+    # Top campaigns by bid volume
+    @top_campaigns = Campaign.joins(bid_requests: :bids)
+                                   .select('campaigns.id, campaigns.name, COUNT(bids.id) as bid_count, AVG(bids.amount) as avg_bid_amount')
+                                   .group('campaigns.id, campaigns.name')
+                                   .order('bid_count DESC')
+                                   .limit(5)
+    
+    # Top distributions by bid amount and win rate
+    @top_distributions = Distribution.joins(:bids)
+                                      .select('distributions.id, distributions.name, 
+                                              AVG(bids.amount) as avg_bid_amount,
+                                              SUM(CASE WHEN bids.status = 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(bids.id) as win_rate')
+                                      .group('distributions.id, distributions.name')
+                                      .order('avg_bid_amount DESC')
+                                      .limit(5)
+    
+    # Recent bids
+    @recent_bids = Bid.includes(:distribution, bid_request: :campaign)
+                                 .order(created_at: :desc)
+                                 .limit(10)
   end
   
   def show
@@ -10,11 +42,11 @@ class BidRequestsController < ApplicationController
   end
   
   def new
-    @bid_request = current_account.bid_requests.new
+    @bid_request = BidRequest.new
   end
   
   def create
-    @bid_request = current_account.bid_requests.new(bid_request_params)
+    @bid_request = BidRequest.new(bid_request_params)
     
     if @bid_request.save
       redirect_to @bid_request, notice: "Bid request was successfully created."
@@ -41,7 +73,7 @@ class BidRequestsController < ApplicationController
   
   # POST /bid_requests/:id/solicit_bids
   def solicit_bids
-    @bid_request = current_account.bid_requests.find(params[:id])
+    @bid_request = BidRequest.find(params[:id])
     
     if @bid_request.expired?
       redirect_to @bid_request, alert: "Cannot solicit bids for an expired bid request."
@@ -61,7 +93,7 @@ class BidRequestsController < ApplicationController
   
   # POST /bid_requests/:id/complete
   def complete_bidding
-    @bid_request = current_account.bid_requests.find(params[:id])
+    @bid_request = BidRequest.find(params[:id])
     
     if @bid_request.expired?
       redirect_to @bid_request, alert: "Cannot complete bidding for an expired bid request."
@@ -76,17 +108,26 @@ class BidRequestsController < ApplicationController
       return
     end
     
-    # Accept the winning bid
-    if winning_bid.accept!
-      redirect_to @bid_request, notice: "Bidding completed. Winning bid: #{number_to_currency(winning_bid.amount)} from #{winning_bid.distribution.name}"
+    # Complete bidding and distribute lead if available
+    if @bid_request.lead.present?
+      if @bid_request.complete_bidding_and_distribute!
+        redirect_to @bid_request, notice: "Bidding completed and lead distributed. Winning bid: #{number_to_currency(winning_bid.amount)} from #{winning_bid.distribution.name}"
+      else
+        redirect_to @bid_request, alert: "Failed to complete bidding and distribute lead."
+      end
     else
-      redirect_to @bid_request, alert: "Failed to accept the winning bid."
+      # Just accept the winning bid without lead distribution
+      if winning_bid.accept!
+        redirect_to @bid_request, notice: "Bidding completed. Winning bid: #{number_to_currency(winning_bid.amount)} from #{winning_bid.distribution.name}"
+      else
+        redirect_to @bid_request, alert: "Failed to accept the winning bid."
+      end
     end
   end
   
   # POST /bid_requests/:id/expire
   def expire
-    @bid_request = current_account.bid_requests.find(params[:id])
+    @bid_request = BidRequest.find(params[:id])
     
     if @bid_request.update(status: :expired)
       # Mark all pending bids as expired
@@ -100,7 +141,7 @@ class BidRequestsController < ApplicationController
   private
   
   def set_bid_request
-    @bid_request = current_account.bid_requests.find(params[:id])
+    @bid_request = BidRequest.find(params[:id])
   end
   
   def bid_request_params

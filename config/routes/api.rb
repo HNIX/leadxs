@@ -7,6 +7,9 @@ namespace :api, defaults: {format: :json} do
     resources :users
     resources :notification_tokens, param: :token, only: [:create, :destroy]
     
+    # Lead submission API
+    resources :lead_posts, only: [:create]
+    
     # Bidding API
     resources :bid_requests do
       resources :bids, only: [:index]

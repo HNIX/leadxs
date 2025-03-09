@@ -11,7 +11,7 @@ module ThemeHelper
   # This is used for the formula editor to apply the appropriate CodeMirror theme
   def dark_mode?
     # First check user preference
-    if user_signed_in? && current_user.respond_to?(:preferences)
+    if user_signed_in? && current_user.respond_to?(:preferences) && current_user.preferences.present?
       return current_user.preferences['theme'] == "dark"
     end
     

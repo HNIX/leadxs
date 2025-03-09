@@ -346,8 +346,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_184524) do
     t.bigint "account_id", null: false
     t.boolean "bidding_enabled", default: true
     t.integer "bidding_timeout_seconds", default: 5
-    t.string "bid_endpoint_url"
+    t.integer "bidding_strategy", default: 0
     t.decimal "base_bid_amount", precision: 10, scale: 2
+    t.decimal "min_bid_amount", precision: 10, scale: 2
+    t.decimal "max_bid_amount", precision: 10, scale: 2
+    t.string "bid_endpoint_url"
     t.index ["account_id", "name"], name: "index_distributions_on_account_id_and_name", unique: true
     t.index ["account_id"], name: "index_distributions_on_account_id"
     t.index ["company_id", "name"], name: "index_distributions_on_company_id_and_name", unique: true

@@ -19,18 +19,12 @@ class CampaignField < ApplicationRecord
   # Whether this field can be used in anonymous bidding process
   attribute :anonymous_bidding_enabled, :boolean, default: false
   
-  # Legacy field_type constants for backwards compatibility
-  FIELD_TYPES = ['text', 'number', 'date', 'datetime', 'email', 'phone', 'select', 'multi_select', 'checkbox', 'radio', 'address'].freeze
-  
   # Validations
   validates :name, presence: true
   validates :name, uniqueness: { scope: [:account_id, :campaign_id], message: "already exists in this campaign" }
   validate :validate_list_values_if_list
   validate :validate_range_if_range
   validates :data_type, presence: true
-  
-  # For legacy field_type validation
-  validates :field_type, presence: true, inclusion: { in: FIELD_TYPES }, if: -> { data_type.nil? }
   
   # After creation, inherit validation rules from vertical field
   after_create :inherit_validation_rules
@@ -55,44 +49,6 @@ class CampaignField < ApplicationRecord
   scope :ping_fields, -> { where(ping_required: true) }
   scope :post_fields, -> { where(post_required: true) }
   scope :visible_fields, -> { where(hide: false) }
-  
-  # Field type compatibility methods
-  def field_type
-    return self[:field_type] if self[:field_type].present?
-    
-    # Map data_type to field_type
-    case data_type
-    when 'text', 'email', 'phone'
-      data_type.to_s
-    when 'number'
-      'number'
-    when 'date'
-      'date'
-    when 'boolean'
-      value_acceptance == 'list' ? 'radio' : 'checkbox'
-    else
-      'text'
-    end
-  end
-  
-  def field_type=(value)
-    self[:field_type] = value
-    
-    # Map field_type to data_type
-    self.data_type = case value
-    when 'text', 'email', 'phone'
-      value
-    when 'number'
-      'number'
-    when 'date', 'datetime'
-      'date'
-    when 'checkbox', 'radio', 'select', 'multi_select'
-      self.value_acceptance = 'list' unless value == 'checkbox'
-      'boolean'
-    else
-      'text'
-    end
-  end
   
   # Methods to check field type (for backward compatibility)
   def text?
@@ -119,25 +75,6 @@ class CampaignField < ApplicationRecord
     data_type == 'boolean'
   end
   
-  def select?
-    field_type == 'select' || (value_acceptance == 'list' && !multi_select?)
-  end
-  
-  def multi_select?
-    field_type == 'multi_select'
-  end
-  
-  def checkbox?
-    field_type == 'checkbox' || (data_type == 'boolean' && value_acceptance != 'list')
-  end
-  
-  def radio?
-    field_type == 'radio' || (data_type == 'boolean' && value_acceptance == 'list')
-  end
-  
-  def address?
-    field_type == 'address'
-  end
   
   def generate_example_value
     case data_type

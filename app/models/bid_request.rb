@@ -71,6 +71,46 @@ class BidRequest < ApplicationRecord
     lead.field_values_hash
   end
   
+  # Complete the bidding process and distribute the lead
+  def complete_bidding_and_distribute!
+    return false if expired? || status != 'active' || lead.nil?
+    
+    # Get the winning bid
+    winning = winning_bid
+    return false if winning.nil?
+    
+    # Accept the winning bid
+    return false unless winning.accept!
+    
+    # Update the bid request status
+    update(status: :completed)
+    
+    # Now distribute the lead to the winning distribution
+    distribute_lead_to_winning_bid(winning)
+    
+    true
+  end
+  
+  # Distribute the lead to the winning distribution
+  def distribute_lead_to_winning_bid(winning_bid)
+    return false if lead.nil?
+    
+    # Update lead status to distributed
+    lead.update(status: :distributed)
+    
+    # Create or find the campaign distribution
+    campaign_distribution = campaign.campaign_distributions.find_by(distribution: winning_bid.distribution)
+    return false unless campaign_distribution
+    
+    # Use the lead distribution service for a single distribution
+    distribution_service = LeadDistributionService.new(lead)
+    
+    # Process just this distribution
+    distribution_service.send(:process_distribution, campaign_distribution)
+    
+    true
+  end
+  
   private
   
   def generate_unique_id

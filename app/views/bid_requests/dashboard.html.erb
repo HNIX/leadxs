@@ -1,0 +1,154 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="h2">Bidding Dashboard</h1>
+    <div class="flex space-x-2">
+      <%= link_to lead_bidding_docs_path, class: "btn btn-outline flex items-center", target: "_blank" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Documentation
+      <% end %>
+      <%= link_to "Bid Requests", bid_requests_path, class: "btn btn-outline" %>
+      <%= link_to "New Bid Request", new_bid_request_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+  
+  <!-- Documentation Alert -->
+  <div class="mb-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-blue-700 dark:text-blue-300">
+          Learn how to use the bidding system with our <a href="<%= lead_bidding_docs_path %>" class="font-medium underline text-blue-700 dark:text-blue-300 hover:text-blue-500 dark:hover:text-blue-200">comprehensive documentation</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
+      <h2 class="font-medium text-lg mb-4 dark:text-white">Active Bid Requests</h2>
+      <p class="text-4xl font-bold text-blue-600 dark:text-blue-400"><%= @active_bid_requests_count %></p>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Requests currently accepting bids</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
+      <h2 class="font-medium text-lg mb-4 dark:text-white">Total Bids Today</h2>
+      <p class="text-4xl font-bold text-blue-600 dark:text-blue-400"><%= @bids_today_count %></p>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Bids received in the last 24 hours</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
+      <h2 class="font-medium text-lg mb-4 dark:text-white">Average Bid Amount</h2>
+      <p class="text-4xl font-bold text-blue-600 dark:text-blue-400"><%= number_to_currency(@average_bid_amount) %></p>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Average across all active campaigns</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
+      <h2 class="font-medium text-lg mb-4 dark:text-white">Top Campaigns by Bid Volume</h2>
+      <% if @top_campaigns.any? %>
+        <div class="overflow-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b dark:border-gray-700">
+                <th class="text-left pb-2 dark:text-gray-300">Campaign</th>
+                <th class="text-right pb-2 dark:text-gray-300">Bid Count</th>
+                <th class="text-right pb-2 dark:text-gray-300">Avg. Bid</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @top_campaigns.each do |campaign| %>
+                <tr class="border-b dark:border-gray-700">
+                  <td class="py-2 dark:text-gray-300"><%= link_to campaign.name, campaign, class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %></td>
+                  <td class="py-2 text-right dark:text-gray-300"><%= campaign.bid_count %></td>
+                  <td class="py-2 text-right dark:text-gray-300"><%= number_to_currency(campaign.avg_bid_amount) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No campaign data available yet.</p>
+      <% end %>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
+      <h2 class="font-medium text-lg mb-4 dark:text-white">Top Distributions by Bid Amount</h2>
+      <% if @top_distributions.any? %>
+        <div class="overflow-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b dark:border-gray-700">
+                <th class="text-left pb-2 dark:text-gray-300">Distribution</th>
+                <th class="text-right pb-2 dark:text-gray-300">Avg. Bid</th>
+                <th class="text-right pb-2 dark:text-gray-300">Win Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @top_distributions.each do |distribution| %>
+                <tr class="border-b dark:border-gray-700">
+                  <td class="py-2 dark:text-gray-300"><%= link_to distribution.name, distribution, class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %></td>
+                  <td class="py-2 text-right dark:text-gray-300"><%= number_to_currency(distribution.avg_bid_amount) %></td>
+                  <td class="py-2 text-right dark:text-gray-300"><%= number_to_percentage(distribution.win_rate, precision: 1) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No distribution data available yet.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6">
+    <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
+      <h2 class="font-medium text-lg mb-4 dark:text-white">Recent Bid Activity</h2>
+      <% if @recent_bids.any? %>
+        <div class="overflow-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b dark:border-gray-700">
+                <th class="text-left pb-2 dark:text-gray-300">Time</th>
+                <th class="text-left pb-2 dark:text-gray-300">Distribution</th>
+                <th class="text-left pb-2 dark:text-gray-300">Campaign</th>
+                <th class="text-right pb-2 dark:text-gray-300">Amount</th>
+                <th class="text-center pb-2 dark:text-gray-300">Status</th>
+                <th class="text-right pb-2 dark:text-gray-300">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @recent_bids.each do |bid| %>
+                <tr class="border-b dark:border-gray-700">
+                  <td class="py-2 dark:text-gray-300"><%= time_ago_in_words(bid.created_at) %> ago</td>
+                  <td class="py-2 dark:text-gray-300"><%= link_to bid.distribution.name, bid.distribution, class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %></td>
+                  <td class="py-2 dark:text-gray-300"><%= link_to bid.bid_request.campaign.name, bid.bid_request.campaign, class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %></td>
+                  <td class="py-2 text-right font-medium dark:text-gray-300"><%= number_to_currency(bid.amount) %></td>
+                  <td class="py-2 text-center">
+                    <span class="<%= bid_status_class(bid) %>">
+                      <%= bid.status.titleize %>
+                    </span>
+                  </td>
+                  <td class="py-2 text-right">
+                    <%= link_to "View", bid_request_bid_path(bid.bid_request, bid), class: "btn btn-sm btn-link dark:text-blue-400 dark:hover:text-blue-300" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-4 text-right">
+          <%= link_to "View All Bid Requests", bid_requests_path, class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %>
+        </div>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No recent bid activity.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

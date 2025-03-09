@@ -2,8 +2,14 @@ require "test_helper"
 
 class ApiRequestTest < ActiveSupport::TestCase
   setup do
+    @account = accounts(:one)
     @distribution = distributions(:one)
+    
+    # Set current tenant for testing
+    ActsAsTenant.current_tenant = @account
+    
     @api_request = ApiRequest.new(
+      account: @account,
       requestable: @distribution,
       endpoint_url: "https://example.com/api/leads",
       request_method: :post,
@@ -12,6 +18,10 @@ class ApiRequestTest < ActiveSupport::TestCase
       response_payload: '{"success":true,"id":"123"}',
       duration_ms: 350
     )
+  end
+  
+  teardown do
+    ActsAsTenant.current_tenant = nil
   end
 
   test "valid api request" do

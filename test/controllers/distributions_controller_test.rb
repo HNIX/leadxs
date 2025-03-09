@@ -14,8 +14,18 @@ class DistributionsControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should get index" do
-    get distributions_path
-    assert_response :success
+    # Set the current tenant for the test
+    ActsAsTenant.with_tenant(@account) do
+      get distributions_path
+      assert_response :success
+      
+      # Check that the page includes the distribution name
+      assert_select "p.text-sm.font-medium.text-primary-600", text: @distribution.name
+      
+      # Check for standard elements on the page
+      assert_select "h1", "Distributions"
+      assert_select "a", "New Distribution"
+    end
   end
 
   test "should get show" do

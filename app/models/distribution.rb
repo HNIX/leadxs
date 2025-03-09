@@ -43,14 +43,91 @@ class Distribution < ApplicationRecord
     status == "active"
   end
   
-  # Bidding attributes with defaults
-  attribute :bidding_enabled, :boolean, default: true
-  attribute :bidding_timeout_seconds, :integer, default: 5
+  # Bidding configuration
+  enum :bidding_strategy, {
+    manual: 0,          # Fixed amount for all leads
+    rule_based: 10,     # Apply rules based on lead attributes
+    dynamic: 20         # Use machine learning/optimization
+  }, default: :manual
+  
+  validates :base_bid_amount, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :min_bid_amount, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :max_bid_amount, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validate :validate_bid_amounts
   
   # Calculate bid amount for a lead based on its data
   def calculate_bid_amount(lead_data)
-    # Simple implementation - in real application this would be more complex
-    # and might include business rules or machine learning models
-    base_bid_amount || 0.0
+    # Start with base amount
+    amount = base_bid_amount || 0.0
+    
+    case bidding_strategy
+    when "manual"
+      # Just use the base amount
+      amount
+    when "rule_based"
+      # Apply rules based on lead data
+      # This would be more complex in a production system
+      apply_bidding_rules(amount, lead_data)
+    when "dynamic"
+      # Dynamic bidding based on machine learning
+      # This would likely call an external service
+      dynamic_bid_calculation(amount, lead_data)
+    else
+      amount
+    end
+  end
+  
+  # Check if bidding is enabled for this distribution
+  def bidding_enabled?
+    # Enable bidding if the base amount is set and the distribution is active
+    active? && base_bid_amount.present? && base_bid_amount > 0
+  end
+  
+  private
+  
+  def validate_bid_amounts
+    return unless min_bid_amount.present? && max_bid_amount.present?
+    
+    if max_bid_amount < min_bid_amount
+      errors.add(:max_bid_amount, "must be greater than minimum bid amount")
+    end
+  end
+  
+  def apply_bidding_rules(base_amount, lead_data)
+    # Example rules - these would be configured in a real system
+    amount = base_amount
+    
+    # Apply modifiers based on lead data
+    # For example, zip code premiums
+    if lead_data["zip"].present? && premium_zip_codes.include?(lead_data["zip"])
+      amount *= 1.2 # 20% premium for high-value zip codes
+    end
+    
+    # Ensure amount is within bounds
+    enforce_bid_limits(amount)
+  end
+  
+  def dynamic_bid_calculation(base_amount, lead_data)
+    # This would call an ML model in production
+    # For now, just use the base amount with some randomness
+    amount = base_amount * (0.9 + rand * 0.2) # +/- 10%
+    
+    # Ensure amount is within bounds
+    enforce_bid_limits(amount)
+  end
+  
+  def enforce_bid_limits(amount)
+    # Apply minimum bid if set
+    amount = [amount, min_bid_amount].max if min_bid_amount.present?
+    
+    # Apply maximum bid if set
+    amount = [amount, max_bid_amount].min if max_bid_amount.present?
+    
+    amount
+  end
+  
+  def premium_zip_codes
+    # This would come from a configuration in production
+    ["90210", "10001", "94105", "60007"]
   end
 end

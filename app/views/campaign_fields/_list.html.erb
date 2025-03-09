@@ -10,7 +10,7 @@
             </div>
           <div class="flex-shrink-0 mr-3 handle gap-x-6 cursor-move">
             <div class="flex items-center justify-center h-8 w-8 rounded-md bg-blue-500 dark:bg-blue-600 text-white">
-              <% case field.field_type %>
+              <% case field.data_type %>
               <% when "text" %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
@@ -84,7 +84,7 @@
           <div>
             <div class="mt-1 flex flex-wrap items-center gap-2">
               <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                <%= field.field_type.humanize %>
+                <%= field.data_type.humanize %>
               </span>
               
               <% if field.ping_required? %>

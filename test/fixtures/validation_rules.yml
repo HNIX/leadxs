@@ -1,0 +1,40 @@
+# Validation Rules Fixtures
+
+# Campaign-level validation rule
+campaign_rule:
+  account: one
+  validatable: campaigns_one (Campaign)
+  name: "Required Email Format"
+  rule_type: "pattern"
+  condition: "true"
+  error_message: "Please enter a valid email address"
+  severity: "error"
+  active: true
+  position: 1
+  parameters: <%= {field_name: "email", pattern: '\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z'}.to_json %>
+
+# Vertical-level validation rule
+vertical_rule:
+  account: one
+  validatable: verticals_one (Vertical)
+  name: "Required First Name"
+  rule_type: "condition"
+  condition: "!String.empty?(field('first_name'))"
+  error_message: "First name is required"
+  severity: "error"
+  active: true
+  position: 1
+  parameters: <%= {}.to_json %>
+
+# Inactive rule
+inactive_rule:
+  account: one
+  validatable: campaigns_one (Campaign)
+  name: "Optional Phone Format"
+  rule_type: "pattern"
+  condition: "true"
+  error_message: "Please enter a valid phone number"
+  severity: "warning"
+  active: false
+  position: 2
+  parameters: <%= {field_name: "phone", pattern: '\A\+?[1-9]\d{1,14}\z'}.to_json %>

@@ -1,6 +1,6 @@
 <%= form_with model: [@bid_request, bid], data: { turbo: false } do |form| %>
   <% if bid.errors.any? %>
-    <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+    <div class="mb-6 bg-red-100 border border-red-400 text-red-700 dark:bg-red-900 dark:border-red-600 dark:text-red-300 px-4 py-3 rounded">
       <h2 class="text-lg font-medium mb-2">Error!</h2>
       <ul class="list-disc list-inside">
         <% bid.errors.full_messages.each do |message| %>
@@ -11,27 +11,27 @@
   <% end %>
 
   <div class="mb-6">
-    <%= form.label :distribution_id, class: "form-label" %>
-    <%= form.collection_select :distribution_id, current_account.distributions.active.order(:name), :id, :name, { prompt: "Select a distribution" }, class: "form-select" %>
+    <%= form.label :distribution_id, class: "form-label dark:text-gray-300" %>
+    <%= form.collection_select :distribution_id, current_account.distributions.active.order(:name), :id, :name, { prompt: "Select a distribution" }, class: "form-select dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" %>
   </div>
 
   <div class="mb-6">
-    <%= form.label :amount, class: "form-label" %>
+    <%= form.label :amount, class: "form-label dark:text-gray-300" %>
     <div class="relative mt-1 rounded-md shadow-sm">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <span class="text-gray-500 sm:text-sm">$</span>
+        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
       </div>
-      <%= form.number_field :amount, min: 0, step: 0.01, class: "form-input pl-7", placeholder: "0.00" %>
+      <%= form.number_field :amount, min: 0, step: 0.01, class: "form-input pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300", placeholder: "0.00" %>
     </div>
   </div>
 
   <div class="mb-6">
-    <%= form.label :status, class: "form-label" %>
-    <%= form.select :status, Bid.statuses.keys.map { |status| [status.titleize, status] }, {}, class: "form-select" %>
+    <%= form.label :status, class: "form-label dark:text-gray-300" %>
+    <%= form.select :status, Bid.statuses.keys.map { |status| [status.titleize, status] }, {}, class: "form-select dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" %>
   </div>
 
   <div class="flex justify-between mt-8">
-    <%= form.submit class: "btn btn-primary" %>
-    <%= link_to "Cancel", bid.persisted? ? [@bid_request, bid] : @bid_request, class: "btn btn-light" %>
+    <%= form.submit class: "btn btn-primary dark:bg-blue-700 dark:hover:bg-blue-800" %>
+    <%= link_to "Cancel", bid.persisted? ? [@bid_request, bid] : @bid_request, class: "btn btn-light dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 dark:border-gray-600" %>
   </div>
 <% end %>

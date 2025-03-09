@@ -27,17 +27,33 @@ class CampaignFieldsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create campaign_field" do
-    assert_difference("CampaignField.count") do
-      post campaign_campaign_fields_url(@campaign), params: {
-        campaign_field: {
-          name: "new_text_field",
-          label: "New Text Field",
-          field_type: "text",
-          required: true,
-          description: "This is a new text field"
-        }
+    before_count = CampaignField.count
+    
+    post campaign_campaign_fields_url(@campaign), params: {
+      campaign_field: {
+        name: "new_text_field",
+        label: "New Text Field",
+        field_type: "text",
+        required: true,
+        description: "This is a new text field",
+        data_type: "text" # Add this parameter
       }
+    }
+    
+    after_count = CampaignField.count
+    
+    # Debug output in case of failure
+    if before_count == after_count
+      # Check errors
+      if @response.status == 422
+        puts "Validation errors: #{@response.body}"
+      else
+        puts "Response status: #{@response.status}"
+        puts "Response body: #{@response.body}"
+      end
     end
+    
+    assert_equal before_count + 1, after_count, "Campaign field count should increase by 1"
 
     field = CampaignField.last
     assert_redirected_to campaign_url(@campaign)
@@ -49,23 +65,39 @@ class CampaignFieldsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create campaign_field with list values" do
-    assert_difference("CampaignField.count") do
-      post campaign_campaign_fields_url(@campaign), params: {
-        campaign_field: {
-          name: "new_select_field",
-          label: "New Select Field",
-          field_type: "select",
-          value_acceptance: "list",
-          required: true,
-          description: "This is a select field",
-          list_values_attributes: {
-            "0" => { list_value: "Option 1", position: 0 },
-            "1" => { list_value: "Option 2", position: 1 },
-            "2" => { list_value: "Option 3", position: 2 }
-          }
+    before_count = CampaignField.count
+    
+    post campaign_campaign_fields_url(@campaign), params: {
+      campaign_field: {
+        name: "new_select_field",
+        label: "New Select Field",
+        field_type: "select",
+        data_type: "text", # Add data_type parameter
+        value_acceptance: "list",
+        required: true,
+        description: "This is a select field",
+        list_values_attributes: {
+          "0" => { list_value: "Option 1", position: 0 },
+          "1" => { list_value: "Option 2", position: 1 },
+          "2" => { list_value: "Option 3", position: 2 }
         }
       }
+    }
+    
+    after_count = CampaignField.count
+    
+    # Debug output in case of failure
+    if before_count == after_count
+      # Check errors
+      if @response.status == 422
+        puts "Validation errors: #{@response.body}"
+      else
+        puts "Response status: #{@response.status}"
+        puts "Response body: #{@response.body}"
+      end
     end
+    
+    assert_equal before_count + 1, after_count, "Campaign field count should increase by 1"
 
     field = CampaignField.last
     assert_redirected_to campaign_url(@campaign)

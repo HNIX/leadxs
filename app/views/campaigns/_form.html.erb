@@ -42,7 +42,30 @@
 
         <div>
           <%= form.label :distribution_method, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-          <%= form.select :distribution_method, Campaign::DISTRIBUTION_METHODS.map { |d| [d.titleize, d] }, { include_blank: "Select a distribution method" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+          <%= form.select :distribution_method, Campaign::DISTRIBUTION_METHODS.map { |d| [d.titleize, d] }, { include_blank: "Select a distribution method" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { controller: "toggle", action: "change->toggle#toggle", toggle_target: "controller" } } %>
+        </div>
+        
+        <div id="bidding_options" data-controller="toggle" data-toggle-target="toggleable" data-toggle-active-class="block" data-toggle-inactive-class="hidden" data-toggle-show-value="<%= campaign.use_bidding_system? || false %>">
+          <div class="py-3 px-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Bidding Configuration</h3>
+              <%= link_to lead_bidding_docs_path, class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300", target: "_blank" do %>
+                <span>Learn more about bidding</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline ml-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                  <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                </svg>
+              <% end %>
+            </div>
+            <div>
+              <%= form.label :bid_timeout_seconds, "Bid Timeout (seconds)", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <%= form.number_field :bid_timeout_seconds, min: 5, max: 300, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Time to wait for bids before auto-selecting a winner (5-300 seconds)</p>
+            </div>
+            <div class="mt-4 text-xs bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500 dark:border-blue-700 p-2 text-blue-700 dark:text-blue-300">
+              <p><strong>Tip:</strong> For ping-post campaigns, the system will create anonymized bid requests and automatically select a winner after the timeout period. Longer timeouts allow more bids to come in but may delay lead processing.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -91,6 +114,7 @@
 
 <%= javascript_tag do %>
   document.addEventListener('turbo:load', function() {
+    // Schedule options toggle
     const scheduleCheckbox = document.querySelector('#campaign_distribution_schedule_enabled');
     const scheduleOptions = document.querySelector('#schedule_options');
     
@@ -105,6 +129,28 @@
       
       toggleScheduleOptions();
       scheduleCheckbox.addEventListener('change', toggleScheduleOptions);
+    }
+    
+    // Bidding options toggle based on campaign type and distribution method
+    const campaignTypeSelect = document.querySelector('#campaign_campaign_type');
+    const distributionMethodSelect = document.querySelector('#campaign_distribution_method');
+    const biddingOptions = document.querySelector('#bidding_options');
+    
+    if (campaignTypeSelect && distributionMethodSelect && biddingOptions) {
+      function toggleBiddingOptions() {
+        const isPingPost = campaignTypeSelect.value === 'ping_post';
+        const isBiddingMethod = ['highest_bid', 'weighted_random', 'waterfall'].includes(distributionMethodSelect.value);
+        
+        if (isPingPost && isBiddingMethod) {
+          biddingOptions.classList.remove('hidden');
+        } else {
+          biddingOptions.classList.add('hidden');
+        }
+      }
+      
+      toggleBiddingOptions();
+      campaignTypeSelect.addEventListener('change', toggleBiddingOptions);
+      distributionMethodSelect.addEventListener('change', toggleBiddingOptions);
     }
   });
 <% end %>

@@ -4,13 +4,22 @@ class DistributionTest < ActiveSupport::TestCase
   setup do
     @account = accounts(:one)
     @company = companies(:one)
+    
+    # Set current tenant for testing
+    ActsAsTenant.current_tenant = @account
+    
     @distribution = Distribution.new(
+      account: @account,
       name: "Test Distribution",
       company: @company,
       endpoint_url: "https://example.com/api/leads",
       request_method: :post,
       request_format: :json
     )
+  end
+  
+  teardown do
+    ActsAsTenant.current_tenant = nil
   end
 
   test "valid distribution" do
@@ -100,43 +109,32 @@ class DistributionTest < ActiveSupport::TestCase
   end
 
   test "has many campaign_distributions dependent destroy" do
-    @distribution.save
-    campaign = campaigns(:one)
-    
-    campaign_distribution = CampaignDistribution.create!(
-      campaign: campaign,
-      distribution: @distribution
-    )
-    
-    assert_includes @distribution.campaign_distributions, campaign_distribution
-    assert_difference -> { CampaignDistribution.count }, -1 do
-      @distribution.destroy
+    assert_difference "CampaignDistribution.count", -1 do
+      distributions(:one).destroy
     end
   end
 
   test "has many campaigns through campaign_distributions" do
-    @distribution.save
+    distribution = distributions(:one)
     campaign = campaigns(:one)
     
-    CampaignDistribution.create!(
-      campaign: campaign,
-      distribution: @distribution
-    )
+    # Verify the association is working correctly
+    assert_includes distribution.campaigns, campaign
     
-    assert_includes @distribution.campaigns, campaign
+    # Test that we can access campaigns through the distribution
+    assert_equal 1, distribution.campaigns.count
+    assert_equal campaign.id, distribution.campaigns.first.id
   end
 
   test "has many headers dependent destroy" do
-    @distribution.save
-    header = Header.create!(
-      distribution: @distribution,
-      name: "Authorization",
-      value: "Bearer token123"
-    )
+    distribution = distributions(:one)
     
-    assert_includes @distribution.headers, header
-    assert_difference -> { Header.count }, -1 do
-      @distribution.destroy
+    # Ensure we have headers for this distribution
+    assert_equal 2, distribution.headers.count
+    
+    # Test that destroying the distribution destroys the headers
+    assert_difference "Header.count", -2 do
+      distribution.destroy
     end
   end
 end

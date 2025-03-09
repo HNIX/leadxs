@@ -71,6 +71,10 @@ Rails.application.routes.draw do
   
   # Bidding system routes
   resources :bid_requests do
+    collection do
+      get :dashboard
+    end
+    
     resources :bids do
       member do
         post :accept
@@ -137,6 +141,7 @@ Rails.application.routes.draw do
     get :privacy
     get :pricing
     get :reset_app
+    get :lead_bidding_docs
   end
   
   # Validation rules documentation

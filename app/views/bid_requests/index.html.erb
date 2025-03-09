@@ -4,37 +4,37 @@
     <%= link_to "New Bid Request", new_bid_request_path, class: "btn btn-primary" %>
   </div>
 
-  <div class="bg-white rounded shadow">
+  <div class="bg-white dark:bg-gray-800 rounded shadow">
     <% if @bid_requests.any? %>
       <table class="table-auto w-full">
         <thead>
           <tr>
-            <th class="p-3 text-left">ID</th>
-            <th class="p-3 text-left">Campaign</th>
-            <th class="p-3 text-left">Status</th>
-            <th class="p-3 text-left">Bids</th>
-            <th class="p-3 text-left">Expires</th>
-            <th class="p-3 text-left">Created</th>
-            <th class="p-3 text-left">Actions</th>
+            <th class="p-3 text-left dark:text-gray-300">ID</th>
+            <th class="p-3 text-left dark:text-gray-300">Campaign</th>
+            <th class="p-3 text-left dark:text-gray-300">Status</th>
+            <th class="p-3 text-left dark:text-gray-300">Bids</th>
+            <th class="p-3 text-left dark:text-gray-300">Expires</th>
+            <th class="p-3 text-left dark:text-gray-300">Created</th>
+            <th class="p-3 text-left dark:text-gray-300">Actions</th>
           </tr>
         </thead>
         <tbody>
           <% @bid_requests.each do |bid_request| %>
-            <tr class="border-t border-gray-200">
-              <td class="p-3"><%= link_to bid_request.unique_id.truncate(10), bid_request, class: "text-blue-600 hover:text-blue-800" %></td>
-              <td class="p-3"><%= link_to bid_request.campaign.name, bid_request.campaign %></td>
+            <tr class="border-t border-gray-200 dark:border-gray-700">
+              <td class="p-3 dark:text-gray-300"><%= link_to bid_request.unique_id.truncate(10), bid_request, class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %></td>
+              <td class="p-3 dark:text-gray-300"><%= link_to bid_request.campaign.name, bid_request.campaign, class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %></td>
               <td class="p-3">
                 <span class="<%= bid_request_status_class(bid_request) %>">
                   <%= bid_request.status.titleize %>
                 </span>
               </td>
-              <td class="p-3"><%= bid_request.bids.count %></td>
-              <td class="p-3"><%= time_ago_in_words(bid_request.expires_at) %></td>
-              <td class="p-3"><%= time_ago_in_words(bid_request.created_at) %> ago</td>
+              <td class="p-3 dark:text-gray-300"><%= bid_request.bids.count %></td>
+              <td class="p-3 dark:text-gray-300"><%= time_ago_in_words(bid_request.expires_at) %></td>
+              <td class="p-3 dark:text-gray-300"><%= time_ago_in_words(bid_request.created_at) %> ago</td>
               <td class="p-3">
-                <%= link_to "View", bid_request, class: "btn btn-sm btn-link" %>
+                <%= link_to "View", bid_request, class: "btn btn-sm btn-link dark:text-blue-400 dark:hover:text-blue-300" %>
                 <% if !bid_request.expired? && bid_request.status != "completed" %>
-                  <%= button_to "Solicit Bids", solicit_bids_bid_request_path(bid_request), class: "btn btn-sm btn-outline" %>
+                  <%= button_to "Solicit Bids", solicit_bids_bid_request_path(bid_request), class: "btn btn-sm btn-outline dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700" %>
                 <% end %>
               </td>
             </tr>
@@ -47,7 +47,7 @@
       </div>
     <% else %>
       <div class="p-6 text-center">
-        <p class="text-gray-500">No bid requests found.</p>
+        <p class="text-gray-500 dark:text-gray-400">No bid requests found.</p>
       </div>
     <% end %>
   </div>
