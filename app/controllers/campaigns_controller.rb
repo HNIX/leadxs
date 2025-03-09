@@ -29,6 +29,12 @@ class CampaignsController < ApplicationController
     @campaign_fields = @campaign.campaign_fields.ordered
     @calculated_fields = @campaign.calculated_fields.ordered
     @validation_rules = @campaign.validation_rules.ordered
+    @source_filters = @campaign.source_filters.where(type: 'SourceFilter').includes(:campaign_field).limit(5)
+    @distribution_filters = @campaign.distribution_filters.where(type: 'DistributionFilter').includes(:campaign_field).limit(5)
+    @sources = @campaign.sources.includes(:company).limit(5)
+    @distributions = @campaign.distributions.includes(:company).limit(5)
+    @leads_count = @campaign.leads.count
+    @recent_leads = @campaign.leads.order(created_at: :desc).limit(5)
   end
 
   def edit
