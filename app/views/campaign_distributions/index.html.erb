@@ -1,0 +1,119 @@
+<div class="max-w-6xl mx-auto px-4">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <%= @campaign.name %> - Distributions
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        Manage distribution endpoints for this campaign
+      </p>
+    </div>
+    <div class="flex items-center space-x-2">
+      <%= link_to campaign_path(@campaign), class: "btn btn-white" do %>
+        <i class="fas fa-arrow-left mr-1"></i> Back to Campaign
+      <% end %>
+
+      <%= link_to new_campaign_campaign_distribution_path(@campaign), class: "btn btn-primary" do %>
+        <i class="fas fa-plus mr-1"></i> Add Distribution
+      <% end %>
+    </div>
+  </div>
+
+  <% if @campaign_distributions.any? %>
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Distribution
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Company
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Status
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Priority
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Mappings
+            </th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <% @campaign_distributions.each do |campaign_distribution| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                  <%= campaign_distribution.distribution.name %>
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  <%= campaign_distribution.distribution.request_method.upcase %> / <%= campaign_distribution.distribution.request_format.upcase %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-white">
+                  <%= campaign_distribution.distribution.company.name %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% if campaign_distribution.active? %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    Active
+                  </span>
+                <% else %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                    Inactive
+                  </span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <%= campaign_distribution.priority || '—' %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <% mapped = campaign_distribution.mapped_fields.count %>
+                <% required = campaign_distribution.campaign.campaign_fields.where(required: true).count %>
+                <span class="<%= campaign_distribution.all_required_fields_mapped? ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400' %>">
+                  <%= mapped %> fields mapped
+                </span>
+                <% unless campaign_distribution.all_required_fields_mapped? %>
+                  <div class="text-red-600 dark:text-red-400 text-xs mt-1">
+                    Missing required fields
+                  </div>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex justify-end space-x-2">
+                  <%= link_to campaign_distribution_mapped_fields_path(campaign_distribution), class: "text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300" do %>
+                    <i class="fas fa-list mr-1"></i> Mappings
+                  <% end %>
+                  
+                  <%= link_to edit_campaign_distribution_path(campaign_distribution), class: "text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300" do %>
+                    <i class="fas fa-edit"></i>
+                  <% end %>
+
+                  <%= button_to campaign_distribution_path(campaign_distribution), method: :delete, data: { confirm: "Are you sure you want to remove this distribution from the campaign?" }, class: "text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-transparent border-0 p-0" do %>
+                    <i class="fas fa-trash"></i>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-6 text-center">
+      <p class="text-gray-500 dark:text-gray-400">
+        No distributions have been added to this campaign yet.
+      </p>
+      <p class="mt-2">
+        <%= link_to "Add your first distribution", new_campaign_campaign_distribution_path(@campaign), class: "text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" %>
+      </p>
+    </div>
+  <% end %>
+</div>

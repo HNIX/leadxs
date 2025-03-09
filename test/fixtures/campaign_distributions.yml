@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  campaign: one
+  distribution: one
+  active: true
+  priority: 1
+
+two:
+  campaign: two
+  distribution: two
+  active: true
+  priority: 2

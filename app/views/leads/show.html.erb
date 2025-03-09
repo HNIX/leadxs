@@ -1,0 +1,279 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold dark:text-white">Lead Details</h1>
+    <div class="flex space-x-2">
+      <%= link_to "Back to Leads", leads_path, class: "px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600" %>
+      
+      <% if @lead.campaign %>
+        <%= link_to "Campaign: #{@lead.campaign.name}", campaign_path(@lead.campaign), class: "px-4 py-2 bg-indigo-100 dark:bg-indigo-900 rounded-md text-indigo-800 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800" %>
+      <% end %>
+      
+      <% if @lead.api_requests.any? %>
+        <%= link_to "View API Requests", api_requests_path(lead_id: @lead.id), class: "px-4 py-2 bg-blue-100 dark:bg-blue-900 rounded-md text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Lead overview -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow col-span-1">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-lg font-medium dark:text-white">Lead Overview</h2>
+      </div>
+      
+      <div class="p-6">
+        <dl class="space-y-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">ID</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white"><%= @lead.id %></dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Unique ID</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono"><%= @lead.unique_id %></dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+            <dd class="mt-1 text-sm">
+              <% case @lead.status %>
+              <% when "distributed" %>
+                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                  DISTRIBUTED
+                </span>
+              <% when "new" %>
+                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                  NEW
+                </span>
+              <% when "processing" %>
+                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                  PROCESSING
+                </span>
+              <% when "rejected" %>
+                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100">
+                  REJECTED
+                </span>
+              <% when "error" %>
+                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                  ERROR
+                </span>
+              <% end %>
+            </dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Campaign</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+              <% if @lead.campaign %>
+                <%= link_to @lead.campaign.name, campaign_path(@lead.campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+              <% else %>
+                <span class="text-gray-400 dark:text-gray-500">N/A</span>
+              <% end %>
+            </dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Source</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+              <% if @lead.source %>
+                <%= link_to @lead.source.name, source_path(@lead.source), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+              <% else %>
+                <span class="text-gray-400 dark:text-gray-500">N/A</span>
+              <% end %>
+            </dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created At</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white"><%= l @lead.created_at, format: :long %></dd>
+          </div>
+          
+          <% if @lead.first_distributed_at %>
+            <div>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">First Distributed At</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white"><%= l @lead.first_distributed_at, format: :long %></dd>
+            </div>
+          <% end %>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution Count</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white"><%= @lead.distribution_count %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    
+    <!-- Browser/Device Info -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow col-span-1">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-lg font-medium dark:text-white">Client Information</h2>
+      </div>
+      
+      <div class="p-6">
+        <dl class="space-y-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">IP Address</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono"><%= @lead.ip_address || "N/A" %></dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">User Agent</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white break-words"><%= @lead.user_agent || "N/A" %></dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Referrer</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-white break-words"><%= @lead.referrer || "N/A" %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    
+    <!-- API Requests Summary -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow col-span-1">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-lg font-medium dark:text-white">API Requests</h2>
+      </div>
+      
+      <div class="p-6">
+        <% if @api_requests.any? %>
+          <div class="space-y-4">
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Requests</span>
+              <span class="text-sm text-gray-900 dark:text-white"><%= @api_requests.count %></span>
+            </div>
+            
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Successful</span>
+              <span class="text-sm text-green-600 dark:text-green-400"><%= @api_requests.select(&:successful?).count %></span>
+            </div>
+            
+            <div class="flex justify-between">
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Failed</span>
+              <span class="text-sm text-red-600 dark:text-red-400"><%= @api_requests.reject(&:successful?).count %></span>
+            </div>
+            
+            <div class="mt-6">
+              <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Recent Requests</h3>
+              <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                <% @api_requests.first(5).each do |api_request| %>
+                  <li class="py-3">
+                    <div class="flex justify-between">
+                      <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
+                          <%= api_request.requestable_type %>: <%= api_request.endpoint_url %>
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                          <%= time_ago_in_words(api_request.created_at) %> ago
+                        </p>
+                      </div>
+                      <div>
+                        <% if api_request.successful? %>
+                          <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                            <%= api_request.response_code %>
+                          </span>
+                        <% else %>
+                          <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                            <%= api_request.response_code || "ERROR" %>
+                          </span>
+                        <% end %>
+                      </div>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+              
+              <div class="mt-4 text-center">
+                <%= link_to "View All API Requests", api_requests_path(lead_id: @lead.id), class: "text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <p class="text-sm text-gray-500 dark:text-gray-400">No API requests found for this lead.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Lead Data -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h2 class="text-lg font-medium dark:text-white">Lead Data</h2>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Field</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Value</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Required</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Meta</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <% if @lead_data.any? %>
+            <% @lead_data.each do |lead_data| %>
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 <%= lead_data.campaign_field.required? ? 'font-medium' : '' %>">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <%= lead_data.campaign_field.label.presence || lead_data.campaign_field.name %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <%= lead_data.campaign_field.field_type&.titleize || "Unknown" %>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white break-words">
+                  <% if lead_data.campaign_field.field_type == "email" %>
+                    <a href="mailto:<%= lead_data.value %>" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"><%= lead_data.value %></a>
+                  <% elsif lead_data.campaign_field.field_type == "phone" %>
+                    <a href="tel:<%= lead_data.value %>" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"><%= lead_data.value %></a>
+                  <% elsif lead_data.campaign_field.field_type == "url" %>
+                    <a href="<%= lead_data.value %>" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"><%= lead_data.value %></a>
+                  <% else %>
+                    <%= lead_data.value %>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <% if lead_data.campaign_field.required? %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                      Required
+                    </span>
+                  <% else %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100">
+                      Optional
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <% if lead_data.campaign_field.is_pii? %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                      PII
+                    </span>
+                  <% end %>
+                  
+                  <% if lead_data.campaign_field.ping_required? %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 ml-1">
+                      Ping
+                    </span>
+                  <% end %>
+                  
+                  <% if lead_data.campaign_field.post_required? %>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 ml-1">
+                      Post
+                    </span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <p>No data available for this lead.</p>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

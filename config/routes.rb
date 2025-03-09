@@ -1,6 +1,35 @@
 # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  # Distributions (buyers/endpoints)
+  resources :distributions do
+    member do
+      post :test_connection
+      patch :toggle_status
+    end
+  end
+  
+  # Campaign Distributions mapping
+  resources :campaign_distributions, except: [:index, :new, :create] do
+    resources :mapped_fields, only: [:index] do
+      collection do
+        patch :update_mappings
+      end
+    end
+  end
+  
+  # API request logs
+  resources :api_requests, only: [:index, :show] do
+    member do
+      post :resend
+    end
+  end
+  
+  # Lead management
+  resources :leads, only: [:index, :show]
+  
   resources :campaigns do
+    # Campaign Distributions for this campaign
+    resources :campaign_distributions, path: 'distributions', only: [:index, :new, :create]
     resources :campaign_fields do
       resource :positions, only: [:update], module: :campaign_fields
     end

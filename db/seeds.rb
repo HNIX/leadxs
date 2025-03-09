@@ -189,6 +189,41 @@ if Rails.env.development?
     end
   end
   
+  # Create some companies
+  ActsAsTenant.with_tenant(account) do
+    # Create a source company
+    unless Company.exists?(name: "Publisher Company", account_id: account.id)
+      company = Company.create!(
+        name: "Publisher Company",
+        address: "123 Publisher St",
+        city: "Seattle",
+        state: "WA",
+        zip_code: "98101",
+        billing_cycle: "monthly",
+        payment_terms: "net30",
+        currency: "USD",
+        account_id: account.id
+      )
+      puts "Created Publisher Company"
+    end
+    
+    # Create a distribution company
+    unless Company.exists?(name: "Buyer Company", account_id: account.id)
+      company = Company.create!(
+        name: "Buyer Company",
+        address: "456 Buyer Ave",
+        city: "San Francisco",
+        state: "CA",
+        zip_code: "94107",
+        billing_cycle: "monthly",
+        payment_terms: "net15",
+        currency: "USD",
+        account_id: account.id
+      )
+      puts "Created Buyer Company"
+    end
+  end
+  
   # Create sample campaigns
   ActsAsTenant.with_tenant(account) do
     # Create campaigns for each vertical
@@ -243,5 +278,8 @@ if Rails.env.development?
     end
   end
 
+  # Create leads and API requests
+  require_relative "seeds/add_leads_and_api_requests"
+  
   puts "Development seed data created successfully!"
 end

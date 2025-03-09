@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -119,6 +119,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "api_requests", force: :cascade do |t|
+    t.string "requestable_type", null: false
+    t.bigint "requestable_id", null: false
+    t.bigint "lead_id"
+    t.string "endpoint_url", null: false
+    t.integer "request_method", null: false
+    t.text "request_payload"
+    t.integer "response_code"
+    t.text "response_payload"
+    t.integer "duration_ms"
+    t.text "error"
+    t.datetime "sent_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "account_id", null: false
+    t.index ["account_id"], name: "index_api_requests_on_account_id"
+    t.index ["requestable_type", "requestable_id", "created_at"], name: "idx_on_requestable_type_requestable_id_created_at_3b74dff40b"
+    t.index ["requestable_type", "requestable_id"], name: "index_api_requests_on_requestable"
+  end
+
   create_table "api_tokens", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "token"
@@ -146,6 +166,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
     t.index ["account_id"], name: "index_calculated_fields_on_account_id"
     t.index ["campaign_id", "name"], name: "index_calculated_fields_on_campaign_id_and_name", unique: true
     t.index ["campaign_id"], name: "index_calculated_fields_on_campaign_id"
+  end
+
+  create_table "campaign_distributions", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.bigint "distribution_id", null: false
+    t.boolean "active", default: true, null: false
+    t.integer "priority", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "distribution_id"], name: "idx_on_campaign_id_distribution_id_81ffb0256c", unique: true
+    t.index ["campaign_id"], name: "index_campaign_distributions_on_campaign_id"
+    t.index ["distribution_id"], name: "index_campaign_distributions_on_distribution_id"
   end
 
   create_table "campaign_fields", force: :cascade do |t|
@@ -248,11 +280,70 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
     t.index ["company_id"], name: "index_contacts_on_company_id"
   end
 
+  create_table "distributions", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.bigint "company_id", null: false
+    t.string "endpoint_url", null: false
+    t.string "authentication_token"
+    t.integer "status", default: 0, null: false
+    t.integer "request_method", default: 1, null: false
+    t.integer "request_format", default: 1, null: false
+    t.text "template"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "account_id", null: false
+    t.index ["account_id", "name"], name: "index_distributions_on_account_id_and_name", unique: true
+    t.index ["account_id"], name: "index_distributions_on_account_id"
+    t.index ["company_id", "name"], name: "index_distributions_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_distributions_on_company_id"
+  end
+
+  create_table "headers", force: :cascade do |t|
+    t.bigint "distribution_id", null: false
+    t.string "name", null: false
+    t.string "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["distribution_id", "name"], name: "index_headers_on_distribution_id_and_name", unique: true
+    t.index ["distribution_id"], name: "index_headers_on_distribution_id"
+  end
+
   create_table "inbound_webhooks", force: :cascade do |t|
     t.integer "status", default: 0, null: false
     t.text "body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "lead_data", force: :cascade do |t|
+    t.bigint "lead_id", null: false
+    t.bigint "campaign_field_id", null: false
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_field_id"], name: "index_lead_data_on_campaign_field_id"
+    t.index ["lead_id", "campaign_field_id"], name: "index_lead_data_on_lead_id_and_campaign_field_id", unique: true
+    t.index ["lead_id"], name: "index_lead_data_on_lead_id"
+  end
+
+  create_table "leads", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "campaign_id", null: false
+    t.bigint "source_id"
+    t.string "unique_id", null: false
+    t.integer "status", default: 0, null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.string "referrer"
+    t.datetime "first_distributed_at"
+    t.integer "distribution_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "unique_id"], name: "index_leads_on_account_id_and_unique_id", unique: true
+    t.index ["account_id"], name: "index_leads_on_account_id"
+    t.index ["campaign_id"], name: "index_leads_on_campaign_id"
+    t.index ["source_id"], name: "index_leads_on_source_id"
   end
 
   create_table "list_values", force: :cascade do |t|
@@ -268,6 +359,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
     t.index ["account_id"], name: "index_list_values_on_account_id"
     t.index ["list_owner_type", "list_owner_id", "position"], name: "index_list_values_on_owner_and_position"
     t.index ["list_owner_type", "list_owner_id"], name: "index_list_values_on_list_owner"
+  end
+
+  create_table "mapped_fields", force: :cascade do |t|
+    t.bigint "campaign_distribution_id", null: false
+    t.integer "campaign_field_id"
+    t.string "distribution_field_name", null: false
+    t.string "static_value"
+    t.integer "value_type", default: 0, null: false
+    t.boolean "required", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_distribution_id", "distribution_field_name"], name: "index_mapped_fields_on_campaign_dist_and_field_name", unique: true
+    t.index ["campaign_distribution_id"], name: "index_mapped_fields_on_campaign_distribution_id"
   end
 
   create_table "noticed_events", force: :cascade do |t|
@@ -613,9 +717,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
   add_foreign_key "account_users", "users"
   add_foreign_key "accounts", "users", column: "owner_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "api_requests", "accounts"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "calculated_fields", "accounts"
   add_foreign_key "calculated_fields", "campaigns", on_delete: :cascade
+  add_foreign_key "campaign_distributions", "campaigns"
+  add_foreign_key "campaign_distributions", "distributions"
   add_foreign_key "campaign_fields", "accounts"
   add_foreign_key "campaign_fields", "campaigns", on_delete: :cascade
   add_foreign_key "campaign_fields", "vertical_fields"
@@ -624,7 +731,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_08_233214) do
   add_foreign_key "companies", "accounts"
   add_foreign_key "contacts", "accounts"
   add_foreign_key "contacts", "companies"
+  add_foreign_key "distributions", "accounts"
+  add_foreign_key "distributions", "companies"
+  add_foreign_key "headers", "distributions"
+  add_foreign_key "lead_data", "campaign_fields"
+  add_foreign_key "lead_data", "leads"
+  add_foreign_key "leads", "accounts"
+  add_foreign_key "leads", "campaigns"
+  add_foreign_key "leads", "sources"
   add_foreign_key "list_values", "accounts"
+  add_foreign_key "mapped_fields", "campaign_distributions"
   add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"

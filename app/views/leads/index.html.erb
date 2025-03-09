@@ -1,0 +1,133 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold dark:text-white">Leads</h1>
+    <div class="flex space-x-2">
+      <%= link_to leads_path(status: 'all'), class: "px-3 py-1 rounded-md #{params[:status].blank? ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}" do %>
+        All
+      <% end %>
+      <%= link_to leads_path(status: 'distributed'), class: "px-3 py-1 rounded-md #{params[:status] == 'distributed' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}" do %>
+        Distributed
+      <% end %>
+      <%= link_to leads_path(status: 'error'), class: "px-3 py-1 rounded-md #{params[:status] == 'error' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}" do %>
+        Errors
+      <% end %>
+      <%= link_to leads_path(status: 'new'), class: "px-3 py-1 rounded-md #{params[:status] == 'new' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}" do %>
+        New
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <%= form_with url: leads_path, method: :get, class: "flex flex-wrap gap-2", data: { turbo_frame: "_top" } do |f| %>
+      <div>
+        <%= f.select :campaign_id, [['All Campaigns', '']] + Campaign.where(account: current_account).order(:name).map { |c| [c.name, c.id] }, 
+                      { selected: params[:campaign_id] }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white" } %>
+      </div>
+      
+      <div>
+        <%= f.select :source_id, [['All Sources', '']] + Source.where(account: current_account).order(:name).map { |s| [s.name, s.id] }, 
+                      { selected: params[:source_id] }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white" } %>
+      </div>
+      
+      <%= f.hidden_field :status, value: params[:status] if params[:status].present? %>
+      
+      <div>
+        <%= f.button "Filter", class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+        <%= link_to "Clear", leads_path, class: "ml-2 px-3 py-2 bg-gray-100 rounded-md text-gray-800 hover:bg-gray-200 text-sm dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Unique ID</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Campaign</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Source</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Created</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">API Requests</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <% if @leads.any? %>
+            <% @leads.each do |lead| %>
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"><%= lead.id %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <span class="font-mono"><%= lead.unique_id %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <%= link_to lead.campaign.name, campaign_path(lead.campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <% if lead.source %>
+                    <%= link_to lead.source.name, source_path(lead.source), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+                  <% else %>
+                    <span class="text-gray-400 dark:text-gray-500">N/A</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <% case lead.status %>
+                  <% when "distributed" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                      DISTRIBUTED
+                    </span>
+                  <% when "new" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                      NEW
+                    </span>
+                  <% when "processing" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                      PROCESSING
+                    </span>
+                  <% when "rejected" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100">
+                      REJECTED
+                    </span>
+                  <% when "error" %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                      ERROR
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <span title="<%= l lead.created_at, format: :long %>"><%= time_ago_in_words(lead.created_at) %> ago</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <% api_count = lead.api_requests.count %>
+                  <% if api_count > 0 %>
+                    <%= link_to api_requests_path(lead_id: lead.id), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
+                      <%= api_count %> <%= api_count == 1 ? 'request' : 'requests' %>
+                    <% end %>
+                  <% else %>
+                    <span class="text-gray-400 dark:text-gray-500">None</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <%= link_to "View", lead_path(lead), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <p>No leads found matching your criteria.</p>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <%== pagy_nav(@pagy) %>
+  </div>
+</div>

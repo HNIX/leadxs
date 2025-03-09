@@ -1,0 +1,62 @@
+<div class="max-w-6xl mx-auto px-4">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Distributions</h1>
+    <%= link_to new_distribution_path, class: "btn btn-primary" do %>
+      <i class="fas fa-plus mr-1"></i> New Distribution
+    <% end %>
+  </div>
+  
+  <% if @distributions.any? %>
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+      <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+        <% @distributions.each do |distribution| %>
+          <li>
+            <%= link_to distribution_path(distribution), class: "block hover:bg-gray-50 dark:hover:bg-gray-700" do %>
+              <div class="px-4 py-4 sm:px-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <p class="text-sm font-medium text-primary-600 truncate">
+                      <%= distribution.name %>
+                    </p>
+                    <div class="ml-2 flex-shrink-0 flex">
+                      <% status_color = distribution.active? ? "green" : "gray" %>
+                      <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-<%= status_color %>-100 text-<%= status_color %>-800 dark:bg-<%= status_color %>-900 dark:text-<%= status_color %>-200">
+                        <%= distribution.status.titleize %>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="ml-2 flex-shrink-0 flex">
+                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <%= distribution.request_method.upcase %> / <%= distribution.request_format.upcase %>
+                    </p>
+                  </div>
+                </div>
+                <div class="mt-2 sm:flex sm:justify-between">
+                  <div class="sm:flex">
+                    <p class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <i class="fas fa-building flex-shrink-0 mr-1.5 text-gray-400 dark:text-gray-500"></i>
+                      <%= distribution.company.name %>
+                    </p>
+                  </div>
+                  <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400 sm:mt-0">
+                    <i class="fas fa-globe flex-shrink-0 mr-1.5 text-gray-400 dark:text-gray-500"></i>
+                    <p class="truncate">
+                      <%= distribution.endpoint_url %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md p-6 text-center">
+      <p class="text-gray-500 dark:text-gray-400">No distributions found.</p>
+      <p class="mt-2">
+        <%= link_to "Create your first distribution", new_distribution_path, class: "text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" %>
+      </p>
+    </div>
+  <% end %>
+</div>

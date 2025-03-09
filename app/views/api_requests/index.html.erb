@@ -1,0 +1,131 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">API Requests</h1>
+    <div class="flex space-x-2">
+      <%= link_to api_requests_path(status: 'all'), class: "px-3 py-1 rounded-md #{params[:status] != 'failed' && params[:status] != 'successful' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}" do %>
+        All
+      <% end %>
+      <%= link_to api_requests_path(status: 'successful'), class: "px-3 py-1 rounded-md #{params[:status] == 'successful' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}" do %>
+        Successful
+      <% end %>
+      <%= link_to api_requests_path(status: 'failed'), class: "px-3 py-1 rounded-md #{params[:status] == 'failed' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}" do %>
+        Failed
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <%= form_with url: api_requests_path, method: :get, class: "flex flex-wrap gap-2", data: { turbo_frame: "_top" } do |f| %>
+      <div>
+        <%= f.select :requestable_type, [['All Types', ''], ['Distribution', 'Distribution'], ['Source', 'Source']], 
+                      { selected: params[:requestable_type] }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" } %>
+      </div>
+      
+      <div>
+        <%= f.text_field :endpoint_contains, placeholder: "Endpoint URL contains...", value: params[:endpoint_contains], 
+                         class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" %>
+      </div>
+      
+      <div>
+        <%= f.select :method, [['All Methods', ''], ['GET', 'get'], ['POST', 'post'], ['PUT', 'put'], ['PATCH', 'patch']], 
+                      { selected: params[:method] }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" } %>
+      </div>
+      
+      <div>
+        <%= f.select :campaign_id, [['All Campaigns', '']] + Campaign.where(account: current_account).order(:name).map { |c| [c.name, c.id] }, 
+                      { selected: params[:campaign_id] }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm" } %>
+      </div>
+      
+      <%= f.hidden_field :status, value: params[:status] if params[:status].present? %>
+      
+      <div>
+        <%= f.button "Filter", class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+        <%= link_to "Clear", api_requests_path, class: "ml-2 px-3 py-2 bg-gray-100 rounded-md text-gray-800 hover:bg-gray-200 text-sm" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Endpoint</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Method</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Code</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Campaign</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Time</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <% if @api_requests.any? %>
+            <% @api_requests.each do |api_request| %>
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"><%= api_request.id %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <%= api_request.requestable_type %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <span class="truncate block max-w-xs" title="<%= api_request.endpoint_url %>"><%= api_request.endpoint_url %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                    <%= api_request.method %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <% if api_request.successful? %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                      SUCCESS
+                    </span>
+                  <% else %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                      FAILED
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <%= api_request.response_code || "N/A" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <%= api_request.duration_ms ? "#{api_request.duration_ms}ms" : "N/A" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <% if api_request.campaign %>
+                    <%= link_to api_request.campaign.name, campaign_path(api_request.campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+                  <% else %>
+                    N/A
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <span title="<%= l api_request.created_at, format: :long %>"><%= time_ago_in_words(api_request.created_at) %> ago</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <%= link_to "View", api_request_path(api_request), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <p>No API requests found matching your criteria.</p>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <%== pagy_nav(@pagy) %>
+  </div>
+</div>

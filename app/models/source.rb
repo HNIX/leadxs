@@ -3,6 +3,7 @@ class Source < AccountRecord
   acts_as_tenant :account
   belongs_to :campaign
   belongs_to :company
+  has_many :leads, dependent: :destroy
   
   # Constants
   STATUSES = ['active', 'paused', 'archived'].freeze

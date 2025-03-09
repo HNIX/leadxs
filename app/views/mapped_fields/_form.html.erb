@@ -1,0 +1,58 @@
+<%= form_with(model: mapped_field, url: mapped_field_path(mapped_field), class: "space-y-6") do |form| %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <%= form.label :distribution_field_name, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :distribution_field_name, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+      <p class="mt-1 text-sm text-gray-500">The name of the field in the distribution endpoint</p>
+    </div>
+
+    <div>
+      <%= form.label :value_type, class: "block text-sm font-medium text-gray-700" %>
+      <div class="mt-1">
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center">
+            <%= form.radio_button :value_type, "dynamic", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300", data: { controller: "toggle", toggle_target: "input", action: "change->toggle#toggle", toggle_show_target: "dynamicField", toggle_hide_target: "staticField" } %>
+            <%= form.label :value_type_dynamic, "Dynamic (Campaign Field)", class: "ml-2 block text-sm text-gray-700" %>
+          </div>
+          <div class="flex items-center">
+            <%= form.radio_button :value_type, "static", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300", data: { controller: "toggle", toggle_target: "input", action: "change->toggle#toggle", toggle_show_target: "staticField", toggle_hide_target: "dynamicField" } %>
+            <%= form.label :value_type_static, "Static Value", class: "ml-2 block text-sm text-gray-700" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="dynamicField" class="<%= mapped_field.value_type == 'static' ? 'hidden' : '' %>" data-toggle-target="dynamicField">
+      <%= form.label :campaign_field_id, "Campaign Field", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.collection_select :campaign_field_id, 
+          mapped_field.campaign_distribution.campaign.campaign_fields, 
+          :id, :name, 
+          { include_blank: "Select a campaign field" }, 
+          { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" } %>
+      <p class="mt-1 text-sm text-gray-500">The campaign field to map to this distribution field</p>
+    </div>
+
+    <div id="staticField" class="<%= mapped_field.value_type == 'dynamic' ? 'hidden' : '' %>" data-toggle-target="staticField">
+      <%= form.label :static_value, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :static_value, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+      <p class="mt-1 text-sm text-gray-500">A fixed value that will be sent with every request</p>
+    </div>
+
+    <div>
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= form.check_box :required, class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" %>
+        </div>
+        <div class="ml-3 text-sm">
+          <%= form.label :required, class: "font-medium text-gray-700" %>
+          <p class="text-gray-500">Mark this field as required for the distribution</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end">
+    <%= link_to "Cancel", campaign_distribution_path(mapped_field.campaign_distribution), class: "inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    <%= form.submit class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+  </div>
+<% end %>

@@ -19,7 +19,6 @@ class CampaignField < ApplicationRecord
   # Validations
   validates :name, presence: true
   validates :name, uniqueness: { scope: [:account_id, :campaign_id], message: "already exists in this campaign" }
-  validates :position, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :validate_list_values_if_list
   validate :validate_range_if_range
   validates :data_type, presence: true

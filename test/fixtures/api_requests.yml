@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+successful:
+  requestable: one (Distribution)
+  endpoint_url: https://example.com/api/leads
+  request_method: 1 # post
+  request_payload: '{"first_name":"John","last_name":"Doe","email":"john@example.com"}'
+  response_code: 200
+  response_payload: '{"success":true,"id":"123"}'
+  duration_ms: 350
+  error: 
+  sent_at: <%= Time.current %>
+
+failed:
+  requestable: two (Distribution)
+  endpoint_url: https://example.com/api/leads
+  request_method: 1 # post
+  request_payload: '{"first_name":"Jane","last_name":"Doe","email":"jane@example.com"}'
+  response_code: 400
+  response_payload: '{"error":"Invalid data"}'
+  duration_ms: 250
+  error: 'Bad Request: Invalid data'
+  sent_at: <%= Time.current %>

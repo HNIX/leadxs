@@ -1,0 +1,51 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# For distribution one & campaign one
+first_name:
+  campaign_distribution: one
+  campaign_field_id: 1  # This would need to match a real campaign field id
+  distribution_field_name: firstName
+  static_value: 
+  value_type: 0  # dynamic
+  required: true
+
+last_name:
+  campaign_distribution: one
+  campaign_field_id: 2  # This would need to match a real campaign field id
+  distribution_field_name: lastName
+  static_value: 
+  value_type: 0  # dynamic
+  required: true
+
+email:
+  campaign_distribution: one
+  campaign_field_id: 3  # This would need to match a real campaign field id
+  distribution_field_name: email
+  static_value: 
+  value_type: 0  # dynamic
+  required: true
+
+static_source:
+  campaign_distribution: one
+  campaign_field_id: 
+  distribution_field_name: source
+  static_value: api_integration
+  value_type: 1  # static
+  required: false
+
+# For distribution two & campaign two
+name:
+  campaign_distribution: two
+  campaign_field_id: 1  # This would need to match a real campaign field id
+  distribution_field_name: name
+  static_value: 
+  value_type: 0  # dynamic
+  required: true
+
+phone:
+  campaign_distribution: two
+  campaign_field_id: 4  # This would need to match a real campaign field id
+  distribution_field_name: phone
+  static_value: 
+  value_type: 0  # dynamic
+  required: true

@@ -1,0 +1,34 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Buyer API Endpoint
+  description: Primary endpoint for lead delivery
+  company: one
+  endpoint_url: https://example.com/api/leads
+  authentication_token: token123
+  status: 0 # active
+  request_method: 1 # post
+  request_format: 1 # json
+  template: '{"lead": {"firstName": "{first_name}", "lastName": "{last_name}", "email": "{email}", "phone": "{phone}"}}'
+
+two:
+  name: Secondary Endpoint
+  description: Backup endpoint
+  company: two
+  endpoint_url: https://backup.example.com/api/leads
+  authentication_token: token456
+  status: 0 # active
+  request_method: 1 # post
+  request_format: 1 # json
+  template: null
+  
+paused:
+  name: Paused Endpoint
+  description: Temporarily paused endpoint
+  company: one
+  endpoint_url: https://paused.example.com/api/leads
+  authentication_token: token789
+  status: 1 # paused
+  request_method: 1 # post
+  request_format: 1 # json
+  template: null

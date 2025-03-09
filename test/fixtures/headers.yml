@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+auth_header:
+  distribution: one
+  name: Authorization
+  value: Bearer token123
+
+content_type:
+  distribution: one
+  name: Content-Type 
+  value: application/json
+
+accept:
+  distribution: two
+  name: Accept
+  value: application/json
+
+api_key:
+  distribution: two
+  name: X-API-Key
+  value: secret-api-key
