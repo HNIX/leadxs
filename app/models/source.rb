@@ -18,8 +18,19 @@ class Source < AccountRecord
   validates :token, presence: true, uniqueness: true
   validates :payout_method, inclusion: { in: PAYOUT_METHODS }, allow_blank: true
   validates :payout_structure, inclusion: { in: PAYOUT_STRUCTURES }, allow_blank: true
-  validates :payout, :margin, :minimum_acceptable_bid, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :minimum_acceptable_bid, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :daily_budget, :monthly_budget, numericality: { greater_than: 0 }, allow_nil: true
+  
+  # Conditional validations based on payout method
+  with_options if: -> { payout_method == 'fixed' } do
+    validates :payout, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    validates :margin, absence: true
+  end
+  
+  with_options if: -> { payout_method == 'percentage' } do
+    validates :margin, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 1 }
+    validates :payout, absence: true
+  end
   
   # Scopes
   scope :active, -> { where(status: 'active') }
@@ -71,13 +82,38 @@ class Source < AccountRecord
   
   # Revenue and profit calculations
   def calculate_revenue(count = 1)
-    return 0 unless payout.present?
-    payout * count
+    return 0 unless payout_method.present?
+    
+    if payout_method == 'fixed' && payout.present?
+      payout * count
+    elsif payout_method == 'percentage' && margin.present?
+      0 # Revenue for percentage method is calculated differently as it depends on bid amounts
+    else
+      0
+    end
   end
   
   def calculate_profit(bid_amount, count = 1)
-    return 0 unless payout.present? && bid_amount.present?
-    (bid_amount - payout) * count
+    return 0 unless payout_method.present? && bid_amount.present?
+    
+    if payout_method == 'fixed' && payout.present?
+      (bid_amount - payout) * count
+    elsif payout_method == 'percentage' && margin.present?
+      (bid_amount * margin) * count
+    else
+      0
+    end
+  end
+  
+  # Display the payout amount or percentage based on the method
+  def display_payout
+    if payout_method == 'fixed' && payout.present?
+      ActionController::Base.helpers.number_to_currency(payout)
+    elsif payout_method == 'percentage' && margin.present?
+      "#{(margin * 100).round(2)}%"
+    else
+      "Not set"
+    end
   end
   
   private

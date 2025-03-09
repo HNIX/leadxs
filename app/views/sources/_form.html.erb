@@ -1,4 +1,4 @@
-<%= form_with(model: [@campaign, @source].compact, local: true, class: "space-y-6") do |form| %>
+<%= form_with(model: [@campaign, @source].compact, local: true, class: "space-y-6", data: { controller: "source-form" }) do |form| %>
   <% if @source.errors.any? %>
     <div class="alert alert-danger mb-6 dark:bg-red-900 dark:border-red-700" role="alert">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="dark:text-red-300">
@@ -47,7 +47,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
       <div>
         <%= form.label :payout_method, class: "dark:text-gray-200" %>
-        <%= form.select :payout_method, Source::PAYOUT_METHODS.map { |method| [method.humanize, method] }, {include_blank: "Select payout method"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
+        <%= form.select :payout_method, 
+                        Source::PAYOUT_METHODS.map { |method| [method.humanize, method] }, 
+                        {include_blank: "Select payout method"}, 
+                        {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", 
+                         data: { 
+                           source_form_target: "payoutMethodSelect",
+                           action: "change->source-form#toggleFields" 
+                         }
+                        } %>
       </div>
 
       <div>
@@ -55,7 +63,7 @@
         <%= form.select :payout_structure, Source::PAYOUT_STRUCTURES.map { |structure| [structure.humanize, structure] }, {include_blank: "Select payout structure"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
       </div>
 
-      <div>
+      <div data-source-form-target="payoutGroup" class="<%= 'hidden' unless @source.payout_method == 'fixed' %>">
         <%= form.label :payout, class: "dark:text-gray-200" %>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -64,22 +72,23 @@
           <%= form.number_field :payout, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
         </div>
       </div>
+
+      <div data-source-form-target="marginGroup" class="<%= 'hidden' unless @source.payout_method == 'percentage' %>">
+        <%= form.label :margin, class: "dark:text-gray-200", title: "Percentage margin (e.g. 0.20 for 20%)" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">%</span>
+          </div>
+          <%= form.number_field :margin, step: "0.01", min: "0", max: "1", class: "form-input w-full pr-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.20" %>
+          <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter as decimal (e.g. 0.20 for 20%)</div>
+        </div>
+      </div>
     </div>
   </fieldset>
 
   <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
     <legend class="font-semibold text-lg dark:text-gray-200">Budget & Performance</legend>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
-      <div>
-        <%= form.label :margin, class: "dark:text-gray-200" %>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
-          </div>
-          <%= form.number_field :margin, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
-        </div>
-      </div>
-
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
       <div>
         <%= form.label :minimum_acceptable_bid, class: "dark:text-gray-200" %>
         <div class="relative">

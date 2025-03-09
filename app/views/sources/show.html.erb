@@ -131,13 +131,10 @@
         </div>
         
         <div>
-          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Payout</div>
-          <div class="mt-1 text-sm text-gray-900 dark:text-gray-200"><%= @source.payout.present? ? number_to_currency(@source.payout) : "Not set" %></div>
-        </div>
-        
-        <div>
-          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Margin</div>
-          <div class="mt-1 text-sm text-gray-900 dark:text-gray-200"><%= @source.margin.present? ? number_to_currency(@source.margin) : "Not set" %></div>
+          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <%= @source.payout_method == 'fixed' ? 'Payout' : 'Margin' %>
+          </div>
+          <div class="mt-1 text-sm text-gray-900 dark:text-gray-200"><%= @source.display_payout %></div>
         </div>
         
         <div>

@@ -26,7 +26,7 @@
               <th class="px-4 py-3 text-left">Company</th>
               <th class="px-4 py-3 text-left">Integration Type</th>
               <th class="px-4 py-3 text-left">Status</th>
-              <th class="px-4 py-3 text-right">Payout</th>
+              <th class="px-4 py-3 text-right">Payout/Margin</th>
               <th class="px-4 py-3 text-right">Min. Bid</th>
               <th class="px-4 py-3 text-center">Actions</th>
             </tr>
@@ -55,7 +55,7 @@
                   </span>
                 </td>
                 <td class="px-4 py-3 text-right dark:text-gray-200">
-                  <%= number_to_currency(source.payout) if source.payout.present? %>
+                  <%= source.display_payout %>
                 </td>
                 <td class="px-4 py-3 text-right dark:text-gray-200">
                   <%= number_to_currency(source.minimum_acceptable_bid) if source.minimum_acceptable_bid.present? %>
