@@ -9,6 +9,8 @@ class ApiRequest < ApplicationRecord
   belongs_to :requestable, polymorphic: true
   belongs_to :lead, optional: true
   
+  before_validation :ensure_uuid
+  
   enum :request_method, {
     get: 0,
     post: 1,
@@ -39,19 +41,19 @@ class ApiRequest < ApplicationRecord
   end
   
   # Get formatted response data
-  def response_payload
-    return {} if response_data.blank?
+  def response_data
+    return {} if response_payload.blank?
     
     begin
       # Handle JSON responses
-      if response_data.is_a?(String) && response_data.start_with?('{')
-        JSON.parse(response_data)
+      if response_payload.is_a?(String) && response_payload.start_with?('{')
+        JSON.parse(response_payload)
       else
-        response_data
+        response_payload
       end
     rescue JSON::ParserError
       # Return as string if not valid JSON
-      response_data
+      response_payload
     end
   end
   
@@ -75,4 +77,16 @@ class ApiRequest < ApplicationRecord
       nil
     end
   end
+  
+  # Override to_param to use UUID in URLs instead of ID
+  def to_param
+    uuid
+  end
+
+  private
+  
+  def ensure_uuid
+    self.uuid ||= SecureRandom.uuid
+  end
+  
 end

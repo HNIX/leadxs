@@ -1,0 +1,38 @@
+<%= form_with model: bid_request, data: { turbo: false } do |form| %>
+  <% if bid_request.errors.any? %>
+    <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <h2 class="text-lg font-medium mb-2">Error!</h2>
+      <ul class="list-disc list-inside">
+        <% bid_request.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-6">
+    <%= form.label :campaign_id, class: "form-label" %>
+    <%= form.collection_select :campaign_id, current_account.campaigns.order(:name), :id, :name, { prompt: "Select a campaign" }, class: "form-select" %>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :status, class: "form-label" %>
+    <%= form.select :status, BidRequest.statuses.keys.map { |status| [status.titleize, status] }, {}, class: "form-select" %>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :expires_at, class: "form-label" %>
+    <%= form.datetime_local_field :expires_at, class: "form-input" %>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :anonymized_data, class: "form-label" %>
+    <%= form.text_area :anonymized_data, value: (bid_request.anonymized_data.is_a?(Hash) ? JSON.pretty_generate(bid_request.anonymized_data) : bid_request.anonymized_data.to_s), rows: 8, class: "form-textarea font-mono text-sm" %>
+    <p class="text-sm text-gray-500 mt-1">Enter JSON data used for bidding (must be valid JSON).</p>
+  </div>
+
+  <div class="flex justify-between mt-8">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", bid_request.persisted? ? bid_request : bid_requests_path, class: "btn btn-light" %>
+  </div>
+<% end %>

@@ -1,0 +1,29 @@
+one:
+  account: one
+  campaign: one
+  unique_id: "abc123"
+  status: pending
+  expires_at: <%= 1.hour.from_now %>
+  anonymized_data:
+    first_name: John
+    zip_code: '90210'
+
+two:
+  account: one
+  campaign: one
+  unique_id: "def456"
+  status: active
+  expires_at: <%= 1.hour.from_now %>
+  anonymized_data:
+    first_name: Jane
+    zip_code: '10001'
+
+expired:
+  account: one
+  campaign: one
+  unique_id: "ghi789"
+  status: expired
+  expires_at: <%= 1.hour.ago %>
+  anonymized_data:
+    first_name: Bob
+    zip_code: '12345'

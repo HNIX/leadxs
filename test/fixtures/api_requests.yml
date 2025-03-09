@@ -1,6 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 successful:
+  account: one
   requestable: one (Distribution)
   endpoint_url: https://example.com/api/leads
   request_method: 1 # post
@@ -12,6 +13,7 @@ successful:
   sent_at: <%= Time.current %>
 
 failed:
+  account: one
   requestable: two (Distribution)
   endpoint_url: https://example.com/api/leads
   request_method: 1 # post

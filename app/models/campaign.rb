@@ -12,6 +12,7 @@ class Campaign < ApplicationRecord
   has_many :leads, dependent: :destroy
   has_many :source_filters, -> { where(type: 'SourceFilter') }, class_name: 'SourceFilter', dependent: :destroy, foreign_key: 'campaign_id'
   has_many :distribution_filters, -> { where(type: 'DistributionFilter') }, class_name: 'DistributionFilter', dependent: :destroy, foreign_key: 'campaign_id'
+  has_many :bid_requests, dependent: :destroy
   
   # Constants for campaign types and distribution methods
   CAMPAIGN_TYPES = ['ping_post', 'direct', 'calls'].freeze
@@ -49,6 +50,17 @@ class Campaign < ApplicationRecord
   # Find eligible distributions for given lead data
   def eligible_distributions(lead_data)
     DistributionFilter.filter_distributions(distributions.active, lead_data, self)
+  end
+  
+  # Find eligible distributions for bidding with given anonymized data
+  def eligible_distributions_for_bidding(anonymized_data)
+    return [] unless distribution_method.in?(['highest_bid', 'weighted_random', 'waterfall'])
+    
+    # Apply filters to determine eligible distributions
+    eligible = eligible_distributions(anonymized_data)
+    
+    # Further limit to distributions set up for bidding
+    eligible.select { |dist| dist.respond_to?(:bidding_enabled?) && dist.bidding_enabled? }
   end
   
   # Get all eligible entities (sources and distributions) for given lead data

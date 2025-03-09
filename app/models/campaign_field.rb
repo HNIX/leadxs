@@ -13,6 +13,12 @@ class CampaignField < ApplicationRecord
   enum :data_type, { text: 0, number: 1, boolean: 2, date: 3, email: 5, phone: 6 }
   enum :value_acceptance, { any: 0, list: 1, range: 2 }
   
+  # Whether this field contains PII (Personally Identifiable Information)
+  attribute :pii, :boolean, default: false
+  
+  # Whether this field can be used in anonymous bidding process
+  attribute :anonymous_bidding_enabled, :boolean, default: false
+  
   # Legacy field_type constants for backwards compatibility
   FIELD_TYPES = ['text', 'number', 'date', 'datetime', 'email', 'phone', 'select', 'multi_select', 'checkbox', 'radio', 'address'].freeze
   

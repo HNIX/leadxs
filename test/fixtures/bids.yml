@@ -1,0 +1,27 @@
+one:
+  account: one
+  bid_request: one
+  distribution: one
+  amount: 10.50
+  status: pending
+
+two:
+  account: one
+  bid_request: one
+  distribution: two
+  amount: 15.75
+  status: pending
+
+three:
+  account: one
+  bid_request: two
+  distribution: one
+  amount: 8.25
+  status: pending
+
+accepted:
+  account: one
+  bid_request: two
+  distribution: two
+  amount: 20.00
+  status: accepted

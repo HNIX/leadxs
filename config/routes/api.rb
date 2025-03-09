@@ -6,6 +6,16 @@ namespace :api, defaults: {format: :json} do
     resources :accounts
     resources :users
     resources :notification_tokens, param: :token, only: [:create, :destroy]
+    
+    # Bidding API
+    resources :bid_requests do
+      resources :bids, only: [:index]
+      member do
+        post :solicit_bids
+        post :complete_bidding
+      end
+    end
+    resources :bids, only: [:create, :show]
   end
 end
 

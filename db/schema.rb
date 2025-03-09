@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_09_154513) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_09_184524) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -155,6 +155,41 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_154513) do
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
+  create_table "bid_requests", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "campaign_id", null: false
+    t.bigint "lead_id"
+    t.string "unique_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "expires_at", null: false
+    t.jsonb "anonymized_data", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "unique_id"], name: "index_bid_requests_on_account_id_and_unique_id", unique: true
+    t.index ["account_id"], name: "index_bid_requests_on_account_id"
+    t.index ["campaign_id"], name: "index_bid_requests_on_campaign_id"
+    t.index ["expires_at"], name: "index_bid_requests_on_expires_at"
+    t.index ["lead_id"], name: "index_bid_requests_on_lead_id"
+    t.index ["status"], name: "index_bid_requests_on_status"
+    t.index ["unique_id"], name: "index_bid_requests_on_unique_id", unique: true
+  end
+
+  create_table "bids", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "bid_request_id", null: false
+    t.bigint "distribution_id", null: false
+    t.decimal "amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_bids_on_account_id_and_status"
+    t.index ["account_id"], name: "index_bids_on_account_id"
+    t.index ["amount"], name: "index_bids_on_amount"
+    t.index ["bid_request_id", "distribution_id"], name: "index_bids_on_bid_request_id_and_distribution_id", unique: true
+    t.index ["bid_request_id"], name: "index_bids_on_bid_request_id"
+    t.index ["distribution_id"], name: "index_bids_on_distribution_id"
+  end
+
   create_table "calculated_fields", force: :cascade do |t|
     t.bigint "campaign_id", null: false
     t.bigint "account_id", null: false
@@ -230,6 +265,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_154513) do
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "bid_timeout_seconds", default: 5
+    t.decimal "minimum_bid_amount", precision: 10, scale: 2
     t.index ["account_id"], name: "index_campaigns_on_account_id"
     t.index ["vertical_id"], name: "index_campaigns_on_vertical_id"
   end
@@ -307,6 +344,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_154513) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "account_id", null: false
+    t.boolean "bidding_enabled", default: true
+    t.integer "bidding_timeout_seconds", default: 5
+    t.string "bid_endpoint_url"
+    t.decimal "base_bid_amount", precision: 10, scale: 2
     t.index ["account_id", "name"], name: "index_distributions_on_account_id_and_name", unique: true
     t.index ["account_id"], name: "index_distributions_on_account_id"
     t.index ["company_id", "name"], name: "index_distributions_on_company_id_and_name", unique: true
@@ -764,6 +805,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_154513) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_requests", "accounts"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "bid_requests", "accounts"
+  add_foreign_key "bid_requests", "campaigns"
+  add_foreign_key "bid_requests", "leads"
+  add_foreign_key "bids", "accounts"
+  add_foreign_key "bids", "bid_requests"
+  add_foreign_key "bids", "distributions"
   add_foreign_key "calculated_fields", "accounts"
   add_foreign_key "calculated_fields", "campaigns", on_delete: :cascade
   add_foreign_key "campaign_distributions", "campaigns"

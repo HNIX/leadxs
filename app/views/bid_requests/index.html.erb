@@ -1,0 +1,54 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="h3">Bid Requests</h1>
+    <%= link_to "New Bid Request", new_bid_request_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="bg-white rounded shadow">
+    <% if @bid_requests.any? %>
+      <table class="table-auto w-full">
+        <thead>
+          <tr>
+            <th class="p-3 text-left">ID</th>
+            <th class="p-3 text-left">Campaign</th>
+            <th class="p-3 text-left">Status</th>
+            <th class="p-3 text-left">Bids</th>
+            <th class="p-3 text-left">Expires</th>
+            <th class="p-3 text-left">Created</th>
+            <th class="p-3 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bid_requests.each do |bid_request| %>
+            <tr class="border-t border-gray-200">
+              <td class="p-3"><%= link_to bid_request.unique_id.truncate(10), bid_request, class: "text-blue-600 hover:text-blue-800" %></td>
+              <td class="p-3"><%= link_to bid_request.campaign.name, bid_request.campaign %></td>
+              <td class="p-3">
+                <span class="<%= bid_request_status_class(bid_request) %>">
+                  <%= bid_request.status.titleize %>
+                </span>
+              </td>
+              <td class="p-3"><%= bid_request.bids.count %></td>
+              <td class="p-3"><%= time_ago_in_words(bid_request.expires_at) %></td>
+              <td class="p-3"><%= time_ago_in_words(bid_request.created_at) %> ago</td>
+              <td class="p-3">
+                <%= link_to "View", bid_request, class: "btn btn-sm btn-link" %>
+                <% if !bid_request.expired? && bid_request.status != "completed" %>
+                  <%= button_to "Solicit Bids", solicit_bids_bid_request_path(bid_request), class: "btn btn-sm btn-outline" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div class="p-3">
+        <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+      </div>
+    <% else %>
+      <div class="p-6 text-center">
+        <p class="text-gray-500">No bid requests found.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -68,6 +68,22 @@ Rails.application.routes.draw do
       post :regenerate_token
     end
   end
+  
+  # Bidding system routes
+  resources :bid_requests do
+    resources :bids do
+      member do
+        post :accept
+        post :reject
+      end
+    end
+    
+    member do
+      post :solicit_bids
+      post :complete_bidding
+      post :expire
+    end
+  end
 
   draw :accounts
   draw :api

@@ -7,6 +7,7 @@ class Distribution < ApplicationRecord
   has_many :headers, dependent: :destroy
   has_many :api_requests, as: :requestable, dependent: :destroy
   has_many :leads, through: :api_requests
+  has_many :bids, dependent: :destroy
 
   accepts_nested_attributes_for :headers, reject_if: :all_blank, allow_destroy: true
 
@@ -40,5 +41,16 @@ class Distribution < ApplicationRecord
 
   def active?
     status == "active"
+  end
+  
+  # Bidding attributes with defaults
+  attribute :bidding_enabled, :boolean, default: true
+  attribute :bidding_timeout_seconds, :integer, default: 5
+  
+  # Calculate bid amount for a lead based on its data
+  def calculate_bid_amount(lead_data)
+    # Simple implementation - in real application this would be more complex
+    # and might include business rules or machine learning models
+    base_bid_amount || 0.0
   end
 end

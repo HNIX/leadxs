@@ -1,0 +1,14 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="mb-4">
+    <%= link_to "← Back to Bid Request", @bid_request, class: "text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <div class="mb-6">
+    <h1 class="h3">New Bid</h1>
+    <p class="text-gray-600">For bid request: <%= @bid_request.unique_id %></p>
+  </div>
+
+  <div class="bg-white rounded shadow p-6">
+    <%= render "form", bid: @bid %>
+  </div>
+</div>

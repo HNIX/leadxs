@@ -6,6 +6,7 @@ class Lead < ApplicationRecord
   
   has_many :lead_data, class_name: "LeadData", dependent: :destroy
   has_many :api_requests, dependent: :destroy
+  has_one :bid_request, dependent: :nullify
   
   accepts_nested_attributes_for :lead_data
   
@@ -49,6 +50,21 @@ class Lead < ApplicationRecord
   # Check if lead passes all validation rules
   def valid_for_distribution?
     validate_against_rules.empty?
+  end
+  
+  # Get anonymized data for bidding purposes
+  def anonymized_data
+    # This is a simplified version - in a real implementation you would
+    # filter out PII fields and only expose what's safe for bidding
+    result = {}
+    campaign.campaign_fields.each do |field|
+      # Only include non-PII fields for bidding
+      if !field.pii?
+        value = field_value(field.id)
+        result[field.name] = value if value.present?
+      end
+    end
+    result
   end
   
   private

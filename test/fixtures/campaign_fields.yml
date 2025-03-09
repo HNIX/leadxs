@@ -174,3 +174,28 @@ campaign_two_field:
   campaign: two
   vertical_field: list_field
   account: two
+
+zip_code:
+  name: zip_code
+  label: ZIP Code
+  field_type: text
+  data_type: 0 # text
+  required: true
+  default_value: 
+  description: Customer's ZIP code
+  validation_regex: '^\\d{5}(-\\d{4})?$'
+  min_length: 5
+  max_length: 10
+  min_value: 
+  max_value: 
+  options: '[]'
+  position: 7
+  ping_required: true
+  post_required: true
+  is_pii: false
+  post_only: false
+  hide: false
+  value_acceptance: 0 # any
+  campaign: one
+  vertical_field: 
+  account: one
