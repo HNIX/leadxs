@@ -1,15 +1,15 @@
 <%= form_with(model: [@campaign, @source].compact, local: true, class: "space-y-6") do |form| %>
   <% if @source.errors.any? %>
-    <div class="alert alert-danger mb-6" role="alert">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+    <div class="alert alert-danger mb-6 dark:bg-red-900 dark:border-red-700" role="alert">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="dark:text-red-300">
         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
       </svg>
 
       <div>
-        <h4>
+        <h4 class="dark:text-red-200">
           <%= I18n.t("errors.messages.not_saved", count: @source.errors.count, resource: @source.class.model_name.human.downcase) %>
         </h4>
-        <ul>
+        <ul class="dark:text-red-200">
           <% @source.errors.full_messages.each do |message| %>
             <li><%= message %></li>
           <% end %>
@@ -20,110 +20,110 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
-      <%= form.label :name %>
-      <%= form.text_field :name, class: "form-input w-full" %>
+      <%= form.label :name, class: "dark:text-gray-200" %>
+      <%= form.text_field :name, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" %>
     </div>
 
     <div>
-      <%= form.label :company_id %>
-      <%= form.collection_select :company_id, current_account.companies.active.sorted, :id, :name, {include_blank: "Select a company"}, {class: "form-select w-full"} %>
+      <%= form.label :company_id, class: "dark:text-gray-200" %>
+      <%= form.collection_select :company_id, current_account.companies.active.sorted, :id, :name, {include_blank: "Select a company"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
-      <%= form.label :integration_type %>
-      <%= form.select :integration_type, Source::INTEGRATION_TYPES.map { |type| [type.humanize, type] }, {}, {class: "form-select w-full"} %>
+      <%= form.label :integration_type, class: "dark:text-gray-200" %>
+      <%= form.select :integration_type, Source::INTEGRATION_TYPES.map { |type| [type.humanize, type] }, {}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
     </div>
 
     <div>
-      <%= form.label :status %>
-      <%= form.select :status, Source::STATUSES.map { |status| [status.humanize, status] }, {}, {class: "form-select w-full"} %>
+      <%= form.label :status, class: "dark:text-gray-200" %>
+      <%= form.select :status, Source::STATUSES.map { |status| [status.humanize, status] }, {}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
     </div>
   </div>
 
-  <fieldset class="bg-gray-50 p-4 rounded-lg shadow-sm">
-    <legend class="font-semibold text-lg">Payout Configuration</legend>
+  <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+    <legend class="font-semibold text-lg dark:text-gray-200">Payout Configuration</legend>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
       <div>
-        <%= form.label :payout_method %>
-        <%= form.select :payout_method, Source::PAYOUT_METHODS.map { |method| [method.humanize, method] }, {include_blank: "Select payout method"}, {class: "form-select w-full"} %>
+        <%= form.label :payout_method, class: "dark:text-gray-200" %>
+        <%= form.select :payout_method, Source::PAYOUT_METHODS.map { |method| [method.humanize, method] }, {include_blank: "Select payout method"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
       </div>
 
       <div>
-        <%= form.label :payout_structure %>
-        <%= form.select :payout_structure, Source::PAYOUT_STRUCTURES.map { |structure| [structure.humanize, structure] }, {include_blank: "Select payout structure"}, {class: "form-select w-full"} %>
+        <%= form.label :payout_structure, class: "dark:text-gray-200" %>
+        <%= form.select :payout_structure, Source::PAYOUT_STRUCTURES.map { |structure| [structure.humanize, structure] }, {include_blank: "Select payout structure"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
       </div>
 
       <div>
-        <%= form.label :payout %>
+        <%= form.label :payout, class: "dark:text-gray-200" %>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-gray-500 sm:text-sm">$</span>
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
           </div>
-          <%= form.number_field :payout, step: "0.01", class: "form-input w-full pl-7", placeholder: "0.00" %>
+          <%= form.number_field :payout, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
         </div>
       </div>
     </div>
   </fieldset>
 
-  <fieldset class="bg-gray-50 p-4 rounded-lg shadow-sm">
-    <legend class="font-semibold text-lg">Budget & Performance</legend>
+  <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+    <legend class="font-semibold text-lg dark:text-gray-200">Budget & Performance</legend>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
       <div>
-        <%= form.label :margin %>
+        <%= form.label :margin, class: "dark:text-gray-200" %>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-gray-500 sm:text-sm">$</span>
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
           </div>
-          <%= form.number_field :margin, step: "0.01", class: "form-input w-full pl-7", placeholder: "0.00" %>
+          <%= form.number_field :margin, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
         </div>
       </div>
 
       <div>
-        <%= form.label :minimum_acceptable_bid %>
+        <%= form.label :minimum_acceptable_bid, class: "dark:text-gray-200" %>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-gray-500 sm:text-sm">$</span>
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
           </div>
-          <%= form.number_field :minimum_acceptable_bid, step: "0.01", class: "form-input w-full pl-7", placeholder: "0.00" %>
+          <%= form.number_field :minimum_acceptable_bid, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
         </div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
       <div>
-        <%= form.label :daily_budget %>
+        <%= form.label :daily_budget, class: "dark:text-gray-200" %>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-gray-500 sm:text-sm">$</span>
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
           </div>
-          <%= form.number_field :daily_budget, step: "0.01", class: "form-input w-full pl-7", placeholder: "0.00" %>
+          <%= form.number_field :daily_budget, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
         </div>
       </div>
 
       <div>
-        <%= form.label :monthly_budget %>
+        <%= form.label :monthly_budget, class: "dark:text-gray-200" %>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-gray-500 sm:text-sm">$</span>
+            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
           </div>
-          <%= form.number_field :monthly_budget, step: "0.01", class: "form-input w-full pl-7", placeholder: "0.00" %>
+          <%= form.number_field :monthly_budget, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
         </div>
       </div>
     </div>
   </fieldset>
 
   <div>
-    <%= form.label :notes %>
-    <%= form.text_area :notes, rows: 4, class: "form-textarea w-full" %>
+    <%= form.label :notes, class: "dark:text-gray-200" %>
+    <%= form.text_area :notes, rows: 4, class: "form-textarea w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" %>
   </div>
 
   <div class="flex justify-between mt-8">
     <% if @source.persisted? %>
-      <%= link_to "Back", source_path(@source), class: "btn btn-outline" %>
+      <%= link_to "Back", source_path(@source), class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" %>
     <% else %>
-      <%= link_to "Back", campaign_sources_path(@campaign), class: "btn btn-outline" %>
+      <%= link_to "Back", campaign_sources_path(@campaign), class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" %>
     <% end %>
 
     <%= form.submit class: "btn btn-primary" %>
