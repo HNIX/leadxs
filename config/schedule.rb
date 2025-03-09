@@ -4,16 +4,24 @@
 # It's helpful, but not entirely necessary to understand cron before proceeding.
 # http://en.wikipedia.org/wiki/Cron
 
-# Example:
-#
-# set :output, "/path/to/my/cron_log.log"
-#
-# every 2.hours do
-#   command "/usr/bin/some_great_command"
-#   runner "MyModel.some_method"
-#   rake "some:great:rake:task"
-# end
-#
-# every 4.days do
-#   runner "AnotherModel.prune_old_records"
-# end
+# Bid Analytics Jobs
+
+# Hourly analytics - generate hourly snapshots
+every 1.hour do
+  runner "GenerateBidAnalyticsJob.perform_later(period_type: :hourly)"
+end
+
+# Daily analytics - run every day at 1:00 AM
+every 1.day, at: '1:00 am' do
+  runner "GenerateBidAnalyticsJob.perform_later(period_type: :daily, all_campaigns: true, all_distributions: true)"
+end
+
+# Weekly analytics - run every Monday at 2:00 AM
+every :monday, at: '2:00 am' do
+  runner "GenerateBidAnalyticsJob.perform_later(period_type: :weekly, all_campaigns: true, all_distributions: true)"
+end
+
+# Monthly analytics - run on the 1st of every month at 3:00 AM
+every '0 3 1 * *' do
+  runner "GenerateBidAnalyticsJob.perform_later(period_type: :monthly, all_campaigns: true, all_distributions: true)"
+end

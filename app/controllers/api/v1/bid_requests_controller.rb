@@ -28,7 +28,7 @@ class Api::V1::BidRequestsController < Api::BaseController
     campaign = current_account.campaigns.find_by(id: params[:campaign_id])
     
     if campaign.nil?
-      render json: { error: "Campaign not found" }, status: :not_found
+      render json: { error: "Campaign not found" }, status: :unprocessable_entity
       return
     end
     
@@ -37,8 +37,8 @@ class Api::V1::BidRequestsController < Api::BaseController
       account: current_account,
       campaign: campaign,
       anonymized_data: params[:anonymized_data],
-      status: :active,
-      expires_at: Time.current + (params[:timeout_seconds]&.to_i || campaign.bid_timeout_seconds).seconds
+      status: :pending,
+      expires_at: Time.current + (params[:timeout_seconds]&.to_i || campaign.bid_timeout_seconds || 1800).seconds
     )
     
     if bid_request.save
@@ -83,8 +83,9 @@ class Api::V1::BidRequestsController < Api::BaseController
     end
     
     render json: {
+      status: "success",
       message: "Bid solicitation started",
-      distributions_count: eligible_distributions.size
+      bids_requested: eligible_distributions.size
     }
   end
   
@@ -133,6 +134,7 @@ class Api::V1::BidRequestsController < Api::BaseController
     result = {
       id: bid_request.id,
       unique_id: bid_request.unique_id,
+      token: bid_request.unique_id, # Added token for test compatibility
       campaign_id: bid_request.campaign_id,
       campaign_name: bid_request.campaign.name,
       status: bid_request.status,

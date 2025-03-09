@@ -1,0 +1,37 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: one
+  campaign: one
+  distribution: one
+  period_start: 2025-03-09 13:42:24
+  period_end: 2025-03-09 13:42:24
+  period_type: "hourly"
+  total_bids: 100
+  accepted_bids: 75
+  rejected_bids: 20
+  expired_bids: 5
+  avg_bid_amount: 35.50
+  max_bid_amount: 55.00
+  min_bid_amount: 15.00
+  conversion_count: 50
+  total_revenue: 1775.00
+  metrics: { "bid_requests_sent": 110, "avg_response_time": 2.5, "time_to_expiration": 30.0, "distribution_stats": {}, "campaign_stats": {} }
+
+two:
+  account: two
+  campaign: two
+  distribution: two
+  period_start: 2025-03-09 13:42:24
+  period_end: 2025-03-09 13:42:24
+  period_type: "daily"
+  total_bids: 200
+  accepted_bids: 150
+  rejected_bids: 40
+  expired_bids: 10
+  avg_bid_amount: 40.50
+  max_bid_amount: 75.00
+  min_bid_amount: 20.00
+  conversion_count: 100
+  total_revenue: 4075.00
+  metrics: { "bid_requests_sent": 220, "avg_response_time": 3.0, "time_to_expiration": 40.0, "distribution_stats": {}, "campaign_stats": {} }

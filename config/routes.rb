@@ -1,5 +1,15 @@
 # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  # Bid analytics and reporting
+  resources :bid_reports, only: [:index, :show]
+  
+  # Real-time bid dashboard
+  get 'bid_dashboard', to: 'bid_dashboard#index', as: :bid_dashboard
+  get 'bid_dashboard/real_time', to: 'bid_dashboard#real_time', as: :real_time_bid_dashboard
+  
+  # Campaign and distribution specific reports
+  get 'bid_reports/campaign/:id', to: 'bid_reports#campaign', as: :campaign_bid_report
+  get 'bid_reports/distribution/:id', to: 'bid_reports#distribution', as: :distribution_bid_report
   # Distributions (buyers/endpoints)
   resources :distributions do
     member do
@@ -142,6 +152,8 @@ Rails.application.routes.draw do
     get :pricing
     get :reset_app
     get :lead_bidding_docs
+    get :bid_reporting_docs
+    get :lead_submission_process
   end
   
   # Validation rules documentation

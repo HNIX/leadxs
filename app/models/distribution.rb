@@ -8,6 +8,7 @@ class Distribution < ApplicationRecord
   has_many :api_requests, as: :requestable, dependent: :destroy
   has_many :leads, through: :api_requests
   has_many :bids, dependent: :destroy
+  has_many :bid_analytic_snapshots, dependent: :nullify
 
   accepts_nested_attributes_for :headers, reject_if: :all_blank, allow_destroy: true
 

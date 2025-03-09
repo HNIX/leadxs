@@ -12,13 +12,28 @@ namespace :api, defaults: {format: :json} do
     
     # Bidding API
     resources :bid_requests do
-      resources :bids, only: [:index]
+      resources :bids, only: [:index] do
+        member do
+          post :accept
+        end
+      end
+      
       member do
         post :solicit_bids
         post :complete_bidding
       end
     end
     resources :bids, only: [:create, :show]
+    
+    # Bid Analytics API
+    resources :bid_analytics, only: [:index]
+    
+    # Campaign Analytics API
+    resources :campaigns, only: [] do
+      member do
+        get :analytics
+      end
+    end
   end
 end
 

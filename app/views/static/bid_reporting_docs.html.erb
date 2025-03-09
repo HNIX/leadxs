@@ -1,0 +1,528 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="prose prose-blue max-w-none dark:prose-invert">
+    <h1>Bid Reporting & Analytics Documentation</h1>
+    
+    <div class="mt-8 border-b border-gray-200 dark:border-gray-700">
+      <nav class="flex -mb-px space-x-6 overflow-x-auto" aria-label="Documentation sections">
+        <a href="#overview" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Overview
+        </a>
+        <a href="#dashboard-features" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Dashboard Features
+        </a>
+        <a href="#generating-reports" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Generating Reports
+        </a>
+        <a href="#analytics" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Available Analytics
+        </a>
+        <a href="#api-access" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          API Access
+        </a>
+        <a href="#best-practices" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Best Practices
+        </a>
+        <a href="#faq" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          FAQ
+        </a>
+      </nav>
+    </div>
+    
+    <section id="overview" class="py-6">
+      <h2>Overview</h2>
+      <p>
+        LeadXS offers comprehensive bid reporting and analytics to help you track, analyze, and optimize your bidding performance across all campaigns. The analytics tools provide insights into bid volumes, acceptance rates, revenue generation, and distribution performance.
+      </p>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Key Benefits</h3>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-900">
+          <ul class="list-disc pl-5 space-y-2">
+            <li><strong>Real-Time Insights</strong>: Monitor bid activity as it happens with real-time dashboards</li>
+            <li><strong>Performance Tracking</strong>: Track campaign and distribution performance over time</li>
+            <li><strong>Revenue Optimization</strong>: Identify opportunities to increase bid amounts and acceptance rates</li>
+            <li><strong>Historical Analysis</strong>: Review performance trends across different time periods</li>
+            <li><strong>Data-driven Decisions</strong>: Make informed decisions about campaign configuration and distribution strategy</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <section id="dashboard-features" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Dashboard Features</h2>
+      
+      <div class="my-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Bid Dashboard</h3>
+          </div>
+          <div class="p-4">
+            <p class="mb-4 text-gray-700 dark:text-gray-300">Access by clicking on "Bid Dashboard" in the main navigation.</p>
+            
+            <h4 class="font-medium text-gray-900 dark:text-white mb-2">Features:</h4>
+            <ul class="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+              <li><strong>Real-Time Metrics</strong>: View total bids, acceptance rates, conversion rates, and revenue stats</li>
+              <li><strong>Bid Volume</strong>: Track hourly and daily bid volumes with interactive charts</li>
+              <li><strong>Recent Bids</strong>: See the most recent bids with status, amount, and campaign details</li>
+              <li><strong>Performance Indicators</strong>: Monitor key performance indicators such as average bid amounts and revenue per bid</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Bid Reports</h3>
+          </div>
+          <div class="p-4">
+            <p class="mb-4 text-gray-700 dark:text-gray-300">Access by clicking on "Bid Reports" in the main navigation.</p>
+            
+            <h4 class="font-medium text-gray-900 dark:text-white mb-2">Features:</h4>
+            <ul class="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+              <li><strong>Time Period Selection</strong>: Filter data by hourly, daily, weekly, or monthly timeframes</li>
+              <li><strong>Campaign Filtering</strong>: Narrow results to specific campaigns</li>
+              <li><strong>Distribution Filtering</strong>: Focus on particular distribution channels</li>
+              <li><strong>Custom Date Ranges</strong>: Select specific date ranges for your analysis</li>
+              <li><strong>Exportable Data</strong>: Download reports in CSV format for offline analysis</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="generating-reports" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Generating Reports</h2>
+      
+      <p class="mb-4">
+        LeadXS offers multiple ways to generate, view, and export bid reports. This section explains where to find different reports and how to generate custom reports for your specific needs.
+      </p>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Where to Find Reports</h3>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-900">
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">1. Main Navigation</h4>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                The primary location for all reports is the <strong>Bid Reports</strong> section in the main navigation. This is your hub for all historical bid analytics and reporting.
+              </p>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">2. Campaign Reports</h4>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                To view reports for a specific campaign, navigate to <strong>Campaigns > [Campaign Name] > Analytics</strong> tab. This provides campaign-specific bidding performance data.
+              </p>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">3. Distribution Reports</h4>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                For distribution-specific reports, go to <strong>Distributions > [Distribution Name] > Performance</strong> tab to see how a specific buyer is performing in the bidding system.
+              </p>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">4. Dashboard Widgets</h4>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                The main dashboard and bid dashboard contain report widgets that can be clicked to view more detailed reports.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Creating Custom Reports</h3>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-900">
+          <p class="mb-4 text-gray-600 dark:text-gray-400">
+            Follow these steps to generate custom bid reports:
+          </p>
+          
+          <ol class="space-y-6 list-decimal pl-5 text-gray-600 dark:text-gray-400">
+            <li>
+              <strong class="text-gray-900 dark:text-white">Navigate to the Reports Section</strong>
+              <p class="mt-1">
+                Go to <strong>Bid Reports</strong> in the main navigation.
+              </p>
+              <img src="/assets/images/docs/bid-reports-nav.png" alt="Navigation to Bid Reports" class="mt-2 rounded-lg border border-gray-200 dark:border-gray-700">
+            </li>
+            
+            <li>
+              <strong class="text-gray-900 dark:text-white">Set Time Period</strong>
+              <p class="mt-1">
+                Select the time granularity (hourly, daily, weekly, or monthly) from the tabs at the top of the reports page.
+              </p>
+              <p class="mt-1">
+                Then use the date range picker to select your desired time period.
+              </p>
+            </li>
+            
+            <li>
+              <strong class="text-gray-900 dark:text-white">Apply Filters</strong>
+              <p class="mt-1">
+                Use the filter panel on the left side of the screen to:
+              </p>
+              <ul class="list-disc pl-5 mt-1 space-y-1">
+                <li>Filter by campaign</li>
+                <li>Filter by distribution</li>
+                <li>Filter by bid status</li>
+                <li>Filter by minimum and maximum bid amounts</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong class="text-gray-900 dark:text-white">Customize Columns</strong>
+              <p class="mt-1">
+                Click the <strong>Columns</strong> button to select which metrics to include in your report.
+              </p>
+            </li>
+            
+            <li>
+              <strong class="text-gray-900 dark:text-white">Generate the Report</strong>
+              <p class="mt-1">
+                Click the <strong>Generate Report</strong> button to create your custom report based on your selections.
+              </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Exporting Reports</h3>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-900">
+          <p class="mb-4 text-gray-600 dark:text-gray-400">
+            LeadXS allows you to export reports in multiple formats for offline analysis or sharing with team members.
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <h4 class="font-medium text-gray-900 dark:text-white">CSV Export</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Click the <strong>Export CSV</strong> button to download raw data in CSV format for spreadsheet analysis.
+              </p>
+            </div>
+            
+            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <h4 class="font-medium text-gray-900 dark:text-white">PDF Reports</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Click the <strong>Export PDF</strong> button to generate a formatted PDF report with charts and tables.
+              </p>
+            </div>
+            
+            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <h4 class="font-medium text-gray-900 dark:text-white">Scheduled Reports</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Click <strong>Schedule</strong> to set up automated report delivery via email on a daily, weekly, or monthly basis.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700 dark:text-yellow-300">
+              <strong>Note:</strong> Reports containing large amounts of data may take longer to generate. For very large datasets (over 100,000 records), consider applying additional filters or using smaller date ranges.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="analytics" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Available Analytics</h2>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Summary Metrics</h3>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-900 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <h4 class="font-medium text-gray-900 dark:text-white">Bid Volumes</h4>
+            <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <li><strong>Total Bids</strong>: Number of bids received</li>
+              <li><strong>Accepted Bids</strong>: Number of bids that were accepted</li>
+              <li><strong>Rejected Bids</strong>: Number of bids that were rejected</li>
+              <li><strong>Expired Bids</strong>: Number of bids that expired</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="font-medium text-gray-900 dark:text-white">Bid Rates</h4>
+            <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <li><strong>Acceptance Rate</strong>: Percentage of bids accepted</li>
+              <li><strong>Conversion Rate</strong>: Percentage of bids that converted</li>
+              <li><strong>Average Bid Amount</strong>: Average dollar value of bids</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="font-medium text-gray-900 dark:text-white">Revenue Metrics</h4>
+            <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <li><strong>Total Revenue</strong>: Total revenue from accepted bids</li>
+              <li><strong>Revenue Per Bid</strong>: Average revenue per bid</li>
+              <li><strong>Revenue Per Accepted Bid</strong>: Average revenue per accepted bid</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Performance Trends</h3>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-900">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">Time-Based Trends</h4>
+              <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li><strong>Bid Volume Trends</strong>: Visual representation of bid volumes over time</li>
+                <li><strong>Conversion Rate Trends</strong>: Track changes in conversion rates</li>
+                <li><strong>Revenue Trends</strong>: Analyze revenue patterns across time periods</li>
+                <li><strong>Response Time Analysis</strong>: Measure how quickly distributions respond</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">Comparative Analysis</h4>
+              <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li><strong>Campaign Comparison</strong>: Compare performance across campaigns</li>
+                <li><strong>Distribution Comparison</strong>: Compare performance across distributions</li>
+                <li><strong>Time Period Comparison</strong>: Compare current vs. previous periods</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Campaign-Specific Analytics</h3>
+        </div>
+        <div class="p-4 bg-white dark:bg-gray-900">
+          <p class="mb-4 text-gray-700 dark:text-gray-300">
+            Access by clicking on a campaign name in the Bid Reports or navigating to Campaigns > [Campaign Name] > Analytics
+          </p>
+          
+          <ul class="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-1">
+            <li><strong>Campaign Performance</strong>: Detailed metrics for individual campaigns</li>
+            <li><strong>Distribution Comparison</strong>: Compare performance across different distribution channels</li>
+            <li><strong>Bid Quality Metrics</strong>: Analyze bid quality for specific campaigns</li>
+            <li><strong>Campaign ROI</strong>: Calculate return on investment for bidding campaigns</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <section id="api-access" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>API Access</h2>
+      
+      <p class="mb-4">
+        All bid analytics are also available via API for integration with your existing systems. The API provides programmatic access to the same data you see in the dashboard.
+      </p>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">API Endpoints</h3>
+        </div>
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+          <div class="p-4 bg-white dark:bg-gray-900">
+            <h4 class="font-medium text-gray-900 dark:text-white">General Analytics</h4>
+            <pre class="mt-2 bg-gray-50 dark:bg-gray-800 p-2 rounded text-sm overflow-x-auto">GET /api/v1/bid_analytics</pre>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Retrieves overall analytics for all campaigns.</p>
+          </div>
+          
+          <div class="p-4 bg-white dark:bg-gray-900">
+            <h4 class="font-medium text-gray-900 dark:text-white">Campaign-Specific Analytics</h4>
+            <pre class="mt-2 bg-gray-50 dark:bg-gray-800 p-2 rounded text-sm overflow-x-auto">GET /api/v1/campaigns/:id/analytics</pre>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Retrieves analytics for a specific campaign.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">API Parameters</h3>
+        </div>
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+          <div class="p-4 bg-white dark:bg-gray-900">
+            <ul class="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-1">
+              <li><strong>period_type</strong>: "hourly", "daily", "weekly", or "monthly"</li>
+              <li><strong>limit</strong>: Number of records to return</li>
+              <li><strong>start_date</strong>: Start of date range (ISO format)</li>
+              <li><strong>end_date</strong>: End of date range (ISO format)</li>
+            </ul>
+          </div>
+          
+          <div class="p-4 bg-white dark:bg-gray-900">
+            <h4 class="font-medium text-gray-900 dark:text-white">Example Request</h4>
+            <pre class="mt-2 bg-gray-50 dark:bg-gray-800 p-2 rounded text-sm overflow-x-auto">curl -X GET "https://api.leadxs.com/api/v1/bid_analytics?period_type=daily&limit=7" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="best-practices" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Best Practices</h2>
+      
+      <div class="my-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Effective Monitoring</h3>
+          </div>
+          <div class="p-4">
+            <ul class="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-3">
+              <li>
+                <strong>Regular Monitoring</strong>
+                <p class="text-sm mt-1">Check the Bid Dashboard daily to identify trends and issues. Morning reviews help you stay on top of performance.</p>
+              </li>
+              <li>
+                <strong>Compare Time Periods</strong>
+                <p class="text-sm mt-1">Use date range filtering to compare performance week-over-week or month-over-month to spot trends.</p>
+              </li>
+              <li>
+                <strong>Set Up Alerts</strong>
+                <p class="text-sm mt-1">Configure alerts for significant drops in bid volumes or acceptance rates to catch issues early.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Performance Optimization</h3>
+          </div>
+          <div class="p-4">
+            <ul class="list-disc pl-5 text-gray-600 dark:text-gray-400 space-y-3">
+              <li>
+                <strong>Campaign Optimization</strong>
+                <p class="text-sm mt-1">Use campaign-specific analytics to optimize bidding parameters, including timeouts and distribution methods.</p>
+              </li>
+              <li>
+                <strong>Distribution Channel Analysis</strong>
+                <p class="text-sm mt-1">Identify your best-performing distribution channels and consider allocating more leads to them.</p>
+              </li>
+              <li>
+                <strong>Response Time Optimization</strong>
+                <p class="text-sm mt-1">Monitor and improve bid response times for better performance. Fast responses improve user experience.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700 dark:text-blue-300">
+              <strong>Pro Tip:</strong> Schedule monthly review sessions with your team to analyze bid performance and make strategic adjustments to your campaigns and distributions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="faq" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Frequently Asked Questions</h2>
+      
+      <div class="mt-6 space-y-6">
+        <div>
+          <h3 class="font-medium text-gray-900 dark:text-white">How often are analytics updated?</h3>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Real-time metrics are updated immediately. Summary reports are generated hourly, daily, weekly, and monthly.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="font-medium text-gray-900 dark:text-white">Can I schedule automated reports?</h3>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Yes, you can schedule reports to be emailed daily, weekly, or monthly from the Reports Settings page.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="font-medium text-gray-900 dark:text-white">How do I interpret the bid acceptance rate?</h3>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            The bid acceptance rate shows the percentage of your bids that were accepted. Higher rates typically indicate more competitive bid amounts or better targeting.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="font-medium text-gray-900 dark:text-white">What's the difference between conversion rate and acceptance rate?</h3>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Acceptance rate is the percentage of bids accepted, while conversion rate is the percentage of accepted bids that resulted in a successful lead conversion.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="font-medium text-gray-900 dark:text-white">How can I improve low bid amounts?</h3>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Review your lead quality, consider enhancing validation rules, and work with your distributions to implement smarter bidding strategies that recognize high-value leads.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="font-medium text-gray-900 dark:text-white">Can I export analytics data for custom analysis?</h3>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Yes, each report view includes an "Export" button that allows you to download the data in CSV format for custom analysis in your preferred tools.
+          </p>
+        </div>
+        
+        <div>
+          <h3 class="font-medium text-gray-900 dark:text-white">Are there any advanced reporting features available?</h3>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Yes, LeadXS offers several advanced reporting features:
+          </p>
+          <ul class="list-disc pl-5 mt-2 space-y-1 text-gray-600 dark:text-gray-400">
+            <li><strong>Custom Report Builder</strong>: Create and save custom report templates with specific metrics and filters</li>
+            <li><strong>Report Sharing</strong>: Share reports with team members via secure links</li>
+            <li><strong>Automated Alerts</strong>: Set up threshold-based alerts for key metrics</li>
+            <li><strong>API Integration</strong>: Pull bid analytics data into third-party BI tools via our API</li>
+            <li><strong>Advanced Visualization</strong>: Access to interactive charts and heatmaps in the Analytics Pro section</li>
+          </ul>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            For access to advanced reporting features, contact your account manager or email support@leadxs.com.
+          </p>
+        </div>
+      </div>
+      
+      <div class="mt-10 border-t border-gray-200 dark:border-gray-700 pt-6">
+        <h3 class="font-medium text-gray-900 dark:text-white">Getting Support</h3>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+          If you need assistance with bid reporting or analytics:
+        </p>
+        
+        <ol class="list-decimal pl-5 mt-3 space-y-2 text-gray-600 dark:text-gray-400">
+          <li>Check this documentation first</li>
+          <li>Use the "Help" button in the dashboard for context-specific guidance</li>
+          <li>Contact support at support@leadxs.com or through the in-app chat</li>
+          <li>Schedule a training session with our team for personalized guidance</li>
+        </ol>
+        
+        <p class="mt-4 text-gray-600 dark:text-gray-400">
+          We're continuously enhancing our reporting capabilities. If you have suggestions for additional metrics or features, please send them to product@leadxs.com.
+        </p>
+      </div>
+    </section>
+  </div>
+</div>

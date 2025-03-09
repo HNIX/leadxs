@@ -1,0 +1,239 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="h2">Bid Analytics Report</h1>
+      <p class="text-gray-500 dark:text-gray-400 mt-1">
+        <%= format_snapshot_period(@snapshot) %>
+        <% if @campaign %> • <%= @campaign.name %><% end %>
+        <% if @distribution %> • <%= @distribution.name %><% end %>
+      </p>
+    </div>
+    
+    <div class="flex space-x-2">
+      <div class="dropdown relative">
+        <button class="btn btn-outline flex items-center dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="dropdown-menu absolute right-0 z-10 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 hidden">
+          <div class="py-1">
+            <a href="#" onclick="alert('CSV export is coming soon!'); return false;" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Export as CSV</a>
+            <a href="#" onclick="alert('PDF export is coming soon!'); return false;" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Export as PDF</a>
+            <a href="#" onclick="alert('Email report is coming soon!'); return false;" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Email Report</a>
+          </div>
+        </div>
+      </div>
+      <%= link_to bid_reports_path(period_type: @snapshot.period_type), class: "btn btn-outline" do %>
+        Back to Reports
+      <% end %>
+    </div>
+    
+    <script>
+      document.addEventListener('turbo:load', function() {
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        
+        if (dropdownToggle) {
+          dropdownToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            dropdownMenu.classList.toggle('hidden');
+          });
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', function(e) {
+            if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+              dropdownMenu.classList.add('hidden');
+            }
+          });
+        }
+      });
+    </script>
+  </div>
+  
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-2 dark:text-white">Total Bids</h3>
+      <p class="text-3xl font-bold text-blue-600 dark:text-blue-400"><%= number_with_delimiter(@snapshot.total_bids) %></p>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-2 dark:text-white">Accepted Bids</h3>
+      <p class="text-3xl font-bold text-green-600 dark:text-green-400"><%= number_with_delimiter(@snapshot.accepted_bids) %></p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <%= number_to_percentage(@snapshot.acceptance_rate, precision: 1) %> acceptance rate
+      </p>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-2 dark:text-white">Average Bid Amount</h3>
+      <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400"><%= number_to_currency(@snapshot.avg_bid_amount) %></p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        Range: <%= number_to_currency(@snapshot.min_bid_amount) %> - <%= number_to_currency(@snapshot.max_bid_amount) %>
+      </p>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-2 dark:text-white">Total Revenue</h3>
+      <p class="text-3xl font-bold text-red-600 dark:text-red-400"><%= number_to_currency(@snapshot.total_revenue) %></p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <%= @snapshot.conversion_count %> conversions
+      </p>
+    </div>
+  </div>
+  
+  <!-- Detailed Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-4 dark:text-white">Performance Metrics</h3>
+      <div class="divide-y divide-gray-200 dark:divide-gray-700">
+        <% @detailed_metrics.each do |key, metric| %>
+          <div class="py-3 flex justify-between">
+            <div>
+              <h4 class="font-medium dark:text-white"><%= key.to_s.titleize %></h4>
+              <p class="text-sm text-gray-500 dark:text-gray-400"><%= metric[:description] %></p>
+            </div>
+            <div class="text-lg font-semibold dark:text-white"><%= metric[:value] %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <% if @campaign_metrics || @distribution_metrics %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <% if @campaign_metrics %>
+          <h3 class="text-lg font-medium mb-4 dark:text-white">Campaign Metrics</h3>
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Total Bids</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= number_with_delimiter(@campaign_metrics[:total_bids]) %></div>
+            </div>
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Accepted Bids</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= number_with_delimiter(@campaign_metrics[:accepted_bids]) %></div>
+            </div>
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Acceptance Rate</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= @campaign_metrics[:acceptance_rate] %></div>
+            </div>
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Average Bid Amount</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= @campaign_metrics[:avg_amount] %></div>
+            </div>
+          </div>
+        <% end %>
+        
+        <% if @distribution_metrics %>
+          <h3 class="text-lg font-medium mb-4 mt-6 dark:text-white">Distribution Metrics</h3>
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Total Bids</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= number_with_delimiter(@distribution_metrics[:total_bids]) %></div>
+            </div>
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Accepted Bids</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= number_with_delimiter(@distribution_metrics[:accepted_bids]) %></div>
+            </div>
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Acceptance Rate</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= @distribution_metrics[:acceptance_rate] %></div>
+            </div>
+            <div class="py-3 flex justify-between">
+              <div>
+                <h4 class="font-medium dark:text-white">Average Bid Amount</h4>
+              </div>
+              <div class="text-lg font-semibold dark:text-white"><%= @distribution_metrics[:avg_amount] %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Raw Metrics Data -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <h3 class="text-lg font-medium dark:text-white">Additional Metrics</h3>
+      <button id="toggleRawData" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+        Show Raw Data
+      </button>
+    </div>
+    <div class="px-6 py-4">
+      <div id="rawDataSummary">
+        <p class="text-gray-500 dark:text-gray-400">
+          This snapshot includes <%= @snapshot.metrics.keys.size %> additional metrics related to bid activity.
+        </p>
+      </div>
+      <div id="rawDataFull" class="hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead>
+              <tr>
+                <th class="px-4 py-2 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Metric</th>
+                <th class="px-4 py-2 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Value</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @snapshot.metrics.sort.each do |key, value| %>
+                <% next if key == 'distribution_stats' || key == 'campaign_stats' # Skip complex nested data %>
+                <tr>
+                  <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"><%= key.to_s.humanize %></td>
+                  <td class="px-4 py-2 whitespace-normal text-sm text-gray-500 dark:text-gray-300">
+                    <% if value.is_a?(Numeric) %>
+                      <%= format_metric(key, value) %>
+                    <% elsif value.is_a?(Hash) || value.is_a?(Array) %>
+                      <pre class="text-xs overflow-x-auto"><%= JSON.pretty_generate(value) rescue value.inspect %></pre>
+                    <% else %>
+                      <%= value.to_s %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('turbo:load', function() {
+      const toggleButton = document.getElementById('toggleRawData');
+      const summary = document.getElementById('rawDataSummary');
+      const fullData = document.getElementById('rawDataFull');
+      
+      if (toggleButton) {
+        toggleButton.addEventListener('click', function() {
+          if (summary.classList.contains('hidden')) {
+            summary.classList.remove('hidden');
+            fullData.classList.add('hidden');
+            toggleButton.textContent = 'Show Raw Data';
+          } else {
+            summary.classList.add('hidden');
+            fullData.classList.remove('hidden');
+            toggleButton.textContent = 'Hide Raw Data';
+          }
+        });
+      }
+    });
+  </script>
+</div>

@@ -1,0 +1,800 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="prose prose-blue max-w-none dark:prose-invert">
+    <h1>Lead Submission and Distribution Process</h1>
+    
+    <div class="mt-8 border-b border-gray-200 dark:border-gray-700">
+      <nav class="flex -mb-px space-x-8 overflow-x-auto" aria-label="Documentation sections">
+        <a href="#overview" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Overview
+        </a>
+        <a href="#detailed-flow" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Detailed Process Flow
+        </a>
+        <a href="#validation" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Validation & Filtering
+        </a>
+        <a href="#bidding" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Bidding Process
+        </a>
+        <a href="#distribution" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Distribution
+        </a>
+        <a href="#compliance" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Compliance & Tracking
+        </a>
+      </nav>
+    </div>
+    
+    <section id="overview" class="py-6">
+      <h2>System Overview</h2>
+      <p>
+        The LeadXS platform handles lead submissions through a comprehensive pipeline that ensures data quality, regulatory compliance, 
+        and optimal distribution to buyers. This document provides a detailed explanation of what happens when a lead is submitted to the system, 
+        from initial entry point to final delivery and reporting.
+      </p>
+      
+      <div class="my-6 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700 dark:text-blue-300">
+              <strong>Key Concept:</strong> LeadXS supports two primary campaign types:
+            </p>
+            <ul class="mt-1 text-sm text-blue-700 dark:text-blue-300 list-disc list-inside ml-2">
+              <li><strong>Direct Campaigns</strong>: Leads are immediately validated and sent to pre-configured distributions</li>
+              <li><strong>Ping-Post Campaigns</strong>: Leads undergo a bidding process before full data is delivered to buyers</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Lead Journey Summary</h3>
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Lead Processing Pipeline</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-2">
+            <li><strong>Submission</strong>: Lead data is received via API from a registered source</li>
+            <li><strong>Authentication & Initial Processing</strong>: System verifies source credentials and prepares the lead</li>
+            <li><strong>Validation</strong>: Lead data is validated against campaign rules and filters</li>
+            <li><strong>Campaign Routing</strong>: System determines whether to use direct distribution or bidding</li>
+            <li><strong>Bidding</strong> (for ping-post campaigns): System solicits and collects bids from buyers</li>
+            <li><strong>Distribution</strong>: Complete lead data is delivered to the selected buyer(s)</li>
+            <li><strong>Tracking & Analytics</strong>: System logs all events for compliance and reporting</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+    
+    <section id="detailed-flow" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Detailed Process Flow</h2>
+      
+      <p>
+        This section provides an in-depth look at what happens at each stage of lead processing, 
+        explaining the systems and services involved.
+      </p>
+      
+      <h3 class="mt-6">1. Lead Submission</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Initial Submission Process</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <strong>API Endpoint Reception</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                When a lead is submitted, it arrives at the <code>/api/v1/lead_posts</code> endpoint as a JSON payload.
+                The API controller immediately begins processing the request.
+              </p>
+            </li>
+            
+            <li>
+              <strong>Authentication</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system authenticates the source using the provided token (either in the <code>X-Source-Token</code> header or 
+                <code>source_token</code> parameter). If authentication fails, the system immediately rejects the submission.
+              </p>
+            </li>
+            
+            <li>
+              <strong>Source Verification</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Once authenticated, the system verifies that:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>The source is active and allowed to submit leads</li>
+                <li>The source has not exceeded its budget or volume limits</li>
+                <li>The source is properly connected to the specified campaign</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Initial Lead Record Creation</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system creates a new lead record with a unique identifier. At this stage, the lead has a "pending" status
+                and is assigned to the appropriate campaign based on the source configuration.
+              </p>
+            </li>
+            
+            <li>
+              <strong>Field Mapping</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system maps the submitted lead data to the campaign's defined fields, applying any transformations
+                or normalizations required (e.g., formatting phone numbers, standardizing addresses).
+              </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="my-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700 dark:text-yellow-300">
+              <strong>Important:</strong> The system records a timestamp for each action performed on the lead. These timestamps
+              are crucial for compliance documentation and tracking lead flow through the system.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">2. Pre-Processing and Enrichment</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Data Enhancement and Preparation</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <strong>Data Normalization</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system normalizes all field values according to standardized formats, ensuring consistent data quality.
+                This includes:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Standardizing phone numbers to E.164 format</li>
+                <li>Converting address components to proper case</li>
+                <li>Standardizing date formats</li>
+                <li>Trimming whitespace from text fields</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Calculated Fields Processing</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                If the campaign has calculated fields defined, the system computes their values now based on the formulas 
+                and the normalized lead data. These calculations can include:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Mathematical operations (e.g., age calculation from birth date)</li>
+                <li>String manipulations (e.g., concatenating first and last name)</li>
+                <li>Conditional logic (e.g., assigning a tier based on income range)</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Data Enrichment (Optional)</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                If configured, the system may enrich the lead data with additional information from external services:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Geocoding addresses to add lat/long coordinates</li>
+                <li>Appending demographic data</li>
+                <li>Verifying phone numbers or emails</li>
+                <li>Running fraud detection checks</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+    
+    <section id="validation" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Validation & Filtering</h2>
+      
+      <p>
+        After initial processing, the lead undergoes comprehensive validation to ensure data quality and campaign fit.
+        This is a critical step that determines whether the lead will proceed further in the pipeline.
+      </p>
+      
+      <h3 class="mt-6">Validation Rules Evaluation</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Validation Process</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <strong>Field-Level Validation</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system first validates that each required field has a value and that the value matches the expected format:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Email addresses must be properly formatted</li>
+                <li>Phone numbers must match the required pattern</li>
+                <li>Numeric fields must be within acceptable ranges</li>
+                <li>Text fields must meet length requirements</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Campaign Validation Rules</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system evaluates all campaign-specific validation rules in sequential order. These rules can include:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Pattern matching (e.g., zip code must be in a specific region)</li>
+                <li>Conditional validation (e.g., if age < 18, guardian information must be provided)</li>
+                <li>Cross-field validation (e.g., password and confirm password must match)</li>
+                <li>Advanced logic using custom code or expressions</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Source Filters</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system applies any source-specific filters to determine if this lead is acceptable from this particular source:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Geographic restrictions (e.g., this source can only submit leads from certain states)</li>
+                <li>Value range filters (e.g., income must be above a threshold for this source)</li>
+                <li>Category filters (e.g., this source can only submit leads for certain product categories)</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Validation Result Processing</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Based on the validation results, the system either:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li><strong>Accepts</strong> the lead and proceeds to the next stage</li>
+                <li><strong>Rejects</strong> the lead if it fails critical validation rules (errors are logged)</li>
+                <li><strong>Flags</strong> the lead with warnings if it fails non-critical validations but can still proceed</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Duplicate Detection</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            After validation, the system performs duplicate detection to prevent the same lead from being processed multiple times:
+          </p>
+          
+          <ol class="list-decimal pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              The system checks for existing leads with matching unique identifiers (email, phone, or other configured keys)
+            </li>
+            <li>
+              Depending on campaign settings, duplicates may be:
+              <ul class="list-disc pl-5 mt-1">
+                <li><strong>Rejected</strong> entirely</li>
+                <li><strong>Allowed</strong> if outside a configured time window (e.g., > 30 days old)</li>
+                <li><strong>Updated</strong> instead of creating a new record</li>
+                <li><strong>Flagged</strong> but still processed (with notification to buyers)</li>
+              </ul>
+            </li>
+            <li>
+              For duplicates that are processed (not rejected), the system records the duplicate status in the lead metadata
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+    
+    <section id="bidding" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Bidding Process</h2>
+      
+      <p>
+        For ping-post campaigns, validated leads enter the bidding system, where buyers compete for the lead 
+        before receiving the complete data. This section explains the detailed bidding workflow.
+      </p>
+      
+      <h3 class="mt-6">Bid Request Creation</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Initial Bid Setup</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <strong>Bid Request Generation</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system creates a new bid request with:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>A unique bid request ID</li>
+                <li>Reference to the original lead</li>
+                <li>Timestamp of creation</li>
+                <li>Expiration time based on campaign bid timeout settings</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Data Anonymization</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system creates an anonymized version of the lead data by:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Removing all Personally Identifiable Information (PII) fields</li>
+                <li>Including only fields marked as "shared during bidding" in the campaign configuration</li>
+                <li>Potentially masking certain fields (e.g., showing only part of a zip code)</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Eligible Distribution Selection</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system identifies which distributions are eligible to receive the bid request by evaluating distribution filters:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Geographic filters (e.g., distribution only accepts leads from certain regions)</li>
+                <li>Value-based filters (e.g., income must be above a threshold)</li>
+                <li>Category filters (e.g., distribution only handles certain product types)</li>
+                <li>Time-based filters (e.g., distribution only accepts leads during business hours)</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Bid Solicitation & Collection</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Bidding Process</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <strong>Bid Requests Dispatch</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system sends the anonymized lead data to all eligible distributions simultaneously, using the configured endpoints
+                and formats for each distribution. Each request includes:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Bid request ID</li>
+                <li>Anonymized lead data</li>
+                <li>Campaign identifier</li>
+                <li>Expiration timestamp</li>
+                <li>Required response format</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Bid Response Collection</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                As distributions analyze the lead data and determine its value, they submit bids back to the system. Each bid includes:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Bid amount (how much the buyer is willing to pay)</li>
+                <li>Bid request ID reference</li>
+                <li>Optional bid notes or conditions</li>
+                <li>Timestamp</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Timeout Handling</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system manages the bidding process timing:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Waits for the configured bid timeout period (e.g., 10 seconds)</li>
+                <li>Collects all bids received during this window</li>
+                <li>May close bidding early if all expected distributions have responded</li>
+                <li>Marks distributions that didn't respond in time as "no bid" or "timeout"</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Winner Selection</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Distribution Selection Methods</h4>
+        </div>
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            After collecting all bids, the system selects a winning distribution based on the campaign's configured distribution method:
+          </p>
+          
+          <div class="mt-3 space-y-4">
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">Highest Bid Selection</h5>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                When configured for highest bid selection, the system:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Ranks all received bids by amount</li>
+                <li>Selects the distribution with the highest bid amount</li>
+                <li>In case of a tie, may use additional factors like response time or distribution priority</li>
+                <li>May apply a minimum bid threshold (rejecting all bids below a configured amount)</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">Weighted Random Selection</h5>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                When configured for weighted random selection, the system:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Assigns a probability to each distribution proportional to their bid amount</li>
+                <li>Higher bids receive higher probabilities of selection</li>
+                <li>Uses a randomized selection algorithm that respects these probabilities</li>
+                <li>This method helps distribute leads among multiple buyers while still favoring higher bidders</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">Waterfall Selection</h5>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                When configured for waterfall selection, the system:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Processes distributions in a pre-defined priority order</li>
+                <li>Checks if each distribution's bid meets the minimum threshold</li>
+                <li>Selects the first distribution that meets the criteria</li>
+                <li>This method honors existing buyer relationships and tier structures</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+            <p><strong>Note:</strong> If no bids meet the criteria (e.g., all below minimum threshold or no bids received), 
+              the lead may be marked as "no accepted bids" and follow a configured fallback path.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="distribution" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Lead Distribution</h2>
+      
+      <p>
+        Once a distribution is selected (either through bidding or direct assignment), the system prepares 
+        and delivers the complete lead data to the buyer.
+      </p>
+      
+      <h3 class="mt-6">Final Lead Preparation</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <strong>Complete Data Package</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system assembles the complete lead data package, including all fields (not just the anonymized subset used during bidding).
+                This includes:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>All lead field values, including PII</li>
+                <li>Calculated fields and enriched data</li>
+                <li>Metadata about the lead (source, timestamp, etc.)</li>
+                <li>Unique lead identifier for tracking</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Field Mapping</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system maps the lead data fields to the expected format for the selected distribution:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Translates field names to match the distribution's expected schema</li>
+                <li>Formats values according to the distribution's requirements</li>
+                <li>Includes or excludes fields based on distribution configuration</li>
+                <li>May transform data structure (e.g., flattening nested objects)</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Request Formatting</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system prepares the HTTP request according to the distribution's API specifications:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Formats the payload (JSON, XML, form data, etc.)</li>
+                <li>Sets appropriate headers (authentication, content type, etc.)</li>
+                <li>Prepares query parameters if needed</li>
+                <li>Sets up request timeouts and retry logic</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Distribution Delivery</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Delivery Process</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3">
+            <li>
+              <strong>API Request Submission</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system sends the prepared lead data to the distribution's endpoint using the configured HTTP method (POST, PUT, etc.).
+              </p>
+            </li>
+            
+            <li>
+              <strong>Response Handling</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                The system captures and processes the distribution's response:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Success responses are recorded with any returned data (e.g., distribution's internal ID)</li>
+                <li>Error responses are logged for troubleshooting</li>
+                <li>Timeouts or connection issues trigger configurable retry logic</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Status Update</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Based on the delivery outcome, the system updates the lead status:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li><strong>Delivered</strong>: Successfully sent to the buyer</li>
+                <li><strong>Rejected</strong>: Buyer rejected the lead (with reason)</li>
+                <li><strong>Error</strong>: Technical issue prevented delivery</li>
+                <li><strong>Pending</strong>: Delivery is still in progress (e.g., retries)</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Multi-Buyer Distribution (Optional)</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                If the campaign is configured for multi-buyer distribution, the system may:
+              </p>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Deliver the lead to multiple buyers in sequence (waterfall)</li>
+                <li>Send to multiple buyers simultaneously</li>
+                <li>Distribute to secondary buyers if primary delivery fails</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Post-Distribution Processing</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <ul class="list-disc pl-5 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <strong>Financial Processing</strong>: The system records financial transactions related to the lead:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Records revenue from the buyer (based on accepted bid or fixed price)</li>
+                <li>Calculates cost to the source (based on source payout configuration)</li>
+                <li>Computes platform margin</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Notifications</strong>: The system may send notifications about successful or failed distributions:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Email alerts for failed deliveries</li>
+                <li>In-app notifications for campaign managers</li>
+                <li>API callbacks to sources (if configured)</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Analytics Updates</strong>: The system updates real-time analytics dashboards and metrics:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Campaign performance indicators</li>
+                <li>Source performance metrics</li>
+                <li>Distribution performance statistics</li>
+                <li>Revenue and cost tracking</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    
+    <section id="compliance" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Compliance & Tracking</h2>
+      
+      <p>
+        Throughout the entire lead processing pipeline, the system maintains comprehensive records for compliance, 
+        auditing, and performance analysis.
+      </p>
+      
+      <h3 class="mt-6">Compliance Documentation</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Regulatory Compliance</h4>
+        </div>
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            The system automatically creates and maintains documentation required for regulatory compliance:
+          </p>
+          
+          <ul class="list-disc pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <strong>Consent Records</strong>: Documentation of user consent, including:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Timestamp of consent</li>
+                <li>IP address</li>
+                <li>Specific disclosures shown to the user</li>
+                <li>Versions of privacy policy and terms accepted</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Data Handling Records</strong>: Complete audit trail of data access and processing:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Who accessed the lead data</li>
+                <li>When data was accessed</li>
+                <li>What operations were performed</li>
+                <li>What data was shared and with whom</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>TCPA Compliance</strong>: For leads with phone numbers:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Explicit consent for calls/texts</li>
+                <li>Do Not Call (DNC) list checking</li>
+                <li>Time restrictions adherence</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>CCPA/GDPR Compliance</strong>: Supporting consumer rights:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Right to access data</li>
+                <li>Right to delete</li>
+                <li>Data processing limitations</li>
+                <li>Data minimization documentation</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Activity Logging</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            The system maintains detailed logs of all activities related to a lead:
+          </p>
+          
+          <ul class="list-disc pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <strong>Lead Status History</strong>: Records of all status changes throughout processing:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Status change timestamp</li>
+                <li>Previous and new status</li>
+                <li>Reason for change</li>
+                <li>User or system that initiated the change</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>API Communication Logs</strong>: Complete records of all API interactions:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Request payloads (with sensitive data redacted)</li>
+                <li>Response bodies</li>
+                <li>HTTP status codes</li>
+                <li>Request and response timestamps</li>
+                <li>Headers and metadata</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Bid History</strong>: For ping-post campaigns, detailed bidding records:
+              <ul class="list-disc pl-5 mt-1">
+                <li>All bids received with amounts and timestamps</li>
+                <li>Distribution identifiers</li>
+                <li>Bid acceptance/rejection status</li>
+                <li>Winner selection reasoning</li>
+              </ul>
+            </li>
+            
+            <li>
+              <strong>Event Timeline</strong>: Chronological record of all events for the lead:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Submission receipt</li>
+                <li>Validation processing</li>
+                <li>Bidding events</li>
+                <li>Distribution attempts</li>
+                <li>Status updates</li>
+                <li>User interactions</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Performance Metrics</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            The system automatically calculates and records performance metrics at multiple levels:
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">Campaign Metrics</h5>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Lead volume and trends</li>
+                <li>Validation pass/fail rates</li>
+                <li>Bid performance statistics</li>
+                <li>Distribution success rates</li>
+                <li>Revenue and ROI analytics</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">Source Metrics</h5>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Lead quality indicators</li>
+                <li>Validation error trends</li>
+                <li>Conversion rates</li>
+                <li>Revenue per lead</li>
+                <li>Volume and time patterns</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">Distribution Metrics</h5>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Bidding patterns</li>
+                <li>Response times</li>
+                <li>Acceptance rates</li>
+                <li>Average bid amounts</li>
+                <li>API reliability statistics</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="my-6 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700 dark:text-blue-300">
+              <strong>Reporting Access:</strong> All performance metrics, logs, and compliance documentation 
+              are accessible through the LeadXS dashboard. Reports can be exported in various formats for 
+              analysis, auditing, or regulatory requirements.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

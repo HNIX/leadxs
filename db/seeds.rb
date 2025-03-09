@@ -281,5 +281,9 @@ if Rails.env.development?
   # Create leads and API requests
   require_relative "seeds/add_leads_and_api_requests"
   
+  # Setup bidding system with distributions, campaign configurations, and test bids
+  require_relative "seeds/bidding/setup_bidding_system"
+  Seeds::Bidding::SetupBiddingSystem.setup
+  
   puts "Development seed data created successfully!"
 end

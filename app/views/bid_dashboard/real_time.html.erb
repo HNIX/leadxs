@@ -1,0 +1,392 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Real-Time Bid Dashboard</h1>
+  </div>
+  
+  <%= render "shared/bidding_navigation" %>
+
+  <!-- Live Metrics Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Bids in Last Hour -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Bids (Last Hour)</p>
+          <h3 class="text-3xl font-bold" id="metric-total_bids"><%= @latest_hourly&.total_bids || 0 %></h3>
+        </div>
+        <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
+          <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <span id="bid-trend-indicator" class="font-medium text-green-600 dark:text-green-400">
+          <svg class="inline-block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+          </svg>
+          <span id="bid-trend-percentage">5.3%</span>
+        </span>
+        <span> from previous hour</span>
+      </div>
+    </div>
+
+    <!-- Active Campaigns -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Campaigns</p>
+          <h3 class="text-3xl font-bold" id="metric-active_campaigns"><%= @campaigns.count %></h3>
+        </div>
+        <div class="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-full">
+          <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <span id="campaigns-active-indicator" class="font-medium text-green-600 dark:text-green-400">
+          <span id="campaigns-active-count"><%= @campaigns.count %></span> campaigns receiving bids
+        </span>
+      </div>
+    </div>
+
+    <!-- Real-time Acceptance Rate -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Acceptance Rate</p>
+          <h3 class="text-3xl font-bold" id="metric-acceptance_rate"><%= (@latest_hourly&.accepted_bids.to_f / @latest_hourly&.total_bids.to_f * 100).round(2) rescue 0 %>%</h3>
+        </div>
+        <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full">
+          <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <span id="acceptance-trend-indicator" class="font-medium text-green-600 dark:text-green-400">
+          <svg class="inline-block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+          </svg>
+          <span id="acceptance-trend-percentage">2.1%</span>
+        </span>
+        <span> from previous hour</span>
+      </div>
+    </div>
+
+    <!-- Real-time Session Counter -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Real-time Bid Count</p>
+          <h3 class="text-3xl font-bold" id="realtime-bid-counter">0</h3>
+        </div>
+        <div class="p-2 bg-red-100 dark:bg-red-900 rounded-full">
+          <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <span>Since this page loaded</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Charts Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Real-time Bid Volume Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-4">Real-time Bid Volume</h3>
+      <div class="h-80">
+        <canvas id="realtimeBidVolumeChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Real-time Acceptance Rate Chart -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-4">Real-time Acceptance Rate</h3>
+      <div class="h-80">
+        <canvas id="realtimeAcceptanceRateChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Bid Feed Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Live Bid Feed -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 lg:col-span-2">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium">Live Bid Feed</h3>
+        <div class="flex items-center space-x-2">
+          <span class="inline-block w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Live</span>
+        </div>
+      </div>
+      <div id="bid-live-feed" class="overflow-y-auto h-96 space-y-2">
+        <!-- Bid items will be added here by JavaScript -->
+        <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+          Waiting for bids...
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaign Performance -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-4">Top Campaigns</h3>
+      <div id="top-campaigns" class="space-y-4">
+        <% if @campaigns.present? %>
+          <% @campaigns.first(5).each_with_index do |campaign, index| %>
+            <div class="flex items-center">
+              <div class="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
+                <span class="text-blue-600 dark:text-blue-300 font-medium"><%= index + 1 %></span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate"><%= campaign.name %></p>
+                <div class="flex items-center">
+                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: <%= rand(30..95) %>%"></div>
+                  </div>
+                  <span class="ml-2 text-xs text-gray-500 dark:text-gray-400"><%= rand(10..50) %> bids</span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+            No active campaigns found. Create campaigns to see data here.
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Load Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set up Chart.js defaults
+    Chart.defaults.font.family = "'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'";
+    Chart.defaults.color = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
+    
+    // Initialize real-time charts with empty data
+    const timeLabels = Array(30).fill().map((_, i) => {
+      const date = new Date();
+      date.setSeconds(date.getSeconds() - (29 - i) * 10);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    });
+    
+    const bidVolumeData = Array(30).fill(0);
+    const acceptanceRateData = Array(30).fill(0);
+    
+    // Create real-time bid volume chart
+    const bidVolumeCtx = document.getElementById('realtimeBidVolumeChart').getContext('2d');
+    window.realtimeBidVolumeChart = new Chart(bidVolumeCtx, {
+      type: 'line',
+      data: {
+        labels: timeLabels,
+        datasets: [{
+          label: 'Bids per 10s',
+          data: bidVolumeData,
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 1,
+          pointHoverRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: document.documentElement.classList.contains('dark') ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.5)'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        animation: {
+          duration: 0
+        }
+      }
+    });
+    
+    // Create real-time acceptance rate chart
+    const acceptanceRateCtx = document.getElementById('realtimeAcceptanceRateChart').getContext('2d');
+    window.realtimeAcceptanceRateChart = new Chart(acceptanceRateCtx, {
+      type: 'line',
+      data: {
+        labels: timeLabels,
+        datasets: [{
+          label: 'Acceptance Rate (%)',
+          data: acceptanceRateData,
+          backgroundColor: 'rgba(16, 185, 129, 0.2)',
+          borderColor: 'rgba(16, 185, 129, 1)',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 1,
+          pointHoverRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            grid: {
+              color: document.documentElement.classList.contains('dark') ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.5)'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        animation: {
+          duration: 0
+        }
+      }
+    });
+    
+    // Function to add data to real-time charts
+    let bidCount = 0;
+    let acceptedCount = 0;
+    
+    function addRealTimeData() {
+      // Update time labels
+      const newTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      
+      // Update bid volume chart
+      const newBidCount = Math.floor(Math.random() * 10); // Simulate random bid count
+      bidCount += newBidCount;
+      
+      // Update acceptance rate data
+      const newAcceptedCount = Math.floor(Math.random() * newBidCount);
+      acceptedCount += newAcceptedCount;
+      const newAcceptanceRate = newBidCount > 0 ? (newAcceptedCount / newBidCount) * 100 : 0;
+      
+      // Update charts
+      window.realtimeBidVolumeChart.data.labels.shift();
+      window.realtimeBidVolumeChart.data.labels.push(newTime);
+      window.realtimeBidVolumeChart.data.datasets[0].data.shift();
+      window.realtimeBidVolumeChart.data.datasets[0].data.push(newBidCount);
+      window.realtimeBidVolumeChart.update();
+      
+      window.realtimeAcceptanceRateChart.data.labels.shift();
+      window.realtimeAcceptanceRateChart.data.labels.push(newTime);
+      window.realtimeAcceptanceRateChart.data.datasets[0].data.shift();
+      window.realtimeAcceptanceRateChart.data.datasets[0].data.push(newAcceptanceRate);
+      window.realtimeAcceptanceRateChart.update();
+      
+      // Simulate a new bid in the feed
+      if (newBidCount > 0) {
+        simulateNewBids(newBidCount);
+      }
+    }
+    
+    // Function to simulate new bids
+    function simulateNewBids(count) {
+      const campaigns = <%= raw (@campaigns.present? ? @campaigns.map { |c| c.name } : ['Sample Campaign 1', 'Sample Campaign 2', 'Sample Campaign 3']).to_json %>;
+      const statuses = ['accepted', 'rejected', 'expired'];
+      const feedElement = document.getElementById('bid-live-feed');
+      
+      // Remove the "waiting for bids" message if present
+      const waitingMessage = feedElement.querySelector('div.text-center');
+      if (waitingMessage) {
+        feedElement.removeChild(waitingMessage);
+      }
+      
+      for (let i = 0; i < count; i++) {
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const amount = (Math.random() * 100 + 10).toFixed(2);
+        const campaign = campaigns[Math.floor(Math.random() * campaigns.length)];
+        
+        const bidItem = document.createElement('div');
+        bidItem.classList.add('bid-item', 'p-3', 'border', 'border-gray-200', 'dark:border-gray-700', 'rounded-lg', 'flex', 'justify-between', 'items-center', 'animate-fade-in');
+        
+        // Add appropriate status color
+        let statusColor = '';
+        if (status === 'accepted') {
+          statusColor = 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900';
+        } else if (status === 'rejected') {
+          statusColor = 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900';
+        } else {
+          statusColor = 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900';
+        }
+        
+        bidItem.innerHTML = `
+          <div class="flex items-center">
+            <div class="flex-shrink-0 mr-3">
+              <span class="inline-block w-2 h-2 rounded-full ${status === 'accepted' ? 'bg-green-500' : status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'}"></span>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">${campaign}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">${new Date().toLocaleTimeString()}</p>
+            </div>
+          </div>
+          <div class="flex items-center">
+            <span class="px-2 py-1 text-xs font-medium ${statusColor} rounded-full mr-3">${status}</span>
+            <span class="text-sm font-medium">$${amount}</span>
+          </div>
+        `;
+        
+        feedElement.prepend(bidItem);
+        
+        // Update the realtime bid counter
+        const counterElement = document.getElementById('realtime-bid-counter');
+        if (counterElement) {
+          const currentCount = parseInt(counterElement.textContent || '0');
+          counterElement.textContent = currentCount + 1;
+        }
+        
+        // Limit feed to 20 items
+        const items = feedElement.querySelectorAll('.bid-item');
+        if (items.length > 20) {
+          feedElement.removeChild(items[items.length - 1]);
+        }
+      }
+    }
+    
+    // Start updating charts every 10 seconds
+    setInterval(addRealTimeData, 10000);
+    
+    // Initial data point
+    addRealTimeData();
+    
+    // Add CSS animation for new bid items
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>

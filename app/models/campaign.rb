@@ -13,6 +13,7 @@ class Campaign < ApplicationRecord
   has_many :source_filters, -> { where(type: 'SourceFilter') }, class_name: 'SourceFilter', dependent: :destroy, foreign_key: 'campaign_id'
   has_many :distribution_filters, -> { where(type: 'DistributionFilter') }, class_name: 'DistributionFilter', dependent: :destroy, foreign_key: 'campaign_id'
   has_many :bid_requests, dependent: :destroy
+  has_many :bid_analytic_snapshots, dependent: :nullify
   
   # Constants for campaign types and distribution methods
   CAMPAIGN_TYPES = ['ping_post', 'direct', 'calls'].freeze

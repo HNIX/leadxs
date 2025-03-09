@@ -5,6 +5,9 @@ class Bid < ApplicationRecord
   belongs_to :distribution
   has_one :api_request, as: :requestable, dependent: :destroy
   
+  after_create :broadcast_new_bid
+  after_update :broadcast_status_change, if: -> { saved_change_to_status? }
+  
   enum :status, {
     pending: 0,
     accepted: 10,
@@ -44,5 +47,22 @@ class Bid < ApplicationRecord
   # Mark as expired
   def expire!
     update!(status: :expired) unless accepted?
+  end
+  
+  # Helper method to get campaign through bid request
+  def campaign
+    bid_request&.campaign
+  end
+  
+  private
+  
+  # Broadcast new bid to the real-time dashboard
+  def broadcast_new_bid
+    BidAnalyticsBroadcastJob.perform_later(account_id, :new_bid, self)
+  end
+  
+  # Broadcast status change to the real-time dashboard
+  def broadcast_status_change
+    BidAnalyticsBroadcastJob.perform_later(account_id, :new_bid, self)
   end
 end

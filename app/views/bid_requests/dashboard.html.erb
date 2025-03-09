@@ -1,6 +1,6 @@
 <div class="container px-4 mx-auto my-8">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="h2">Bidding Dashboard</h1>
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="h2">Bid Requests Dashboard</h1>
     <div class="flex space-x-2">
       <%= link_to lead_bidding_docs_path, class: "btn btn-outline flex items-center", target: "_blank" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -8,10 +8,11 @@
         </svg>
         Documentation
       <% end %>
-      <%= link_to "Bid Requests", bid_requests_path, class: "btn btn-outline" %>
       <%= link_to "New Bid Request", new_bid_request_path, class: "btn btn-primary" %>
     </div>
   </div>
+  
+  <%= render "shared/bidding_navigation" %>
   
   <!-- Documentation Alert -->
   <div class="mb-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">

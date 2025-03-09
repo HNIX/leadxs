@@ -97,4 +97,47 @@ class Api::V1::BidsController < Api::BaseController
       winning_bid: bid.winning_bid?
     }}
   end
+  
+  # POST /api/v1/bid_requests/:bid_request_id/bids/:id/accept
+  # Accept a specific bid
+  def accept
+    bid_request = current_account.bid_requests.find_by(id: params[:bid_request_id])
+    
+    if bid_request.nil?
+      render json: { error: "Bid request not found" }, status: :not_found
+      return
+    end
+    
+    bid = bid_request.bids.find_by(id: params[:id])
+    
+    if bid.nil?
+      render json: { error: "Bid not found" }, status: :not_found
+      return
+    end
+    
+    if bid_request.expired?
+      render json: { error: "Bid request has expired" }, status: :unprocessable_entity
+      return
+    end
+    
+    if bid.accepted?
+      render json: { error: "Bid has already been accepted" }, status: :unprocessable_entity
+      return
+    end
+    
+    # Accept the bid
+    if bid.accept!
+      render json: {
+        status: "success",
+        message: "Bid accepted successfully",
+        bid: {
+          id: bid.id,
+          amount: bid.amount,
+          status: bid.status
+        }
+      }
+    else
+      render json: { error: "Failed to accept the bid" }, status: :unprocessable_entity
+    end
+  end
 end

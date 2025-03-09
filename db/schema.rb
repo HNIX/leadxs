@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_09_184524) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -153,6 +153,33 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_184524) do
     t.datetime "updated_at", null: false
     t.index ["token"], name: "index_api_tokens_on_token", unique: true
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "bid_analytic_snapshots", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "period_start", null: false
+    t.datetime "period_end", null: false
+    t.string "period_type", null: false
+    t.jsonb "metrics", default: "{}", null: false
+    t.integer "total_bids", default: 0, null: false
+    t.integer "accepted_bids", default: 0, null: false
+    t.integer "rejected_bids", default: 0, null: false
+    t.integer "expired_bids", default: 0, null: false
+    t.decimal "avg_bid_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "max_bid_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "min_bid_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "conversion_count", default: 0, null: false
+    t.decimal "total_revenue", precision: 10, scale: 2, default: "0.0", null: false
+    t.bigint "campaign_id"
+    t.bigint "distribution_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "campaign_id"], name: "index_bid_analytic_snapshots_on_account_id_and_campaign_id", where: "(campaign_id IS NOT NULL)"
+    t.index ["account_id", "distribution_id"], name: "index_bid_analytic_snapshots_on_account_id_and_distribution_id", where: "(distribution_id IS NOT NULL)"
+    t.index ["account_id", "period_type", "period_start", "period_end"], name: "idx_on_account_id_period_type_period_start_period_e_f54a4ef7dd"
+    t.index ["account_id"], name: "index_bid_analytic_snapshots_on_account_id"
+    t.index ["campaign_id"], name: "index_bid_analytic_snapshots_on_campaign_id"
+    t.index ["distribution_id"], name: "index_bid_analytic_snapshots_on_distribution_id"
   end
 
   create_table "bid_requests", force: :cascade do |t|
@@ -417,8 +444,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_184524) do
     t.integer "distribution_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "bid_request_id"
     t.index ["account_id", "unique_id"], name: "index_leads_on_account_id_and_unique_id", unique: true
     t.index ["account_id"], name: "index_leads_on_account_id"
+    t.index ["bid_request_id"], name: "index_leads_on_bid_request_id"
     t.index ["campaign_id"], name: "index_leads_on_campaign_id"
     t.index ["source_id"], name: "index_leads_on_source_id"
   end
@@ -808,6 +837,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_184524) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_requests", "accounts"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "bid_analytic_snapshots", "accounts"
+  add_foreign_key "bid_analytic_snapshots", "campaigns"
+  add_foreign_key "bid_analytic_snapshots", "distributions"
   add_foreign_key "bid_requests", "accounts"
   add_foreign_key "bid_requests", "campaigns"
   add_foreign_key "bid_requests", "leads"
@@ -838,6 +870,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_184524) do
   add_foreign_key "lead_data", "campaign_fields"
   add_foreign_key "lead_data", "leads"
   add_foreign_key "leads", "accounts"
+  add_foreign_key "leads", "bid_requests"
   add_foreign_key "leads", "campaigns"
   add_foreign_key "leads", "sources"
   add_foreign_key "list_values", "accounts"

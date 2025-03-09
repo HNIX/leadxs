@@ -18,6 +18,9 @@ class Account < ApplicationRecord
   has_many :api_requests, dependent: :destroy
   has_many :distributions, dependent: :destroy
   has_many :validation_rules, dependent: :destroy
+  has_many :bid_requests, dependent: :destroy
+  has_many :bids, dependent: :destroy
+  has_many :bid_analytic_snapshots, dependent: :destroy
 
   scope :personal, -> { where(personal: true) }
   scope :team, -> { where(personal: false) }

@@ -3,10 +3,11 @@ class Lead < ApplicationRecord
   
   belongs_to :campaign
   belongs_to :source, optional: true
+  belongs_to :bid_request, optional: true
   
   has_many :lead_data, class_name: "LeadData", dependent: :destroy
   has_many :api_requests, dependent: :destroy
-  has_one :bid_request, dependent: :nullify
+  has_one :generated_bid_request, class_name: "BidRequest", foreign_key: "lead_id", dependent: :nullify
   
   accepts_nested_attributes_for :lead_data
   
