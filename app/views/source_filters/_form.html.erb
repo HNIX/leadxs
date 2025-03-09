@@ -1,0 +1,59 @@
+<%= form_with(model: [@campaign, source_filter], data: { controller: "filter" }) do |form| %>
+  <%= render "application/error_messages", resource: source_filter %>
+
+  <div class="form-group">
+    <%= form.label :campaign_field_id, "Field", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.select :campaign_field_id, @fields, {}, class: "form-select dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300", data: { filter_target: "fieldSelect" } %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :operator, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.select :operator, @operators, {}, class: "form-select dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300", data: { filter_target: "operatorSelect", action: "change->filter#updateValueFields" } %>
+  </div>
+
+  <div class="form-group" data-filter-target="valueField">
+    <%= form.label :value, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.text_field :value, class: "form-input dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" %>
+    <div class="help-text">
+      <p class="text-sm text-gray-500 dark:text-gray-400">For multiple values in list operators, separate values with comma.</p>
+    </div>
+  </div>
+
+  <div class="form-group hidden" data-filter-target="betweenFields">
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= form.label :min_value, "Minimum Value", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.text_field :min_value, class: "form-input dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" %>
+      </div>
+      <div>
+        <%= form.label :max_value, "Maximum Value", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.text_field :max_value, class: "form-input dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :status, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.select :status, Filter::STATUSES.map { |s| [s.titleize, s] }, {}, class: "form-select dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300" %>
+  </div>
+
+  <div class="form-group">
+    <div class="form-check">
+      <%= form.check_box :apply_to_all, class: "form-checkbox dark:bg-gray-700 dark:border-gray-600", data: { filter_target: "applyToAll", action: "change->filter#toggleEntitySelection" } %>
+      <%= form.label :apply_to_all, "Apply to all sources", class: "form-check-label ml-2 text-gray-700 dark:text-gray-300" %>
+    </div>
+  </div>
+
+  <div class="form-group" data-filter-target="entitySelectionContainer">
+    <%= form.label :source_ids, "Select Sources", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.collection_select :source_ids, @sources, :id, :name, { selected: source_filter.source_ids }, { multiple: true, class: "form-multiselect dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300", data: { filter_target: "entitySelection" } } %>
+    <div class="help-text">
+      <p class="text-sm text-gray-500 dark:text-gray-400">Select which sources this filter applies to. If "Apply to all sources" is checked, this selection is ignored.</p>
+    </div>
+  </div>
+
+  <div class="mt-6 flex justify-between">
+    <%= link_to "Cancel", campaign_source_filters_path(@campaign), class: "btn btn-light dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600" %>
+    <%= form.submit class: "btn btn-primary" %>
+  </div>
+<% end %>

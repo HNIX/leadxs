@@ -74,7 +74,7 @@ class ApiRequestsController < ApplicationController
   private
 
   def set_api_request
-    @api_request = ApiRequest.find_by(id: params[:id], account: current_account)
+    @api_request = ApiRequest.find_by(uuid: params[:id], account: current_account)
     
     unless @api_request
       redirect_to api_requests_path, alert: "API Request not found"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_09_154513) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -134,9 +134,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "account_id", null: false
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.index ["account_id"], name: "index_api_requests_on_account_id"
     t.index ["requestable_type", "requestable_id", "created_at"], name: "idx_on_requestable_type_requestable_id_created_at_3b74dff40b"
     t.index ["requestable_type", "requestable_id"], name: "index_api_requests_on_requestable"
+    t.index ["uuid"], name: "index_api_requests_on_uuid", unique: true
   end
 
   create_table "api_tokens", force: :cascade do |t|
@@ -280,6 +282,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
     t.index ["company_id"], name: "index_contacts_on_company_id"
   end
 
+  create_table "distribution_filter_assignments", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "distribution_filter_id", null: false
+    t.bigint "distribution_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "distribution_filter_id", "distribution_id"], name: "idx_distribution_filter_assignments_uniqueness", unique: true
+    t.index ["account_id"], name: "index_distribution_filter_assignments_on_account_id"
+    t.index ["distribution_filter_id"], name: "idx_on_distribution_filter_id_8620034130"
+    t.index ["distribution_id"], name: "index_distribution_filter_assignments_on_distribution_id"
+  end
+
   create_table "distributions", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -297,6 +311,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
     t.index ["account_id"], name: "index_distributions_on_account_id"
     t.index ["company_id", "name"], name: "index_distributions_on_company_id_and_name", unique: true
     t.index ["company_id"], name: "index_distributions_on_company_id"
+  end
+
+  create_table "filters", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "campaign_id", null: false
+    t.bigint "campaign_field_id", null: false
+    t.string "type", null: false
+    t.string "operator", null: false
+    t.string "value"
+    t.decimal "min_value", precision: 10, scale: 2
+    t.decimal "max_value", precision: 10, scale: 2
+    t.string "status", default: "active", null: false
+    t.boolean "apply_to_all", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_filters_on_account_id"
+    t.index ["campaign_field_id"], name: "index_filters_on_campaign_field_id"
+    t.index ["campaign_id"], name: "index_filters_on_campaign_id"
+    t.index ["type", "account_id", "campaign_id"], name: "index_filters_on_type_and_account_id_and_campaign_id"
   end
 
   create_table "headers", force: :cascade do |t|
@@ -580,6 +613,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
     t.index ["referral_code_id"], name: "index_refer_visits_on_referral_code_id"
   end
 
+  create_table "source_filter_assignments", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "source_filter_id", null: false
+    t.bigint "source_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "source_filter_id", "source_id"], name: "idx_source_filter_assignments_uniqueness", unique: true
+    t.index ["account_id"], name: "index_source_filter_assignments_on_account_id"
+    t.index ["source_filter_id"], name: "index_source_filter_assignments_on_source_filter_id"
+    t.index ["source_id"], name: "index_source_filter_assignments_on_source_id"
+  end
+
   create_table "sources", force: :cascade do |t|
     t.string "name", null: false
     t.string "token", null: false
@@ -731,8 +776,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
   add_foreign_key "companies", "accounts"
   add_foreign_key "contacts", "accounts"
   add_foreign_key "contacts", "companies"
+  add_foreign_key "distribution_filter_assignments", "accounts"
+  add_foreign_key "distribution_filter_assignments", "distributions"
+  add_foreign_key "distribution_filter_assignments", "filters", column: "distribution_filter_id"
   add_foreign_key "distributions", "accounts"
   add_foreign_key "distributions", "companies"
+  add_foreign_key "filters", "accounts"
+  add_foreign_key "filters", "campaign_fields"
+  add_foreign_key "filters", "campaigns"
   add_foreign_key "headers", "distributions"
   add_foreign_key "lead_data", "campaign_fields"
   add_foreign_key "lead_data", "leads"
@@ -745,6 +796,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_033311) do
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
   add_foreign_key "refer_visits", "refer_referral_codes", column: "referral_code_id"
+  add_foreign_key "source_filter_assignments", "accounts"
+  add_foreign_key "source_filter_assignments", "filters", column: "source_filter_id"
+  add_foreign_key "source_filter_assignments", "sources"
   add_foreign_key "sources", "accounts"
   add_foreign_key "sources", "campaigns"
   add_foreign_key "sources", "companies"

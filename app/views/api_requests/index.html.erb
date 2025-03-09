@@ -69,7 +69,7 @@
           <% if @api_requests.any? %>
             <% @api_requests.each do |api_request| %>
               <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"><%= api_request.id %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"><%= api_request.uuid %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                   <%= api_request.requestable_type %>
                 </td>

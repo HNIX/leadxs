@@ -10,6 +10,8 @@ class Campaign < ApplicationRecord
   has_many :campaign_distributions, dependent: :destroy
   has_many :distributions, through: :campaign_distributions
   has_many :leads, dependent: :destroy
+  has_many :source_filters, -> { where(type: 'SourceFilter') }, class_name: 'SourceFilter', dependent: :destroy, foreign_key: 'campaign_id'
+  has_many :distribution_filters, -> { where(type: 'DistributionFilter') }, class_name: 'DistributionFilter', dependent: :destroy, foreign_key: 'campaign_id'
   
   # Constants for campaign types and distribution methods
   CAMPAIGN_TYPES = ['ping_post', 'direct', 'calls'].freeze
@@ -38,6 +40,21 @@ class Campaign < ApplicationRecord
   end
 
   after_create :generate_fields_from_vertical
+  
+  # Find eligible sources for given lead data
+  def eligible_sources(lead_data)
+    SourceFilter.filter_sources(sources.active, lead_data, self)
+  end
+  
+  # Find eligible distributions for given lead data
+  def eligible_distributions(lead_data)
+    DistributionFilter.filter_distributions(distributions.active, lead_data, self)
+  end
+  
+  # Get all eligible entities (sources and distributions) for given lead data
+  def eligible_entities(lead_data)
+    FilterService.evaluate_filters(lead_data, self)
+  end
   
   private
   

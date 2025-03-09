@@ -1,6 +1,11 @@
 class ApiRequest < ApplicationRecord
   acts_as_tenant :account
   
+  # Use UUID as the primary key for API lookup
+  def self.find_by_uuid(uuid)
+    find_by(uuid: uuid)
+  end
+  
   belongs_to :requestable, polymorphic: true
   belongs_to :lead, optional: true
   

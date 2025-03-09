@@ -54,6 +54,10 @@ Rails.application.routes.draw do
       end
     end
     
+    # Filters for sources and distributions
+    resources :source_filters
+    resources :distribution_filters
+    
     # Sources for lead acquisition
     resources :sources, shallow: true, only: [:index, :new, :create]
   end
