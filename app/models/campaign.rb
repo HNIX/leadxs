@@ -19,6 +19,7 @@ class Campaign < ApplicationRecord
   CAMPAIGN_TYPES = ['ping_post', 'direct', 'calls'].freeze
   DISTRIBUTION_METHODS = ['highest_bid', 'round_robin', 'weighted_random', 'waterfall'].freeze
   STATUSES = ['draft', 'active', 'paused', 'archived'].freeze
+  MULTI_DISTRIBUTION_STRATEGIES = ['sequential', 'parallel', 'single'].freeze
   
   # Validations
   validates :name, presence: true
@@ -26,12 +27,31 @@ class Campaign < ApplicationRecord
   validates :campaign_type, presence: true, inclusion: { in: CAMPAIGN_TYPES }
   validates :distribution_method, presence: true, inclusion: { in: DISTRIBUTION_METHODS }
   validates :bid_timeout_seconds, numericality: { greater_than_or_equal_to: 5, less_than_or_equal_to: 300 }, if: :use_bidding_system?
+  validates :multi_distribution_strategy, presence: true, inclusion: { in: MULTI_DISTRIBUTION_STRATEGIES }
+  validates :max_distributions, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 20 }
   
   # Validate schedule times if scheduling is enabled
   validates :distribution_schedule_days, presence: true, if: :distribution_schedule_enabled?
   validates :distribution_schedule_start_time, presence: true, if: :distribution_schedule_enabled?
   validates :distribution_schedule_end_time, presence: true, if: :distribution_schedule_enabled?
   validate :validate_schedule_times, if: :distribution_schedule_enabled?
+  
+  # Campaign status methods
+  def active?
+    status == 'active'
+  end
+  
+  def paused?
+    status == 'paused'
+  end
+  
+  def archived?
+    status == 'archived'
+  end
+  
+  def draft?
+    status == 'draft'
+  end
   
   # Check if bidding system should be used
   def use_bidding_system?

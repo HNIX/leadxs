@@ -11,6 +11,7 @@ class LeadDistributionService
     @failed_distributions = []
   end
 
+  # Distribute lead to all active distributions for the campaign
   def distribute!
     # Get active distributions for this campaign
     distributions = active_distributions
@@ -27,6 +28,62 @@ class LeadDistributionService
       successful: @successful_distributions,
       failed: @failed_distributions
     }
+  end
+
+  # Distribute lead to specific distribution (used after bidding)
+  def distribute_to_specific!(campaign_distribution)
+    return { success: false, message: "Invalid distribution" } unless campaign_distribution
+
+    process_distribution(campaign_distribution)
+
+    if @failed_distributions.empty?
+      { success: true, distribution: campaign_distribution.distribution }
+    else
+      {
+        success: false,
+        distribution: campaign_distribution.distribution,
+        error: @failed_distributions.first[:error]
+      }
+    end
+  end
+
+  # Select a winner based on campaign's distribution method
+  def select_winner(distributions_data)
+    return nil if distributions_data.empty?
+    
+    case @campaign.distribution_method
+    when 'highest_bid'
+      # Sort by bid amount descending and return the first
+      distributions_data.sort_by { |d| -d[:bid].to_f }.first
+    when 'weighted_random'
+      # Implement weighted random selection based on bid amounts
+      total_amount = distributions_data.sum { |d| d[:bid].to_f }
+      return distributions_data.first if total_amount <= 0
+      
+      random_point = rand * total_amount
+      current_sum = 0
+      
+      distributions_data.each do |distribution_data|
+        current_sum += distribution_data[:bid].to_f
+        return distribution_data if current_sum >= random_point
+      end
+      
+      distributions_data.first # Fallback
+    when 'round_robin'
+      # Get the distribution that was least recently used
+      campaign_distributions = @campaign.campaign_distributions.where(distribution_id: distributions_data.map { |d| d[:distribution].id })
+      campaign_distributions.order(last_used_at: :asc).first&.distribution
+      
+      # If we found a match, return the distribution data for it
+      selected_distribution = campaign_distributions.order(last_used_at: :asc).first&.distribution
+      distributions_data.find { |d| d[:distribution] == selected_distribution } || distributions_data.first
+    when 'waterfall'
+      # Sort by priority ascending and return the first
+      distributions_data.sort_by { |d| d[:priority] || 999 }.first
+    else
+      # Default to highest priority
+      distributions_data.sort_by { |d| d[:priority] || 999 }.first
+    end
   end
 
   private
@@ -52,14 +109,21 @@ class LeadDistributionService
     end
     
     begin
-      # Build payload for this distribution
-      payload = build_payload(campaign_distribution)
+      # Use FieldMapper to prepare the payload
+      field_mapper = FieldMapper.new(@lead, campaign_distribution)
+      payload = field_mapper.build_payload
+      
+      # Format the payload according to distribution requirements
+      formatted_payload = format_payload(distribution, payload)
       
       # Send the request
-      response = send_request(distribution, payload)
+      response = send_request(distribution, formatted_payload)
       
       # Record the API request
-      api_request = record_api_request(distribution, payload, response)
+      api_request = record_api_request(distribution, formatted_payload, response)
+      
+      # Update last_used_at timestamp for round robin distribution
+      update_last_used_timestamp(campaign_distribution) if api_request.successful?
       
       if api_request.successful?
         @successful_distributions << {
@@ -83,25 +147,6 @@ class LeadDistributionService
         error: e.message
       }
     end
-  end
-
-  def build_payload(campaign_distribution)
-    payload = {}
-    
-    # Process each mapped field
-    campaign_distribution.mapped_fields.each do |mapped_field|
-      field_name = mapped_field.distribution_field_name
-      field_value = mapped_field.value_for_lead(@lead)
-      
-      # Skip nil values unless required
-      next if field_value.nil? && !mapped_field.required?
-      
-      # Add to payload
-      payload[field_name] = field_value
-    end
-    
-    # Format payload according to distribution format
-    format_payload(campaign_distribution.distribution, payload)
   end
 
   def format_payload(distribution, data)
@@ -202,5 +247,9 @@ class LeadDistributionService
     api_request.save!
     
     api_request
+  end
+  
+  def update_last_used_timestamp(campaign_distribution)
+    campaign_distribution.update(last_used_at: Time.current)
   end
 end

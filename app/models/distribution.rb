@@ -35,6 +35,12 @@ class Distribution < ApplicationRecord
     json: 1,
     xml: 2
   }, default: :json
+  
+  enum :metadata_requirements, {
+    no_metadata: 0,              # No metadata fields required
+    include_standard_fields: 1,  # Include standard tracking fields (lead_id, timestamp, etc.)
+    include_extended_fields: 2   # Include extended tracking fields
+  }, default: :no_metadata
 
   def self.active
     where(status: :active)

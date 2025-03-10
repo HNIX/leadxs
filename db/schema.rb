@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_10_040221) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -192,8 +192,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.jsonb "anonymized_data", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "bid_metadata", default: {}
     t.index ["account_id", "unique_id"], name: "index_bid_requests_on_account_id_and_unique_id", unique: true
     t.index ["account_id"], name: "index_bid_requests_on_account_id"
+    t.index ["bid_metadata"], name: "index_bid_requests_on_bid_metadata", using: :gin
     t.index ["campaign_id"], name: "index_bid_requests_on_campaign_id"
     t.index ["expires_at"], name: "index_bid_requests_on_expires_at"
     t.index ["lead_id"], name: "index_bid_requests_on_lead_id"
@@ -227,9 +229,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.jsonb "error_log", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "share_during_bidding", default: false
     t.index ["account_id"], name: "index_calculated_fields_on_account_id"
     t.index ["campaign_id", "name"], name: "index_calculated_fields_on_campaign_id_and_name", unique: true
     t.index ["campaign_id"], name: "index_calculated_fields_on_campaign_id"
+    t.index ["share_during_bidding"], name: "index_calculated_fields_on_share_during_bidding"
   end
 
   create_table "campaign_distributions", force: :cascade do |t|
@@ -239,6 +243,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.integer "priority", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "last_used_at"
     t.index ["campaign_id", "distribution_id"], name: "idx_on_campaign_id_distribution_id_81ffb0256c", unique: true
     t.index ["campaign_id"], name: "index_campaign_distributions_on_campaign_id"
     t.index ["distribution_id"], name: "index_campaign_distributions_on_distribution_id"
@@ -271,10 +276,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.string "example_value"
     t.integer "value_acceptance", default: 0
     t.bigint "account_id", null: false
+    t.boolean "share_during_bidding", default: false
     t.index ["account_id", "campaign_id", "name"], name: "index_campaign_fields_on_account_campaign_and_name"
     t.index ["account_id"], name: "index_campaign_fields_on_account_id"
     t.index ["campaign_id", "position"], name: "index_campaign_fields_on_campaign_id_and_position"
     t.index ["campaign_id"], name: "index_campaign_fields_on_campaign_id"
+    t.index ["share_during_bidding"], name: "index_campaign_fields_on_share_during_bidding"
     t.index ["vertical_field_id"], name: "index_campaign_fields_on_vertical_field_id"
   end
 
@@ -294,7 +301,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.datetime "updated_at", null: false
     t.integer "bid_timeout_seconds", default: 5
     t.decimal "minimum_bid_amount", precision: 10, scale: 2
+    t.string "multi_distribution_strategy", default: "sequential"
+    t.integer "max_distributions", default: 1
     t.index ["account_id"], name: "index_campaigns_on_account_id"
+    t.index ["multi_distribution_strategy"], name: "index_campaigns_on_multi_distribution_strategy"
     t.index ["vertical_id"], name: "index_campaigns_on_vertical_id"
   end
 
@@ -378,6 +388,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.decimal "min_bid_amount", precision: 10, scale: 2
     t.decimal "max_bid_amount", precision: 10, scale: 2
     t.string "bid_endpoint_url"
+    t.string "metadata_requirements"
+    t.jsonb "custom_metadata_fields"
     t.index ["account_id", "name"], name: "index_distributions_on_account_id_and_name", unique: true
     t.index ["account_id"], name: "index_distributions_on_account_id"
     t.index ["company_id", "name"], name: "index_distributions_on_company_id_and_name", unique: true
@@ -445,6 +457,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "bid_request_id"
+    t.text "error_message"
     t.index ["account_id", "unique_id"], name: "index_leads_on_account_id_and_unique_id", unique: true
     t.index ["account_id"], name: "index_leads_on_account_id"
     t.index ["bid_request_id"], name: "index_leads_on_bid_request_id"
@@ -476,6 +489,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_220653) do
     t.boolean "required", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "preferences"
     t.index ["campaign_distribution_id", "distribution_field_name"], name: "index_mapped_fields_on_campaign_dist_and_field_name", unique: true
     t.index ["campaign_distribution_id"], name: "index_mapped_fields_on_campaign_distribution_id"
   end

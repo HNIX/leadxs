@@ -47,6 +47,19 @@ module Api
           return false
         end
         
+        unless @source.can_submit_leads?
+          if @source.daily_budget.present? || @source.monthly_budget.present?
+            render json: { error: 'Source has reached its budget limit' }, status: :forbidden
+            return false
+          elsif @source.campaign.nil? || !@source.campaign.active?
+            render json: { error: 'Campaign is not available for submissions' }, status: :forbidden
+            return false
+          else
+            render json: { error: 'Source is not eligible to submit leads' }, status: :forbidden
+            return false
+          end
+        end
+        
         # Set the current account for tenant scoping
         ActsAsTenant.current_tenant = @source.account
         

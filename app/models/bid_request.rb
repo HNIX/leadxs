@@ -6,6 +6,7 @@ class BidRequest < ApplicationRecord
   has_many :bids, dependent: :destroy
   
   store_accessor :anonymized_data, []
+  store_accessor :bid_metadata, []
   
   enum :status, {
     pending: 0,
@@ -91,24 +92,41 @@ class BidRequest < ApplicationRecord
     true
   end
   
-  # Distribute the lead to the winning distribution
+  # Distribute the lead to the winning distribution(s)
   def distribute_lead_to_winning_bid(winning_bid)
     return false if lead.nil?
     
-    # Update lead status to distributed
-    lead.update(status: :distributed)
+    # Update lead status to distributing
+    lead.update(status: :distributing)
     
-    # Create or find the campaign distribution
-    campaign_distribution = campaign.campaign_distributions.find_by(distribution: winning_bid.distribution)
-    return false unless campaign_distribution
+    # Find the campaign distribution for the winning bid
+    primary_distribution = campaign.campaign_distributions.find_by(distribution: winning_bid.distribution)
+    return false unless primary_distribution
     
-    # Use the lead distribution service for a single distribution
-    distribution_service = LeadDistributionService.new(lead)
-    
-    # Process just this distribution
-    distribution_service.send(:process_distribution, campaign_distribution)
-    
-    true
+    # Check if campaign is configured for multi-distribution
+    if campaign.multi_distribution_strategy == "single" || campaign.max_distributions <= 1
+      # Use LeadDistributionService for a single distribution
+      distribution_service = LeadDistributionService.new(lead)
+      result = distribution_service.distribute_to_specific!(primary_distribution)
+      
+      # Update lead status based on distribution result
+      if result[:success]
+        lead.update(status: :distributed)
+      else
+        lead.update(status: :error, error_message: result[:error])
+      end
+      
+      result[:success]
+    else
+      # Use MultiDistributionService for multi-distribution strategies
+      # The winning bid already determined which distributions to use
+      distribution_service = MultiDistributionService.new(lead)
+      
+      # The service handles updating the lead status
+      result = distribution_service.distribute!
+      
+      result[:success]
+    end
   end
   
   private

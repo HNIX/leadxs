@@ -42,46 +42,19 @@ class ValidationRule < ApplicationRecord
   }
   
   # Evaluate the validation rule against provided data
+  # @deprecated: Use ValidationRuleProcessor instead
   def evaluate(data)
-    begin
-      result = case rule_type
-      when RULE_TYPES[:condition]
-        evaluate_condition(data)
-      when RULE_TYPES[:pattern]
-        evaluate_pattern(data)
-      when RULE_TYPES[:lookup]
-        evaluate_lookup(data)
-      when RULE_TYPES[:dependency]
-        evaluate_dependency(data)
-      when RULE_TYPES[:comparison]
-        evaluate_comparison(data)
-      when RULE_TYPES[:custom]
-        evaluate_custom(data)
-      else
-        # Unknown rule type
-        false
-      end
-      
-      # Return result hash with validation info
-      {
-        valid: result,
-        rule_id: id,
-        rule_name: name,
-        error_message: result ? nil : error_message,
-        severity: severity
-      }
-    rescue => e
-      # Log the error and return false (validation failed)
-      Rails.logger.error("Error evaluating validation rule #{id} (#{name}): #{e.message}")
-      
-      {
-        valid: false,
-        rule_id: id,
-        rule_name: name,
-        error_message: "Internal validation error: #{e.message}",
-        severity: 'error'
-      }
-    end
+    processor = ValidationRuleProcessor.new(self, data)
+    result = processor.evaluate
+    
+    # Return result hash with validation info for backward compatibility
+    {
+      valid: result.valid,
+      rule_id: result.rule_id,
+      rule_name: result.rule_name,
+      error_message: result.message,
+      severity: result.severity
+    }
   end
   
   # Test the validation rule with test data

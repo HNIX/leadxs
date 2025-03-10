@@ -4,10 +4,21 @@ class BidService
     
     if lead_or_anonymized_data.is_a?(Lead)
       @lead = lead_or_anonymized_data
+      # Generate anonymized data with our robust implementation
       @anonymized_data = @lead.anonymized_data
+      @bid_metadata = {
+        lead_id: @lead.unique_id,
+        campaign_id: @campaign.id,
+        created_at: Time.current.iso8601,
+        source_type: @lead.source&.integration_type
+      }
     else
       @lead = nil
       @anonymized_data = lead_or_anonymized_data
+      @bid_metadata = {
+        campaign_id: @campaign.id,
+        created_at: Time.current.iso8601
+      }
     end
     
     @bid_request = nil
@@ -18,12 +29,13 @@ class BidService
     # Determine the account to use
     account = ActsAsTenant.current_tenant || @lead&.account || @campaign.account
     
-    # Create a new bid request
+    # Create a new bid request with enriched anonymized data
     @bid_request = BidRequest.create!(
       account: account,
       campaign: @campaign,
       lead: @lead,
       anonymized_data: @anonymized_data,
+      bid_metadata: @bid_metadata,
       status: :active,
       expires_at: Time.current + @campaign.bid_timeout_seconds.seconds
     )
@@ -52,13 +64,13 @@ class BidService
     # Check for expiration
     @bid_request.check_expiration!
     
-    # Get winning bid
-    winning_bid = @bid_request.winning_bid
+    # Use the LeadDistributionService to select a winner according to campaign distribution method
+    winning_bid = select_winning_bid
     
     if winning_bid.nil?
       return {
         success: false,
-        message: "No bids received",
+        message: "No bids received or no winner could be selected",
         bid_request: @bid_request
       }
     end
@@ -78,6 +90,38 @@ class BidService
         bid_request: @bid_request
       }
     end
+  end
+  
+  private
+  
+  # Use LeadDistributionService to select the winning bid according to campaign's distribution method
+  def select_winning_bid
+    return nil if @bid_request.bids.empty?
+    
+    # Create a distribution service (if we have a lead)
+    distribution_service = @lead ? LeadDistributionService.new(@lead) : nil
+    
+    # If we don't have a lead or a distribution service, fall back to the basic selection
+    return @bid_request.winning_bid unless distribution_service
+    
+    # Format bid data for the distribution service
+    distributions_data = @bid_request.bids.map do |bid|
+      campaign_distribution = @campaign.campaign_distributions.find_by(distribution: bid.distribution)
+      
+      {
+        bid: bid.amount,
+        distribution: bid.distribution,
+        campaign_distribution: campaign_distribution,
+        priority: campaign_distribution&.priority || 999
+      }
+    end
+    
+    # Use the distribution service to select a winner
+    winning_data = distribution_service.select_winner(distributions_data)
+    return nil unless winning_data
+    
+    # Find and return the corresponding bid
+    @bid_request.bids.find_by(distribution: winning_data[:distribution])
   end
   
   # Request a single bid from a distribution

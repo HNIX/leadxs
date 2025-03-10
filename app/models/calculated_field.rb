@@ -7,6 +7,9 @@ class CalculatedField < ApplicationRecord
   validates :name, presence: true, uniqueness: { scope: :campaign_id }
   validates :formula, presence: true
   
+  # Whether this field should be shared during the bidding phase
+  attribute :share_during_bidding, :boolean, default: false
+  
   before_save :clean_formula_content
   
   # Status options
@@ -19,6 +22,7 @@ class CalculatedField < ApplicationRecord
   # Scopes
   scope :active, -> { where(status: STATUSES[:active]) }
   scope :ordered, -> { order(name: :asc) }
+  scope :for_bidding, -> { where(share_during_bidding: true) }
   
   # Clean the formula and prepare it for evaluation
   def clean_formula_content
@@ -54,6 +58,12 @@ class CalculatedField < ApplicationRecord
       self.save
       raise e
     end
+  end
+  
+  # Determine if this field should be shared during bidding
+  def share_during_bidding?
+    # Explicit setting takes precedence
+    share_during_bidding
   end
   
   # Inner class for formula evaluation with a controlled environment

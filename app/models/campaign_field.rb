@@ -19,6 +19,9 @@ class CampaignField < ApplicationRecord
   # Whether this field can be used in anonymous bidding process
   attribute :anonymous_bidding_enabled, :boolean, default: false
   
+  # Whether this field should be shared during the bidding phase
+  attribute :share_during_bidding, :boolean, default: false
+  
   # Validations
   validates :name, presence: true
   validates :name, uniqueness: { scope: [:account_id, :campaign_id], message: "already exists in this campaign" }
@@ -73,6 +76,29 @@ class CampaignField < ApplicationRecord
   
   def boolean?
     data_type == 'boolean'
+  end
+  
+  # Determine if this field should be shared during bidding
+  def share_during_bidding?
+    # Explicit setting takes precedence
+    return share_during_bidding if share_during_bidding.present?
+    
+    # Legacy support for anonymous_bidding_enabled
+    return anonymous_bidding_enabled if anonymous_bidding_enabled.present?
+    
+    # Default behavior based on field properties
+    
+    # Never share certain field types during bidding regardless of PII status
+    return false if %w[ssn social_security credit_card password].include?(field_type)
+    
+    # For PII fields, don't share unless explicitly configured to
+    return false if pii?
+    
+    # Share non-PII fields by default, especially useful ones for bidding
+    return true if %w[zip state city income age].include?(name.downcase)
+    
+    # Default to not sharing unless explicitly enabled
+    false
   end
   
   

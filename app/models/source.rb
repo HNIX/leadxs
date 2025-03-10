@@ -56,6 +56,29 @@ class Source < AccountRecord
     status == 'archived'
   end
   
+  def can_submit_leads?
+    return false unless active?
+    
+    # Check daily budget if set
+    if daily_budget.present?
+      today_lead_count = leads.where('created_at >= ?', Time.zone.now.beginning_of_day).count
+      today_revenue = calculate_revenue(today_lead_count)
+      return false if today_revenue >= daily_budget
+    end
+    
+    # Check monthly budget if set
+    if monthly_budget.present?
+      month_lead_count = leads.where('created_at >= ?', Time.zone.now.beginning_of_month).count
+      month_revenue = calculate_revenue(month_lead_count)
+      return false if month_revenue >= monthly_budget
+    end
+    
+    # Check if campaign is active
+    return false if campaign.nil? || !campaign.active?
+    
+    true
+  end
+  
   def affiliate?
     integration_type == 'affiliate'
   end
