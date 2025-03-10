@@ -19,7 +19,7 @@ gem "receipts", "~> 2.1"
 gem "rotp", "~> 6.2"
 gem "rqrcode", "~> 2.1"
 gem "ruby-oembed", "~> 0.18.0", require: "oembed"
-gem "tailwindcss-rails", "~> 4.0"
+gem "tailwindcss-rails", "~> 4.2"
 
 group :development, :test do
   gem "erb_lint", require: false
