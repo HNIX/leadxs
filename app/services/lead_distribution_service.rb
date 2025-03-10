@@ -9,6 +9,7 @@ class LeadDistributionService
     @campaign = lead.campaign
     @successful_distributions = []
     @failed_distributions = []
+    @compliance_service = ComplianceService.new(account: @lead.account)
   end
 
   # Distribute lead to all active distributions for the campaign
@@ -108,6 +109,32 @@ class LeadDistributionService
       return
     end
     
+    # Verify proper consent has been collected for this distribution
+    unless lead_has_consent_for_distribution?(distribution)
+      @failed_distributions << {
+        distribution: distribution,
+        error: "Missing required consent for this distribution"
+      }
+      
+      # Log consent failure to compliance records
+      @compliance_service.record_distribution(
+        @lead, 
+        distribution, 
+        ComplianceRecord::DISTRIBUTION_FAILED, 
+        { reason: "Missing required consent" }
+      )
+      
+      return
+    end
+    
+    # Log distribution attempt to compliance
+    @compliance_service.record_distribution(
+      @lead, 
+      distribution, 
+      ComplianceRecord::DISTRIBUTION_ATTEMPTED,
+      { campaign_distribution_id: campaign_distribution.id }
+    )
+    
     begin
       # Use FieldMapper to prepare the payload
       field_mapper = FieldMapper.new(@lead, campaign_distribution)
@@ -130,12 +157,35 @@ class LeadDistributionService
           distribution: distribution,
           api_request: api_request
         }
+        
+        # Log successful distribution to compliance records
+        @compliance_service.record_distribution(
+          @lead, 
+          distribution, 
+          ComplianceRecord::DISTRIBUTION_SUCCEEDED, 
+          { 
+            api_request_id: api_request.id,
+            response_code: api_request.response_code
+          }
+        )
       else
         @failed_distributions << {
           distribution: distribution,
           api_request: api_request,
           error: api_request.error || "HTTP Error: #{api_request.response_code}"
         }
+        
+        # Log failed distribution to compliance records
+        @compliance_service.record_distribution(
+          @lead, 
+          distribution, 
+          ComplianceRecord::DISTRIBUTION_FAILED, 
+          { 
+            api_request_id: api_request.id,
+            response_code: api_request.response_code,
+            error: api_request.error || "HTTP Error: #{api_request.response_code}"
+          }
+        )
       end
     rescue => e
       # Record the failed API request with the error
@@ -146,6 +196,18 @@ class LeadDistributionService
         api_request: api_request,
         error: e.message
       }
+      
+      # Log exception to compliance records
+      @compliance_service.record_distribution(
+        @lead, 
+        distribution, 
+        ComplianceRecord::DISTRIBUTION_FAILED, 
+        { 
+          api_request_id: api_request.id,
+          error: e.message,
+          error_class: e.class.name
+        }
+      )
     end
   end
 
@@ -251,5 +313,25 @@ class LeadDistributionService
   
   def update_last_used_timestamp(campaign_distribution)
     campaign_distribution.update(last_used_at: Time.current)
+  end
+  
+  # Check if lead has proper consent for distribution
+  def lead_has_consent_for_distribution?(distribution)
+    # If distribution doesn't require explicit consent, return true
+    return true unless distribution_requires_consent?(distribution)
+    
+    # Check if lead has active consent record of type DISTRIBUTION_CONSENT
+    @lead.has_consent?(ConsentRecord::DISTRIBUTION_CONSENT)
+  end
+  
+  # Determine if distribution requires explicit consent
+  def distribution_requires_consent?(distribution)
+    # This logic would be based on your business rules
+    # For example, you might require consent for certain high-risk verticals
+    # or for distributions to certain companies
+    
+    # For now, as a placeholder, we'll assume all distributions require consent
+    # In a real implementation, you would have more complex logic
+    true
   end
 end

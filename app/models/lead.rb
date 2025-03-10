@@ -8,6 +8,9 @@ class Lead < ApplicationRecord
   has_many :lead_data, class_name: "LeadData", dependent: :destroy
   has_many :api_requests, dependent: :destroy
   has_one :generated_bid_request, class_name: "BidRequest", foreign_key: "lead_id", dependent: :nullify
+  has_many :consent_records, dependent: :destroy
+  has_many :compliance_records, as: :record, dependent: :destroy
+  has_many :data_access_records, as: :record, dependent: :destroy
   
   accepts_nested_attributes_for :lead_data
   
@@ -198,6 +201,90 @@ class Lead < ApplicationRecord
     end
   end
   
+  # Check if lead has a valid consent of specific type
+  def has_consent?(consent_type)
+    consent_records.active.of_type(consent_type).exists?
+  end
+  
+  # Record consent for this lead
+  def record_consent(consent_type, consent_text, options = {})
+    compliance_service = ComplianceService.new
+    compliance_service.create_consent_record(
+      self, 
+      consent_type, 
+      consent_text, 
+      options
+    )
+  end
+  
+  # Get the active consent of a specific type
+  def active_consent(consent_type)
+    consent_records.active.of_type(consent_type).order(consented_at: :desc).first
+  end
+  
+  # Record lead access
+  def record_access(action, user, options = {})
+    DataAccessRecord.record_access(self, action, user, options)
+  end
+  
+  # Get compliance history for this lead
+  def compliance_history(options = {})
+    ComplianceService.new.compliance_history(self, options)
+  end
+  
+  # Generate a compliance report for this lead
+  def generate_compliance_report
+    {
+      lead_id: id,
+      unique_id: unique_id,
+      created_at: created_at.iso8601,
+      campaign_id: campaign_id,
+      campaign_name: campaign.name,
+      source_id: source_id,
+      source_name: source&.name,
+      status: status,
+      consents: consent_records.map do |consent|
+        {
+          id: consent.id,
+          type: consent.consent_type,
+          given_at: consent.consented_at.iso8601,
+          expires_at: consent.expires_at&.iso8601,
+          active: consent.active?,
+          revoked: consent.revoked?
+        }
+      end,
+      distributions: api_requests.where(requestable_type: "Distribution").map do |req|
+        {
+          id: req.id,
+          distribution_id: req.requestable_id,
+          distribution_name: req.requestable.name,
+          sent_at: req.sent_at&.iso8601,
+          status: req.successful? ? "success" : "failure",
+          response_code: req.response_code
+        }
+      end,
+      data_access: data_access_records.order(accessed_at: :desc).limit(100).map do |access|
+        {
+          id: access.id,
+          user_id: access.user_id,
+          user_name: access.user&.name,
+          action: access.action,
+          purpose: access.purpose,
+          accessed_at: access.accessed_at.iso8601
+        }
+      end,
+      compliance_events: compliance_records.order(occurred_at: :desc).limit(100).map do |event|
+        {
+          id: event.id,
+          event_type: event.event_type,
+          action: event.action,
+          occurred_at: event.occurred_at.iso8601,
+          data: event.data
+        }
+      end
+    }
+  end
+
   private
   
   def generate_unique_id

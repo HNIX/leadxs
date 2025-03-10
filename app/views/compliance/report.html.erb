@@ -1,0 +1,375 @@
+<% content_for :title, "Compliance Report" %>
+
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <%= link_to compliance_path, class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 inline-flex items-center" do %>
+      <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+      </svg>
+      Back to compliance records
+    <% end %>
+  </div>
+
+  <div class="border-b border-gray-200 dark:border-gray-700 pb-5 mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100">Compliance Report</h1>
+    <div class="flex">
+      <%= link_to compliance_report_path(format: :json, start_date: @start_date, end_date: @end_date), class: "ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-700 hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" do %>
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+        </svg>
+        Export JSON
+      <% end %>
+      
+      <%= link_to compliance_regulatory_report_path, class: "ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800" do %>
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+        </svg>
+        Regulatory Report
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Date Range Form -->
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+    <%= form_with url: compliance_report_path, method: :get, class: "p-6" do |f| %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :start_date, "Start Date", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.date_field :start_date, value: params[:start_date] || @start_date.to_date, class: "mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400 sm:text-sm" %>
+        </div>
+        
+        <div>
+          <%= f.label :end_date, "End Date", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.date_field :end_date, value: params[:end_date] || @end_date.to_date, class: "mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400 sm:text-sm" %>
+        </div>
+      </div>
+      
+      <div class="mt-4 flex justify-end">
+        <%= f.submit "Generate Report", class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-700 hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Report Summary -->
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
+      <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+        Compliance Report Summary
+      </h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        <%= @start_date.strftime("%b %d, %Y") %> to <%= @end_date.strftime("%b %d, %Y") %>
+      </p>
+    </div>
+    
+    <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Overall Statistics -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">Overall Activity</h3>
+          </div>
+          <div class="p-4">
+            <dl>
+              <div class="flex justify-between py-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Compliance Events:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report[:total_compliance_events] %></dd>
+              </div>
+              <div class="flex justify-between py-1 border-t border-gray-100 dark:border-gray-700">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Unique Records Affected:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report[:events_by_type].size %></dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        
+        <!-- Consent Statistics -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">Consent Management</h3>
+          </div>
+          <div class="p-4">
+            <dl>
+              <div class="flex justify-between py-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Consents Given:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report.dig(:consent_statistics, :consents_given) || 0 %></dd>
+              </div>
+              <div class="flex justify-between py-1 border-t border-gray-100 dark:border-gray-700">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Consents Revoked:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report.dig(:consent_statistics, :consents_revoked) || 0 %></dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        
+        <!-- Distribution Statistics -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">Lead Distributions</h3>
+          </div>
+          <div class="p-4">
+            <dl>
+              <div class="flex justify-between py-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Attempted:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report.dig(:distribution_statistics, :distributions_attempted) || 0 %></dd>
+              </div>
+              <div class="flex justify-between py-1 border-t border-gray-100 dark:border-gray-700">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Successful:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report.dig(:distribution_statistics, :distributions_succeeded) || 0 %></dd>
+              </div>
+              <div class="flex justify-between py-1 border-t border-gray-100 dark:border-gray-700">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Failed:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report.dig(:distribution_statistics, :distributions_failed) || 0 %></dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        
+        <!-- Data Access Statistics -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">Data Access</h3>
+          </div>
+          <div class="p-4">
+            <dl>
+              <div class="flex justify-between py-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Access Events:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report.dig(:data_access_report, :total_access_events) || 0 %></dd>
+              </div>
+              <div class="flex justify-between py-1 border-t border-gray-100 dark:border-gray-700">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Users Accessing Data:</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= @report.dig(:data_access_report, :access_by_user)&.size || 0 %></dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events By Type -->
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+        Events by Type
+      </h3>
+    </div>
+    
+    <div class="border-t border-gray-200 dark:border-gray-700">
+      <div class="px-4 py-6">
+        <% if @report[:events_by_type].present? %>
+          <div class="relative">
+            <div class="overflow-hidden bg-white dark:bg-gray-800">
+              <div class="flex items-center space-x-4">
+                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-4">
+                  <% @report[:events_by_type].each do |type, count| %>
+                    <% percentage = (count.to_f / @report[:total_compliance_events] * 100).round(1) %>
+                    <% next if percentage < 3 # Skip tiny segments for visual clarity %>
+                    <% 
+                      color = case type
+                        when "lead_processing" then "bg-blue-500"
+                        when "consent" then "bg-green-500"
+                        when "distribution" then "bg-purple-500"
+                        when "data_access" then "bg-yellow-500"
+                        when "validation" then "bg-red-500"
+                        when "bid_request" then "bg-pink-500"
+                        else "bg-gray-500"
+                      end
+                    %>
+                    <div 
+                      class="h-4 rounded-full <%= color %> inline-block" 
+                      style="width: <%= percentage %>%"
+                      title="<%= type.humanize %>: <%= count %> events (<%= percentage %>%)"
+                    ></div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <% @report[:events_by_type].sort_by { |_, count| -count }.each do |type, count| %>
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="flex items-center">
+                  <% 
+                    bg_color = case type
+                      when "lead_processing" then "bg-blue-100 dark:bg-blue-900/50"
+                      when "consent" then "bg-green-100 dark:bg-green-900/50"
+                      when "distribution" then "bg-purple-100 dark:bg-purple-900/50"
+                      when "data_access" then "bg-yellow-100 dark:bg-yellow-900/50"
+                      when "validation" then "bg-red-100 dark:bg-red-900/50"
+                      when "bid_request" then "bg-pink-100 dark:bg-pink-900/50"
+                      else "bg-gray-100 dark:bg-gray-700"
+                    end
+                    
+                    text_color = case type
+                      when "lead_processing" then "text-blue-800 dark:text-blue-300"
+                      when "consent" then "text-green-800 dark:text-green-300"
+                      when "distribution" then "text-purple-800 dark:text-purple-300"
+                      when "data_access" then "text-yellow-800 dark:text-yellow-300"
+                      when "validation" then "text-red-800 dark:text-red-300"
+                      when "bid_request" then "text-pink-800 dark:text-pink-300"
+                      else "text-gray-800 dark:text-gray-300"
+                    end
+                  %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= bg_color %> <%= text_color %>">
+                    <%= type.humanize %>
+                  </span>
+                </div>
+                <div class="text-sm font-medium text-gray-900 dark:text-gray-300">
+                  <%= count %> events
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-500 dark:text-gray-400 text-center">No events to display for this period.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events By Action -->
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+        Events by Action
+      </h3>
+    </div>
+    
+    <div class="border-t border-gray-200 dark:border-gray-700">
+      <div class="px-4 py-6">
+        <% if @report[:events_by_action].present? %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <% @report[:events_by_action].sort_by { |_, count| -count }.each do |action, count| %>
+              <div class="flex items-center justify-between px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div class="text-sm font-medium text-gray-900 dark:text-gray-300">
+                  <%= action.humanize %>
+                </div>
+                <div class="text-sm font-medium text-gray-900 dark:text-gray-300">
+                  <%= count %> events
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-500 dark:text-gray-400 text-center">No actions to display for this period.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Access Report -->
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+        Data Access Analysis
+      </h3>
+    </div>
+    
+    <div class="border-t border-gray-200 dark:border-gray-700">
+      <div class="px-4 py-6">
+        <% if @report[:data_access_report].present? && @report[:data_access_report][:total_access_events].to_i > 0 %>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Access by User -->
+            <div>
+              <h4 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-4">Access by User</h4>
+              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <% if @report[:data_access_report][:access_by_user].present? %>
+                  <ul class="divide-y divide-gray-200 dark:divide-gray-600">
+                    <% @report[:data_access_report][:access_by_user].sort_by { |_, count| -count }.each do |user, count| %>
+                      <li class="py-3 flex justify-between">
+                        <span class="text-sm text-gray-900 dark:text-gray-300"><%= user %></span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= count %> accesses</span>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <p class="text-gray-500 dark:text-gray-400 text-center">No user data available.</p>
+                <% end %>
+              </div>
+            </div>
+            
+            <!-- Access by Record Type -->
+            <div>
+              <h4 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-4">Access by Record Type</h4>
+              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <% if @report[:data_access_report][:access_by_record_type].present? %>
+                  <ul class="divide-y divide-gray-200 dark:divide-gray-600">
+                    <% @report[:data_access_report][:access_by_record_type].sort_by { |_, count| -count }.each do |record_type, count| %>
+                      <li class="py-3 flex justify-between">
+                        <span class="text-sm text-gray-900 dark:text-gray-300"><%= record_type %></span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= count %> accesses</span>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <p class="text-gray-500 dark:text-gray-400 text-center">No record type data available.</p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Access by Action -->
+            <div>
+              <h4 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-4">Access by Action</h4>
+              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <% if @report[:data_access_report][:access_by_action].present? %>
+                  <ul class="divide-y divide-gray-200 dark:divide-gray-600">
+                    <% @report[:data_access_report][:access_by_action].sort_by { |_, count| -count }.each do |action, count| %>
+                      <li class="py-3 flex justify-between">
+                        <span class="text-sm text-gray-900 dark:text-gray-300"><%= action.humanize %></span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= count %> events</span>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <p class="text-gray-500 dark:text-gray-400 text-center">No action data available.</p>
+                <% end %>
+              </div>
+            </div>
+            
+            <!-- Access by Context -->
+            <div>
+              <h4 class="text-base font-medium text-gray-900 dark:text-gray-100 mb-4">Access by Context</h4>
+              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <% if @report[:data_access_report][:access_by_context].present? %>
+                  <ul class="divide-y divide-gray-200 dark:divide-gray-600">
+                    <% @report[:data_access_report][:access_by_context].sort_by { |_, count| -count }.each do |context, count| %>
+                      <li class="py-3 flex justify-between">
+                        <span class="text-sm text-gray-900 dark:text-gray-300"><%= context.humanize %></span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300"><%= count %> accesses</span>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <p class="text-gray-500 dark:text-gray-400 text-center">No context data available.</p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <p class="text-gray-500 dark:text-gray-400 text-center">No data access events to display for this period.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Report Export Information -->
+  <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Compliance Report Information</h3>
+    <div class="prose prose-sm text-gray-500 dark:text-gray-400">
+      <p>
+        This compliance report provides a high-level overview of system activity for the selected period. For regulatory purposes:
+      </p>
+      <ul class="list-disc pl-5">
+        <li>Use the <strong class="text-gray-700 dark:text-gray-300">JSON Export</strong> button to download a machine-readable version of this report</li>
+        <li>Use the <strong class="text-gray-700 dark:text-gray-300">Regulatory Report</strong> button to generate a cryptographically signed report suitable for audit submissions</li>
+        <li>Individual record compliance histories can be exported from their respective detail pages</li>
+      </ul>
+      <p class="mt-4">
+        All reports are timestamped and include detailed metadata for verification purposes.
+      </p>
+    </div>
+  </div>
+</div>

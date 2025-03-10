@@ -1,0 +1,814 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="prose prose-blue max-w-none dark:prose-invert">
+    <h1>Compliance System Documentation</h1>
+    
+    <div class="mt-8 border-b border-gray-200 dark:border-gray-700">
+      <nav class="flex -mb-px space-x-8 overflow-x-auto" aria-label="Documentation sections">
+        <a href="#overview" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Overview
+        </a>
+        <a href="#setup" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Setup Guide
+        </a>
+        <a href="#fields" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Required Fields
+        </a>
+        <a href="#validation" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Validation Rules
+        </a>
+        <a href="#consent" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Consent Management
+        </a>
+        <a href="#reporting" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Reports
+        </a>
+        <a href="#regulations" class="px-1 py-4 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 whitespace-nowrap">
+          Regulatory Compliance
+        </a>
+      </nav>
+    </div>
+    
+    <section id="overview" class="py-6">
+      <h2>Compliance System Overview</h2>
+      <p>
+        The LeadXS compliance system is designed to help your organization maintain regulatory compliance 
+        while collecting, processing, and distributing lead data. It provides comprehensive tracking, validation, 
+        and documentation of all data-related activities, with a focus on meeting current regulatory requirements, 
+        including FTC's 1:1 consent rule.
+      </p>
+      
+      <div class="my-6 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700 dark:text-blue-300">
+              <strong>Key Features:</strong> The LeadXS compliance system includes:
+            </p>
+            <ul class="mt-1 text-sm text-blue-700 dark:text-blue-300 list-disc list-inside ml-2">
+              <li><strong>Immutable Records</strong>: Once created, compliance records cannot be modified or deleted</li>
+              <li><strong>Comprehensive Logging</strong>: All events are logged with detailed context</li>
+              <li><strong>Precise Timestamping</strong>: Exact time and date for every event</li>
+              <li><strong>User Attribution</strong>: Records which user or system initiated each action</li>
+              <li><strong>Verifiable Data</strong>: Each record maintains contextual data and references</li>
+              <li><strong>Cryptographic Verification</strong>: Consent receipts and reports can be cryptographically verified</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Core Components</h3>
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Main Compliance System Components</h4>
+        </div>
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-2">
+            <li>
+              <strong>Compliance Records</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Documents all compliance-related events with immutable records including lead processing, consent, distribution, 
+                data access, validation, and system events.
+              </p>
+            </li>
+            
+            <li>
+              <strong>Consent Management</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Tracks explicit consent with cryptographic verification, supporting various types including distribution consent, 
+                marketing consent, terms of service, privacy policy, and data sharing.
+              </p>
+            </li>
+            
+            <li>
+              <strong>Data Access Logs</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Records all access to personal information including who accessed what data, when, and for what purpose.
+              </p>
+            </li>
+            
+            <li>
+              <strong>Validation Rules</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Ensures data quality and regulatory compliance through customizable rules with different severity levels.
+              </p>
+            </li>
+            
+            <li>
+              <strong>Compliance Reports</strong>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Provides auditable documentation of compliance activities, with cryptographically signed reports for regulatory purposes.
+              </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+    
+    <section id="setup" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Setting Up Compliance</h2>
+      
+      <p>
+        This section guides you through the necessary steps to set up and configure the compliance system 
+        for your organization's needs.
+      </p>
+      
+      <h3 class="mt-6">1. Access Control Setup</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Configure who can access compliance features by setting appropriate roles:
+          </p>
+          
+          <ul class="list-disc pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <strong>Compliance Admin</strong>: Full access to all compliance features
+            </li>
+            <li>
+              <strong>Compliance Auditor</strong>: Read-only access to compliance reports
+            </li>
+            <li>
+              <strong>Regular User</strong>: Limited access to compliance data related to their actions
+            </li>
+          </ul>
+          
+          <div class="mt-4">
+            <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">To set up these permissions:</p>
+            <ol class="list-decimal pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <li>Navigate to <strong>Accounts</strong> > <strong>Users</strong></li>
+              <li>Select a user and click <strong>Edit Permissions</strong></li>
+              <li>Under the Compliance section, set appropriate role</li>
+              <li>Click <strong>Save Changes</strong></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">2. Configure Compliance Settings</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Set up global compliance settings to meet your regulatory and business requirements:
+          </p>
+          
+          <div class="mt-4">
+            <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">Steps to configure global settings:</p>
+            <ol class="list-decimal pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <li>Navigate to <strong>Settings</strong> > <strong>Compliance</strong></li>
+              <li>Configure the following settings:
+                <ul class="list-disc pl-5 mt-1">
+                  <li><strong>Retention Period</strong>: How long to keep compliance records (default: 7 years)</li>
+                  <li><strong>Consent Expiration</strong>: Default expiration for consent records (if applicable)</li>
+                  <li><strong>Required Proof</strong>: Level of evidence required for consent (IP, user agent, etc.)</li>
+                  <li><strong>Report Signing</strong>: Enable/disable cryptographic signing of reports</li>
+                  <li><strong>Automatic Logging</strong>: Configure which events are automatically logged</li>
+                </ul>
+              </li>
+              <li>Click <strong>Save Settings</strong></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">3. Set Up Data Model</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Ensure your data model correctly identifies personally identifiable information (PII):
+          </p>
+          
+          <div class="mt-4">
+            <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">Steps to configure your data model:</p>
+            <ol class="list-decimal pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <li>Navigate to <strong>Verticals</strong> > select your vertical > <strong>Fields</strong></li>
+              <li>For each field, set the appropriate privacy classification:
+                <ul class="list-disc pl-5 mt-1">
+                  <li><strong>PII</strong>: Personally Identifiable Information (name, email, etc.)</li>
+                  <li><strong>Sensitive</strong>: Special category data requiring additional protection</li>
+                  <li><strong>Non-PII</strong>: Data that doesn't identify individuals</li>
+                  <li><strong>Anonymous</strong>: Data safe for use in pre-qualification</li>
+                </ul>
+              </li>
+              <li>For each PII field, configure:
+                <ul class="list-disc pl-5 mt-1">
+                  <li><strong>Anonymization Method</strong>: How the field is anonymized in logs and pre-qualification</li>
+                  <li><strong>Sharing Settings</strong>: Whether the field can be shared in various contexts</li>
+                  <li><strong>Consent Requirements</strong>: What types of consent are needed to process this field</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="fields" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Required Fields and Data Collection</h2>
+      
+      <p>
+        To maintain proper compliance records, certain information must be collected and stored. 
+        This section outlines essential fields and how to configure your data collection processes.
+      </p>
+      
+      <h3 class="mt-6">Essential Compliance Fields</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Field Categories for Lead Generation</h4>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">1. Identity Information</h5>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>First and last name</li>
+                <li>Email address</li>
+                <li>Phone number (if applicable)</li>
+                <li>IP address (automatically collected)</li>
+                <li>User agent (automatically collected)</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">2. Consent Information</h5>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Timestamp of consent (automatically recorded)</li>
+                <li>Specific consent text shown to the user</li>
+                <li>Method of consent (checkbox, signature, etc.)</li>
+                <li>Which offers/services they consented to</li>
+                <li>Whether they agreed to marketing communications</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">3. Source Information</h5>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Lead source/publisher</li>
+                <li>Acquisition channel</li>
+                <li>Campaign identifier</li>
+                <li>Referring URL</li>
+                <li>Landing page URL</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 class="font-medium text-gray-900 dark:text-white">4. Distribution Record Fields</h5>
+              <ul class="list-disc pl-5 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <li>Receiving parties</li>
+                <li>Timestamp of distribution</li>
+                <li>Data fields shared</li>
+                <li>Response from receiving party</li>
+                <li>Bid amount (if applicable)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Setting Up Field Collection</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">To configure what fields to collect:</p>
+          
+          <ol class="list-decimal pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              Navigate to <strong>Verticals</strong> > select your vertical
+            </li>
+            <li>
+              Click on <strong>Fields</strong> to set up the vertical fields
+            </li>
+            <li>
+              For each field, configure:
+              <ul class="list-disc pl-5 mt-1">
+                <li><strong>Field Name</strong>: The database field name</li>
+                <li><strong>Display Name</strong>: User-friendly name shown in forms</li>
+                <li><strong>Field Type</strong>: Type of data (text, email, phone, etc.)</li>
+                <li><strong>Required</strong>: Whether the field is mandatory</li>
+                <li><strong>Validation</strong>: Basic validation rules (format, length, etc.)</li>
+                <li><strong>Compliance Settings</strong>: PII status, sharing restrictions, etc.</li>
+              </ul>
+            </li>
+            <li>
+              After setting up vertical fields, go to <strong>Campaigns</strong> > select/create campaign
+            </li>
+            <li>
+              Under <strong>Campaign Fields</strong>, configure:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Which vertical fields to include in this campaign</li>
+                <li>Campaign-specific validation rules</li>
+                <li>Field display order</li>
+                <li>Default values (if applicable)</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="my-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700 dark:text-yellow-300">
+              <strong>Important:</strong> Ensure you properly identify and classify all PII fields. Improper classification 
+              may lead to regulatory compliance issues, particularly when sharing data or processing leads.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="validation" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Validation Rules</h2>
+      
+      <p>
+        Validation rules ensure data quality and compliance with regulatory requirements. They can be configured 
+        at different levels (vertical, campaign, field) and with different severity levels.
+      </p>
+      
+      <h3 class="mt-6">Types of Validation Rules</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-700">
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Condition Rules</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Use a Ruby-like DSL to create complex conditions.
+            </p>
+            <div class="bg-gray-50 dark:bg-gray-800 mt-2 p-3 rounded text-xs font-mono text-gray-800 dark:text-gray-200 overflow-auto">
+              # Example: Ensure age is 18+ if financial product is selected<br>
+              field('age').to_i >= 18 if field('product_type') == 'financial'
+            </div>
+          </div>
+          
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Pattern Rules</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Validate fields against regex patterns.
+            </p>
+            <div class="bg-gray-50 dark:bg-gray-800 mt-2 p-3 rounded text-xs font-mono text-gray-800 dark:text-gray-200 overflow-auto">
+              # Example: Ensure valid format for SSN<br>
+              field('ssn').match?(/^\d{3}-\d{2}-\d{4}$/)
+            </div>
+          </div>
+          
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Lookup Rules</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Check field values against predefined lists.
+            </p>
+            <div class="bg-gray-50 dark:bg-gray-800 mt-2 p-3 rounded text-xs font-mono text-gray-800 dark:text-gray-200 overflow-auto">
+              # Example: Ensure state is valid US state<br>
+              VALID_STATES.include?(field('state').upcase)
+            </div>
+          </div>
+          
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Dependency Rules</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Ensure dependent fields are provided when required.
+            </p>
+            <div class="bg-gray-50 dark:bg-gray-800 mt-2 p-3 rounded text-xs font-mono text-gray-800 dark:text-gray-200 overflow-auto">
+              # Example: If phone_consent is true, require phone number<br>
+              !field('phone_consent') || field('phone').present?
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Setting Up Validation Rules</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <ol class="list-decimal pl-5 space-y-3 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              Navigate to <strong>Validation Rules</strong>
+            </li>
+            <li>
+              Click <strong>Create New Rule</strong>
+            </li>
+            <li>
+              Configure the rule:
+              <ul class="list-disc pl-5 mt-1">
+                <li><strong>Name</strong>: Descriptive name for the rule</li>
+                <li><strong>Description</strong>: Detailed explanation of what the rule checks</li>
+                <li><strong>Rule Type</strong>: Select from the available types</li>
+                <li><strong>Condition</strong>: Enter the validation expression</li>
+                <li><strong>Error Message</strong>: Message to display when validation fails</li>
+                <li><strong>Severity</strong>: Choose from:
+                  <ul class="list-disc pl-5 mt-1">
+                    <li><strong>Error</strong>: Prevents submission</li>
+                    <li><strong>Warning</strong>: Allows submission but flags for review</li>
+                    <li><strong>Info</strong>: Informational only, doesn't block submission</li>
+                  </ul>
+                </li>
+                <li><strong>Scope</strong>: Where the rule applies (Vertical, Campaign, or Field)</li>
+                <li><strong>Position</strong>: Order in which rules are evaluated</li>
+              </ul>
+            </li>
+            <li>
+              Click <strong>Save Rule</strong>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Testing Validation Rules</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4 text-sm text-gray-600 dark:text-gray-400">
+          <p>Before deploying a validation rule:</p>
+          
+          <ol class="list-decimal pl-5 mt-3 space-y-2">
+            <li>Navigate to <strong>Validation Rules</strong> > select your rule</li>
+            <li>Click <strong>Test Rule</strong></li>
+            <li>Enter test values for the fields referenced in the rule</li>
+            <li>Click <strong>Run Test</strong> to verify the rule works as expected</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+    
+    <section id="consent" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Consent Management</h2>
+      
+      <p>
+        Proper consent management is critical for compliance with regulations like GDPR, CCPA, and FTC requirements.
+        The LeadXS compliance system provides comprehensive tools for recording, managing, and verifying consent.
+      </p>
+      
+      <h3 class="mt-6">Types of Consent</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            The system supports tracking different types of consent:
+          </p>
+          
+          <div class="grid md:grid-cols-2 gap-4 mt-3">
+            <div>
+              <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+                <li>
+                  <strong>Distribution Consent</strong>: Consent to share data with specific third parties
+                </li>
+                <li>
+                  <strong>Marketing Consent</strong>: Consent to receive marketing communications
+                </li>
+              </ul>
+            </div>
+            <div>
+              <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+                <li>
+                  <strong>Terms of Service</strong>: Agreement to the terms of service
+                </li>
+                <li>
+                  <strong>Privacy Policy</strong>: Acknowledgment of privacy policy
+                </li>
+                <li>
+                  <strong>Data Sharing</strong>: Consent for specific data sharing purposes
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Recording Consent</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Consent is typically recorded automatically during lead submission, but you can also record it manually:
+          </p>
+          
+          <ol class="list-decimal pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>Navigate to the lead record</li>
+            <li>Click <strong>Compliance</strong> > <strong>Consent</strong> > <strong>Record Consent</strong></li>
+            <li>Select the consent type</li>
+            <li>Enter the consent text exactly as shown to the user</li>
+            <li>Set an expiration date (if applicable)</li>
+            <li>Add any relevant metadata</li>
+            <li>Click <strong>Save Consent</strong></li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Verifying Consent</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            To verify that consent was properly recorded:
+          </p>
+          
+          <ol class="list-decimal pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>Navigate to the lead record</li>
+            <li>Click <strong>Compliance</strong> > <strong>Consent</strong></li>
+            <li>View the list of consent records</li>
+            <li>Click on a specific consent record to see details:
+              <ul class="list-disc pl-5 mt-1">
+                <li>Exact consent text</li>
+                <li>Timestamp</li>
+                <li>IP address and user agent</li>
+                <li>Proof token for verification</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Revoking Consent</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            If a lead requests to revoke their consent:
+          </p>
+          
+          <ol class="list-decimal pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>Navigate to the lead record</li>
+            <li>Click <strong>Compliance</strong> > <strong>Consent</strong></li>
+            <li>Find the appropriate consent record</li>
+            <li>Click <strong>Revoke Consent</strong></li>
+            <li>Enter the reason for revocation</li>
+            <li>Click <strong>Confirm Revocation</strong></li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="my-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-700 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700 dark:text-yellow-300">
+              <strong>FTC 1:1 Consent Requirement:</strong> For ping-post campaigns, ensure that explicit consent is obtained for each 
+              specific buyer before sharing complete lead data. The LeadXS system enforces this by requiring distribution-specific 
+              consent before full data transfer.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="reporting" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Compliance Reporting</h2>
+      
+      <p>
+        LeadXS provides comprehensive compliance reporting to help you demonstrate regulatory compliance 
+        and monitor your organization's adherence to data protection requirements.
+      </p>
+      
+      <h3 class="mt-6">Available Reports</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <div class="grid md:grid-cols-3 gap-6">
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">Compliance Dashboard</h4>
+              <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <li>Summary statistics on compliance events</li>
+                <li>Recent compliance activities</li>
+                <li>Consent metrics</li>
+                <li>Data access logs</li>
+                <li>Quick overview of compliance health</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">Record-Specific Reports</h4>
+              <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <li>Compliance history for specific leads</li>
+                <li>Consent history for specific leads</li>
+                <li>Distribution history for specific campaigns</li>
+                <li>Validation result details</li>
+                <li>Access logs for specific records</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">Regulatory Reports</h4>
+              <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <li>Comprehensive reports for regulatory audits</li>
+                <li>Signed reports with cryptographic verification</li>
+                <li>Exportable in multiple formats (JSON, PDF)</li>
+                <li>Date-range based reporting</li>
+                <li>Suitable for legal proceedings or audits</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Generating Reports</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-700">
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Compliance Dashboard</h4>
+            <ol class="list-decimal pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <li>Navigate to <strong>Compliance</strong> > <strong>Dashboard</strong></li>
+              <li>View summary statistics and recent events</li>
+              <li>Use the filters to narrow down the time period or event types</li>
+              <li>Click on any metric to drill down for more details</li>
+            </ol>
+          </div>
+          
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Record-Specific Reports</h4>
+            <ol class="list-decimal pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <li>Navigate to the specific record (Lead, Campaign, etc.)</li>
+              <li>Click <strong>Compliance</strong> > <strong>History</strong></li>
+              <li>View the complete compliance history</li>
+              <li>Use filters to narrow down events by type, action, or date</li>
+              <li>Click <strong>Export</strong> to download the report</li>
+            </ol>
+          </div>
+          
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Regulatory Reports</h4>
+            <ol class="list-decimal pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <li>Navigate to <strong>Compliance</strong> > <strong>Regulatory Reports</strong></li>
+              <li>Click <strong>Generate New Report</strong></li>
+              <li>Select the report type and date range</li>
+              <li>Choose export format (JSON, PDF)</li>
+              <li>Click <strong>Generate Report</strong></li>
+              <li>The system will create a cryptographically signed report</li>
+              <li>Download the report for your records</li>
+            </ol>
+          </div>
+          
+          <div class="p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white">Scheduling Reports</h4>
+            <ol class="list-decimal pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <li>Navigate to <strong>Compliance</strong> > <strong>Scheduled Reports</strong></li>
+              <li>Click <strong>Create Schedule</strong></li>
+              <li>Configure:
+                <ul class="list-disc pl-5 mt-1">
+                  <li>Report type</li>
+                  <li>Frequency (daily, weekly, monthly)</li>
+                  <li>Recipients</li>
+                  <li>Export format</li>
+                </ul>
+              </li>
+              <li>Click <strong>Save Schedule</strong></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="regulations" class="py-6 border-t border-gray-200 dark:border-gray-700">
+      <h2>Regulatory Considerations</h2>
+      
+      <p>
+        The LeadXS compliance system is designed to help you meet various regulatory requirements. 
+        This section provides guidance on key regulatory considerations.
+      </p>
+      
+      <h3 class="mt-6">FTC 1:1 Consent Requirement</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            The FTC requires specific 1:1 consent for lead distribution. LeadXS helps you comply by:
+          </p>
+          
+          <ol class="list-decimal pl-5 mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <strong>Pre-Qualification</strong>: Using anonymized data for initial qualification
+            </li>
+            <li>
+              <strong>Explicit Consent</strong>: Recording specific consent for each buyer before full data transfer
+            </li>
+            <li>
+              <strong>Proof Retention</strong>: Maintaining verifiable proof of consent
+            </li>
+            <li>
+              <strong>Disclosure</strong>: Providing clear disclosure of who will receive data
+            </li>
+          </ol>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">GDPR Compliance</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            For operations involving EU residents, LeadXS helps with:
+          </p>
+          
+          <div class="grid md:grid-cols-2 gap-4 mt-3">
+            <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+              <li>
+                <strong>Lawful Basis</strong>: Recording the lawful basis for processing
+              </li>
+              <li>
+                <strong>Data Subject Rights</strong>: Support for right to access, delete, etc.
+              </li>
+            </ul>
+            
+            <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+              <li>
+                <strong>Data Protection</strong>: Proper security measures for PII
+              </li>
+              <li>
+                <strong>Records of Processing</strong>: Comprehensive logging of all data processing
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">CCPA/CPRA Compliance</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            For California residents, LeadXS supports:
+          </p>
+          
+          <div class="grid md:grid-cols-2 gap-4 mt-3">
+            <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+              <li>
+                <strong>Right to Know</strong>: Document what data is collected and shared
+              </li>
+              <li>
+                <strong>Right to Delete</strong>: Support for deletion requests
+              </li>
+            </ul>
+            
+            <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400">
+              <li>
+                <strong>Right to Opt-Out</strong>: Record opt-out preferences
+              </li>
+              <li>
+                <strong>Sensitive Data</strong>: Additional protections for sensitive categories
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="mt-6">Best Practices</h3>
+      
+      <div class="my-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div class="p-4">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">Documentation Tips</h4>
+              <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <li><strong>Be Thorough</strong>: Record all relevant details for compliance events</li>
+                <li><strong>Use Standard Language</strong>: Consistent wording for consent and disclosures</li>
+                <li><strong>Regular Audits</strong>: Periodically review compliance records</li>
+                <li><strong>Keep Reports</strong>: Save regulatory reports for the required retention period</li>
+                <li><strong>Document Procedures</strong>: Maintain written procedures for compliance</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white">Process Recommendations</h4>
+              <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <li><strong>Regular Review</strong>: Schedule regular reviews of compliance settings</li>
+                <li><strong>Staff Training</strong>: Ensure all staff understand compliance requirements</li>
+                <li><strong>Update Consent Language</strong>: Regularly review and update consent language</li>
+                <li><strong>Test Validation Rules</strong>: Periodically test validation rules with sample data</li>
+                <li><strong>Monitor Logs</strong>: Regularly review compliance logs for unusual activity</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <div class="mt-8 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Need Additional Help?</h3>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        This documentation provides a comprehensive overview of the LeadXS compliance system. For specific
+        questions or assistance with your compliance needs, please contact our support team.
+      </p>
+      <div class="mt-4">
+        <a href="mailto:support@leadxs.com" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500">
+          Contact Support
+        </a>
+      </div>
+      <p class="mt-4 text-xs text-gray-500 dark:text-gray-500">
+        <em>Last Updated: March 10, 2025</em>
+      </p>
+    </div>
+  </div>
+</div>

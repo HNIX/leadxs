@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: one
+  lead: one
+  user_id: 
+  consent_type: MyString
+  consent_text: MyText
+  ip_address: MyString
+  user_agent: MyString
+  consented_at: 2025-03-09 23:12:58
+  expires_at: 2025-03-09 23:12:58
+  proof_token: MyString
+
+two:
+  account: two
+  lead: two
+  user_id: 
+  consent_type: MyString
+  consent_text: MyText
+  ip_address: MyString
+  user_agent: MyString
+  consented_at: 2025-03-09 23:12:58
+  expires_at: 2025-03-09 23:12:58
+  proof_token: MyString

@@ -36,6 +36,8 @@ class Distribution < ApplicationRecord
     xml: 2
   }, default: :json
   
+  # Define enum attribute with explicit string type
+  attribute :metadata_requirements, :integer
   enum :metadata_requirements, {
     no_metadata: 0,              # No metadata fields required
     include_standard_fields: 1,  # Include standard tracking fields (lead_id, timestamp, etc.)

@@ -1,5 +1,16 @@
 # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  # Compliance routes
+  get "compliance", to: "compliance#index", as: :compliance
+  get "compliance/dashboard", to: "compliance#dashboard", as: :compliance_dashboard
+  get "compliance/report", to: "compliance#report", as: :compliance_report
+  get "compliance/regulatory", to: "compliance#regulatory_report", as: :compliance_regulatory_report
+  
+  # Record-specific compliance routes
+  get "compliance/:record_type/:record_id", to: "compliance#show", as: :compliance_show
+  get "compliance/:record_type/:record_id/history", to: "compliance#history", as: :compliance_history
+  match "compliance/:record_type/:record_id/consent", to: "compliance#consent", as: :compliance_consent, via: [:get, :post, :delete]
+  get "compliance/:record_type/:record_id/export", to: "compliance#export", as: :compliance_export
   # Bid analytics and reporting
   resources :bid_reports, only: [:index, :show]
   
@@ -154,6 +165,7 @@ Rails.application.routes.draw do
     get :lead_bidding_docs
     get :bid_reporting_docs
     get :lead_submission_process
+    get :compliance_documentation
   end
   
   # Validation rules documentation

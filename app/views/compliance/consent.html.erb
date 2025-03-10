@@ -1,0 +1,192 @@
+<% content_for :title, "Manage Consent" %>
+
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <%= link_to compliance_show_path(record_type: @record.class.name.underscore, record_id: @record.id), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 inline-flex items-center" do %>
+      <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+      </svg>
+      Back to record details
+    <% end %>
+  </div>
+
+  <div class="border-b border-gray-200 dark:border-gray-700 pb-5 mb-6">
+    <h1 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100">
+      Manage Consent for <%= @record.class.name %> #<%= @record.id %>
+    </h1>
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+      <% if @record.is_a?(Lead) %>
+        Lead ID: <%= @record.unique_id %>
+      <% end %>
+    </p>
+  </div>
+
+  <!-- Existing Consent Records -->
+  <% if @consents.present? %>
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+          Existing Consent Records
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Records of consent provided for this <%= @record.class.name.downcase %>.
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700 list-none">
+          <% @consents.each do |consent| %>
+            <li class="px-4 py-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <% if consent.active? %>
+                    <span class="inline-flex items-center mr-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">Active</span>
+                  <% elsif consent.revoked? %>
+                    <span class="inline-flex items-center mr-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">Revoked</span>
+                  <% elsif consent.expires_at && consent.expires_at < Time.current %>
+                    <span class="inline-flex items-center mr-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">Expired</span>
+                  <% else %>
+                    <span class="inline-flex items-center mr-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">Unknown</span>
+                  <% end %>
+                  <span class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= consent.consent_type.humanize %></span>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <span class="text-sm text-gray-500 dark:text-gray-400">
+                    <%= consent.consented_at.strftime("%b %d, %Y") %>
+                    <% if consent.expires_at.present? %>
+                      • Expires: <%= consent.expires_at.strftime("%b %d, %Y") %>
+                    <% end %>
+                  </span>
+                  
+                  <% if consent.active? %>
+                    <button 
+                      type="button" 
+                      class="text-sm text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                      onclick="document.getElementById('revoke-form-<%= consent.id %>').classList.toggle('hidden');"
+                    >
+                      Revoke
+                    </button>
+                    
+                    <div id="revoke-form-<%= consent.id %>" class="hidden mt-4">
+                      <%= form_tag compliance_consent_path(record_type: @record.class.name.underscore, record_id: @record.id), method: :delete, class: "bg-gray-50 dark:bg-gray-700 p-4 rounded-md" do %>
+                        <%= hidden_field_tag :consent_id, consent.id %>
+                        
+                        <div class="mb-4">
+                          <%= label_tag :revocation_reason, "Revocation Reason", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                          <%= text_area_tag :revocation_reason, nil, rows: 3, class: "mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-100 sm:text-sm" %>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3">
+                          <button 
+                            type="button" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-100"
+                            onclick="document.getElementById('revoke-form-<%= consent.id %>').classList.add('hidden');"
+                          >
+                            Cancel
+                          </button>
+                          <%= submit_tag "Confirm Revocation", class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-red-500" %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  
+                  <%= link_to compliance_show_path(record_type: 'consent_record', record_id: consent.id), class: "text-sm text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" do %>
+                    View
+                  <% end %>
+                </div>
+              </div>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  <%= consent.consent_text.truncate(100) %>
+                </p>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Create New Consent Form -->
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+        Record New Consent
+      </h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+        Create a new record of consent for regulatory compliance.
+      </p>
+    </div>
+    
+    <%= form_with url: compliance_consent_path(record_type: @record.class.name.underscore, record_id: @record.id), method: :post, class: "px-4 py-5 sm:p-6" do |f| %>
+      <div class="grid grid-cols-1 gap-6">
+        <div>
+          <%= f.label :consent_type, "Consent Type", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select :consent_type, 
+              @consent_types.map { |type| [type.humanize, type] },
+              { include_blank: "Select a consent type" },
+              { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 sm:text-sm rounded-md" }
+          %>
+        </div>
+        
+        <div>
+          <%= f.label :consent_text, "Consent Text", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <div class="mt-1">
+            <%= f.text_area :consent_text, rows: 5, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md", placeholder: "I consent to..." %>
+          </div>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            This text should match the exact consent language presented to the user.
+          </p>
+        </div>
+        
+        <div>
+          <%= f.label :expires_at, "Expiration Date (Optional)", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.date_field :expires_at, class: "mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 sm:text-sm" %>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            If consent is time-limited, specify when it expires.
+          </p>
+        </div>
+        
+        <div>
+          <fieldset>
+            <div class="mt-4 space-y-4">
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <%= f.check_box :agreed, { class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded" }, "true", "false" %>
+                </div>
+                <div class="ml-3 text-sm">
+                  <%= f.label :agreed, class: "font-medium text-gray-700 dark:text-gray-300" do %>
+                    I confirm this consent was obtained legitimately and in compliance with applicable regulations.
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      
+      <div class="mt-6 flex justify-end">
+        <%= link_to "Cancel", compliance_show_path(record_type: @record.class.name.underscore, record_id: @record.id), class: "mr-3 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-100" %>
+        <%= f.submit "Record Consent", class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500" %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Regulatory Information -->
+  <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Regulatory Information</h3>
+    <div class="prose prose-sm text-gray-500 dark:text-gray-300">
+      <p>
+        Proper consent management is critical for regulatory compliance, particularly with regulations like:
+      </p>
+      <ul class="list-disc pl-5">
+        <li><strong class="text-gray-700 dark:text-gray-200">Federal Trade Commission (FTC):</strong> 1:1 consent requirement for lead distribution</li>
+        <li><strong class="text-gray-700 dark:text-gray-200">Telephone Consumer Protection Act (TCPA):</strong> Prior express written consent for telemarketing</li>
+        <li><strong class="text-gray-700 dark:text-gray-200">CAN-SPAM Act:</strong> Requirements for commercial email messages</li>
+        <li><strong class="text-gray-700 dark:text-gray-200">California Consumer Privacy Act (CCPA):</strong> California resident privacy rights</li>
+      </ul>
+      <p class="mt-4">
+        All consent records are immutable and cryptographically verifiable, with detailed audit trails maintained for regulatory purposes.
+      </p>
+    </div>
+  </div>
+</div>

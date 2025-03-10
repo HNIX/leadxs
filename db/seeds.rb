@@ -285,5 +285,14 @@ if Rails.env.development?
   require_relative "seeds/bidding/setup_bidding_system"
   Seeds::Bidding::SetupBiddingSystem.setup
   
+  # Create consent records
+  require_relative "seeds/consent_records"
+  
+  # Create consent event records with all consent types
+  require_relative "seeds/consent_event_records"
+  
+  # Create compliance records
+  require_relative "seeds/compliance_records"
+  
   puts "Development seed data created successfully!"
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_10_040221) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_10_041302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -327,6 +327,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_040221) do
     t.index ["account_id"], name: "index_companies_on_account_id"
   end
 
+  create_table "compliance_records", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.string "action", null: false
+    t.string "event_type", null: false
+    t.jsonb "data", default: {}
+    t.bigint "user_id"
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "occurred_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "event_type"], name: "index_compliance_records_on_account_id_and_event_type"
+    t.index ["account_id"], name: "index_compliance_records_on_account_id"
+    t.index ["occurred_at"], name: "index_compliance_records_on_occurred_at"
+    t.index ["record_type", "record_id"], name: "index_compliance_records_on_record_type_and_record_id"
+  end
+
   create_table "connected_accounts", force: :cascade do |t|
     t.bigint "owner_id"
     t.string "provider"
@@ -342,6 +361,33 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_040221) do
     t.index ["owner_id", "owner_type"], name: "index_connected_accounts_on_owner_id_and_owner_type"
   end
 
+  create_table "consent_records", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "lead_id", null: false
+    t.bigint "user_id"
+    t.string "consent_type", null: false
+    t.text "consent_text", null: false
+    t.string "ip_address", null: false
+    t.string "user_agent"
+    t.datetime "consented_at", null: false
+    t.datetime "expires_at"
+    t.string "proof_token"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.jsonb "metadata", default: {}
+    t.boolean "revoked", default: false
+    t.datetime "revoked_at"
+    t.text "revocation_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_consent_records_on_account_id"
+    t.index ["consented_at"], name: "index_consent_records_on_consented_at"
+    t.index ["lead_id", "consent_type"], name: "index_consent_records_on_lead_id_and_consent_type"
+    t.index ["lead_id"], name: "index_consent_records_on_lead_id"
+    t.index ["proof_token"], name: "index_consent_records_on_proof_token"
+    t.index ["revoked"], name: "index_consent_records_on_revoked"
+    t.index ["uuid"], name: "index_consent_records_on_uuid", unique: true
+  end
+
   create_table "contacts", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
@@ -354,6 +400,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_040221) do
     t.index ["account_id", "email"], name: "index_contacts_on_account_id_and_email"
     t.index ["account_id"], name: "index_contacts_on_account_id"
     t.index ["company_id"], name: "index_contacts_on_company_id"
+  end
+
+  create_table "data_access_records", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "user_id", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.string "action", null: false
+    t.string "purpose"
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "accessed_at", null: false
+    t.jsonb "fields_accessed", default: []
+    t.string "access_context"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "accessed_at"], name: "index_data_access_records_on_account_id_and_accessed_at"
+    t.index ["account_id"], name: "index_data_access_records_on_account_id"
+    t.index ["record_type", "record_id"], name: "index_data_access_records_on_record_type_and_record_id"
+    t.index ["user_id", "accessed_at"], name: "index_data_access_records_on_user_id_and_accessed_at"
+    t.index ["user_id"], name: "index_data_access_records_on_user_id"
   end
 
   create_table "distribution_filter_assignments", force: :cascade do |t|
@@ -870,8 +937,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_040221) do
   add_foreign_key "campaigns", "accounts"
   add_foreign_key "campaigns", "verticals", on_delete: :cascade
   add_foreign_key "companies", "accounts"
+  add_foreign_key "compliance_records", "accounts"
+  add_foreign_key "consent_records", "accounts"
+  add_foreign_key "consent_records", "leads"
   add_foreign_key "contacts", "accounts"
   add_foreign_key "contacts", "companies"
+  add_foreign_key "data_access_records", "accounts"
+  add_foreign_key "data_access_records", "users"
   add_foreign_key "distribution_filter_assignments", "accounts"
   add_foreign_key "distribution_filter_assignments", "distributions"
   add_foreign_key "distribution_filter_assignments", "filters", column: "distribution_filter_id"
