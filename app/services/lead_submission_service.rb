@@ -7,6 +7,7 @@ class LeadSubmissionService
     @lead = nil
     @validation_errors = {}
     @processed_data = {}
+    @lead_activity_service = nil
   end
   
   def process!
@@ -24,6 +25,22 @@ class LeadSubmissionService
     
     # Validate the lead against campaign rules
     @validation_errors = @lead.validate_against_rules
+    
+    # Record validation activity
+    if @validation_errors.empty?
+      @lead_activity_service.record_validation(@lead, {
+        valid: true,
+        validation_type: "campaign_rules",
+        validations_passed: @lead.validation_rule_results&.select { |r| r[:passed] }&.count || 0
+      })
+    else
+      @lead_activity_service.record_validation(@lead, {
+        valid: false,
+        validation_type: "campaign_rules",
+        validations_failed: @validation_errors.size,
+        errors: @validation_errors.map { |rule_id, failure| "#{failure[:rule_name]}: #{failure[:message]}" }
+      })
+    end
     
     # Decide next steps based on validation and campaign configuration
     if @validation_errors.empty? || @lead.valid_for_distribution?
@@ -46,6 +63,19 @@ class LeadSubmissionService
     
     # Return false if save fails
     return false unless @lead.save
+    
+    # Initialize lead activity service
+    @lead_activity_service = LeadActivityService.new
+    
+    # Record lead submission
+    @lead_activity_service.record_submission(@lead, {
+      source_id: @source.id,
+      source_name: @source.name,
+      campaign_id: @campaign.id,
+      campaign_name: @campaign.name,
+      source_ip: Current.request&.remote_ip,
+      source_user_agent: Current.request&.user_agent
+    })
     
     # Return the lead
     @lead
@@ -94,7 +124,14 @@ class LeadSubmissionService
   
   def process_valid_lead
     # Update lead status to processing
+    old_status = @lead.status
     @lead.update(status: :processing)
+    
+    # Record status update activity
+    @lead_activity_service.record_status_update(@lead, old_status, "processing", {
+      reason: "Lead passed validation",
+      next_step: @campaign.use_bidding_system? ? "bidding" : "direct_distribution"
+    })
     
     if @campaign.use_bidding_system?
       # Process through bidding system
@@ -106,11 +143,25 @@ class LeadSubmissionService
   end
   
   def process_through_bidding
+    # Record anonymization activity before bidding
+    @lead_activity_service.record_anonymization(@lead, {
+      anonymization_type: "bidding_preparation",
+      fields_anonymized: @lead.pii_field_names,
+      anonymization_method: "hash"
+    })
+    
     # Create a bid service
     bid_service = BidService.new(@lead, @campaign)
     
     # Create a bid request and solicit bids
     bid_request = bid_service.solicit_bids!
+    
+    # Record bid request activity
+    @lead_activity_service.record_bid_request(@lead, bid_request, {
+      ping_fields: bid_request.anonymized_data.keys,
+      timeout_seconds: @campaign.bid_timeout_seconds,
+      expiration_time: bid_request.expires_at
+    })
     
     # Bidding is now in progress, this will be async
     # Return success with the bid request
@@ -173,7 +224,14 @@ class LeadSubmissionService
     end
     
     # Update lead status to rejected
+    old_status = @lead.status
     @lead.update(status: :rejected)
+    
+    # Record status update activity
+    @lead_activity_service.record_status_update(@lead, old_status, "rejected", {
+      reason: "Failed validation",
+      validation_errors: errors
+    })
     
     { 
       success: false, 

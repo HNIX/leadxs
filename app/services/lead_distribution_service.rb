@@ -10,6 +10,7 @@ class LeadDistributionService
     @successful_distributions = []
     @failed_distributions = []
     @compliance_service = ComplianceService.new(account: @lead.account)
+    @lead_activity_service = LeadActivityService.new
   end
 
   # Distribute lead to all active distributions for the campaign
@@ -111,6 +112,15 @@ class LeadDistributionService
     
     # Verify proper consent has been collected for this distribution
     unless lead_has_consent_for_distribution?(distribution)
+      # Record consent requested activity if consent is required
+      if distribution_requires_consent?(distribution)
+        @lead_activity_service.record_consent_requested(@lead, distribution, {
+          consent_type: "distribution_consent",
+          buyer_name: distribution.name,
+          buyer_type: distribution.integration_type
+        })
+      end
+      
       @failed_distributions << {
         distribution: distribution,
         error: "Missing required consent for this distribution"
@@ -125,6 +135,20 @@ class LeadDistributionService
       )
       
       return
+    end
+    
+    # If we have consent, record that it was provided
+    if distribution_requires_consent?(distribution)
+      # Find the active consent record
+      consent_record = @lead.active_consent_records.find_by(consent_type: ConsentRecord::DISTRIBUTION_CONSENT)
+      
+      if consent_record
+        @lead_activity_service.record_consent_provided(@lead, consent_record, {
+          buyer_name: distribution.name,
+          buyer_type: distribution.integration_type,
+          consent_timestamp: consent_record.created_at
+        })
+      end
     end
     
     # Log distribution attempt to compliance
@@ -157,6 +181,26 @@ class LeadDistributionService
           distribution: distribution,
           api_request: api_request
         }
+        
+        # Log successful distribution to activity timeline
+        @lead_activity_service.record_distribution(@lead, api_request, {
+          distribution_id: distribution.id,
+          distribution_name: distribution.name,
+          distribution_type: distribution.integration_type,
+          endpoint_url: distribution.endpoint_url,
+          request_method: distribution.request_method,
+          response_code: api_request.response_code
+        })
+        
+        # Log buyer response
+        response_status = determine_response_status(api_request)
+        @lead_activity_service.record_buyer_response(@lead, api_request, {
+          distribution_id: distribution.id,
+          distribution_name: distribution.name,
+          response_status: response_status,
+          response_time: api_request.duration_ms / 1000.0,
+          response_data: parse_response_data(api_request)
+        })
         
         # Log successful distribution to compliance records
         @compliance_service.record_distribution(
@@ -333,5 +377,34 @@ class LeadDistributionService
     # For now, as a placeholder, we'll assume all distributions require consent
     # In a real implementation, you would have more complex logic
     true
+  end
+  
+  # Determine the response status based on the API request
+  def determine_response_status(api_request)
+    return "error" if api_request.error.present?
+    
+    case api_request.response_code
+    when 200..299
+      "accepted" 
+    when 400..499
+      "rejected"
+    when 500..599
+      "error"
+    else
+      "unknown"
+    end
+  end
+  
+  # Parse the response data from the API request
+  def parse_response_data(api_request)
+    return {} if api_request.response_data.blank?
+    
+    begin
+      # Try to parse as JSON
+      JSON.parse(api_request.response_data)
+    rescue JSON::ParserError
+      # If not JSON, return as plain text
+      { message: api_request.response_data.to_s.truncate(500) }
+    end
   end
 end

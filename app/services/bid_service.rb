@@ -12,6 +12,8 @@ class BidService
         created_at: Time.current.iso8601,
         source_type: @lead.source&.integration_type
       }
+      # Initialize lead activity service when we have a lead
+      @lead_activity_service = LeadActivityService.new
     else
       @lead = nil
       @anonymized_data = lead_or_anonymized_data
@@ -19,6 +21,7 @@ class BidService
         campaign_id: @campaign.id,
         created_at: Time.current.iso8601
       }
+      @lead_activity_service = nil
     end
     
     @bid_request = nil
@@ -77,6 +80,15 @@ class BidService
     
     # Accept the winning bid
     if winning_bid.accept!
+      # Record winning bid selected activity if we have a lead
+      if @lead && @lead_activity_service
+        @lead_activity_service.record_bid_selected(@lead, winning_bid, {
+          selection_method: @campaign.distribution_method,
+          total_bids: @bid_request.bids.count,
+          bid_request_id: @bid_request.id
+        })
+      end
+      
       {
         success: true,
         bid: winning_bid,
@@ -133,12 +145,22 @@ class BidService
     bid_amount = distribution.calculate_bid_amount(@anonymized_data)
     
     # Create a bid
-    Bid.create!(
+    bid = Bid.create!(
       bid_request: @bid_request,
       distribution: distribution,
       amount: bid_amount,
       account: @bid_request.account,
       status: :pending
     )
+    
+    # Record bid received activity if we have a lead
+    if @lead && @lead_activity_service
+      @lead_activity_service.record_bid_received(@lead, bid, {
+        distribution_name: distribution.name,
+        distribution_type: distribution.integration_type
+      })
+    end
+    
+    bid
   end
 end

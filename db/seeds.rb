@@ -297,5 +297,8 @@ if Rails.env.development?
   # Create lead activity logs
   require_relative "seeds/lead_activity_logs"
   
+  # Create test lead with complete activity timeline
+  require_relative "seeds/test_lead_activities"
+  
   puts "Development seed data created successfully!"
 end

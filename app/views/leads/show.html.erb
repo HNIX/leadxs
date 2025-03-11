@@ -9,6 +9,8 @@
         <%= link_to "Campaign: #{@lead.campaign.name}", campaign_path(@lead.campaign), class: "px-4 py-2 bg-indigo-100 dark:bg-indigo-900 rounded-md text-indigo-800 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800" %>
       <% end %>
       
+      <%= link_to "View Activity Timeline", lead_activities_path(@lead), class: "px-4 py-2 bg-green-100 dark:bg-green-900 rounded-md text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800" %>
+      
       <% if @lead.api_requests.any? %>
         <%= link_to "View API Requests", api_requests_path(lead_id: @lead.id), class: "px-4 py-2 bg-blue-100 dark:bg-blue-900 rounded-md text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800" %>
       <% end %>
