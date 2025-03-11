@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html class="<%= class_names(dark: current_user&.dark_theme?, "hotwire-native": hotwire_native_app?) %>" lang="<%= I18n.locale %>">
+<html class="<%= class_names(dark: current_user&.dark_theme?, "hotwire-native": hotwire_native_app?) %> overflow-x-hidden" lang="<%= I18n.locale %>">
   <head>
     <%= render "head" %>
   </head>
-  <body class="dark:bg-gray-900" data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %> sidebar" data-theme-preference-value="<%= current_user&.theme %>">
+  <body class="dark:bg-gray-900 overflow-x-hidden" data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %> sidebar" data-theme-preference-value="<%= current_user&.theme %>">
     <!-- Sidebar overlay - only visible on mobile when sidebar is open -->
     <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity opacity-0 hidden z-20 lg:hidden" 
          data-sidebar-target="overlay" 
@@ -32,13 +32,13 @@
     </aside>
     
     <!-- Main content area - shifted right on desktop to make room for sidebar -->
-    <div class="lg:pl-72 flex flex-col h-screen transition-all duration-300 ease-in-out" data-sidebar-target="content">
+    <div class="lg:pl-72 flex flex-col h-screen transition-all duration-300 ease-in-out w-full overflow-x-hidden" data-sidebar-target="content">
       <%= impersonation_banner %>
       <%= render "flash" %>
       <%= render "navbar" %>
 
-      <main class="mb-auto dark:bg-gray-900">
-        <div class="px-4 sm:px-6 lg:px-8">
+      <main class="mb-auto dark:bg-gray-900 w-full overflow-x-hidden">
+        <div class="px-4 sm:px-6 lg:px-8 max-w-full">
           <%= turbo_frame_tag "modal" %>
           <%= yield %>
         </div>

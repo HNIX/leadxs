@@ -16,7 +16,12 @@ class ApiRequestsController < ApplicationController
       end
     end
     
-    # Apply filters if provided
+    # Apply ID search if provided
+    if params[:uuid].present?
+      api_requests = api_requests.where("uuid ILIKE ?", "%#{params[:uuid]}%")
+    end
+    
+    # Apply other filters if provided
     api_requests = api_requests.where(requestable_type: params[:requestable_type]) if params[:requestable_type].present?
     api_requests = api_requests.where(request_method: params[:method]) if params[:method].present?
     api_requests = api_requests.where(lead_id: params[:lead_id]) if params[:lead_id].present?
@@ -34,13 +39,30 @@ class ApiRequestsController < ApplicationController
       api_requests = api_requests.where("endpoint_url ILIKE ?", "%#{params[:endpoint_contains]}%")
     end
     
-    # Order by most recent first
-    api_requests = api_requests.order(created_at: :desc)
+    # Apply date range filters if provided
+    if params[:created_after].present?
+      date = Date.parse(params[:created_after]) rescue nil
+      api_requests = api_requests.where("created_at >= ?", date.beginning_of_day) if date
+    end
+    
+    if params[:created_before].present?
+      date = Date.parse(params[:created_before]) rescue nil
+      api_requests = api_requests.where("created_at <= ?", date.end_of_day) if date
+    end
+    
+    # Apply sorting
+    if params[:sort_by] == 'oldest'
+      api_requests = api_requests.order(created_at: :asc)
+    else
+      # Default to newest first
+      api_requests = api_requests.order(created_at: :desc)
+    end
     
     # Paginate results
+    per_page = params[:per_page].present? ? params[:per_page].to_i : 5
     @pagy, @api_requests = pagy(
       api_requests,
-      items: params[:per_page] || 25
+      limit: per_page
     )
 
     respond_to do |format|

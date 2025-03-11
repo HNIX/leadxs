@@ -39,7 +39,7 @@ end
 
 ### Source Authentication and Verification
 
-**Implementation Files:**
+**Implementation Files:** 
 - `/app/controllers/api/v1/lead_posts_controller.rb`
 - `/app/models/source.rb`
 
