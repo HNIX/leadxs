@@ -1,6 +1,6 @@
 class BidAnalyticsChannel < ApplicationCable::Channel
   def subscribed
-    stream_for current_account
+    #stream_for current_account
   end
 
   def unsubscribed

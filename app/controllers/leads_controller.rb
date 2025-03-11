@@ -26,6 +26,9 @@ class LeadsController < ApplicationController
   def show
     @lead_data = @lead.lead_data.includes(:campaign_field).order("campaign_fields.position")
     @api_requests = @lead.api_requests.order(created_at: :desc)
+    
+    # We don't need to load all activities here since the view only shows the most recent 5
+    # This will be handled by the lead association
 
     respond_to do |format|
       format.html

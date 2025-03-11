@@ -1,0 +1,152 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Lead Activity Timeline
+      </h1>
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        Tracking all events for lead #<%= @lead.id %> - <%= @lead.unique_id %>
+      </p>
+    </div>
+    
+    <div class="mt-4 md:mt-0">
+      <%= link_to "Back to Lead", lead_path(@lead), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-600" %>
+    </div>
+  </div>
+  
+  <!-- Filter section -->
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-6 p-4">
+    <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filter Activities</h2>
+    
+    <%= form_with url: lead_activities_path(@lead), method: :get, local: true, data: { turbo_frame: "activities_list" } do |f| %>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <%= f.label :activity_type, "Activity Type", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select :activity_type, 
+                      LeadActivityLog.activity_types.keys.map { |type| [type.titleize, type] },
+                      { include_blank: "All Activity Types" },
+                      class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+        
+        <div>
+          <%= f.label :start_date, "Start Date", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.date_field :start_date, class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+        
+        <div>
+          <%= f.label :end_date, "End Date", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.date_field :end_date, class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+        
+        <div>
+          <%= f.label :order, "Order By", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select :order, [["Newest First", "newest"], ["Oldest First", "oldest"]], {}, class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+      </div>
+      
+      <div class="mt-4 flex justify-end space-x-3">
+        <%= link_to "Clear Filters", lead_activities_path(@lead), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600" %>
+        <%= f.submit "Apply Filters", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800" %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Timeline section -->
+  <%= turbo_frame_tag "activities_list" do %>
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+      <% if @activities.any? %>
+        <div class="flow-root px-4 py-5 sm:px-6">
+          <ul role="list" class="-mb-8 list-none pl-0">
+            <% @activities.each_with_index do |activity, activity_idx| %>
+              <li class="pb-5">
+                <div class="relative pb-8">
+                  <% if activity_idx != @activities.size - 1 %>
+                    <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700" aria-hidden="true"></span>
+                  <% end %>
+                  <div class="relative flex items-start space-x-4">
+                    <div class="relative">
+                      <div class="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                        <div class="text-gray-500 dark:text-gray-400">
+                          <%= activity_icon(activity) %>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <div class="text-sm">
+                          <span class="font-medium text-gray-900 dark:text-white"><%= activity_title(activity) %></span>
+                          <span class="ml-2"><%= content_tag :span, activity.activity_type.titleize, class: activity_badge(activity) %></span>
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                          <%= time_ago_in_words(activity.created_at) %> ago
+                          <% if activity.user.present? %>
+                            by <%= activity.user.name %>
+                          <% end %>
+                        </p>
+                      </div>
+                      <div class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                        <p><%= activity_description(activity) %></p>
+                      </div>
+                      <% if activity.details.present? && activity.details.except('causer_type', 'causer_id').any? %>
+                        <div class="mt-2" data-controller="details-toggle" id="details-<%= activity.id %>">
+                          <button type="button" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center" 
+                                  data-action="click->details-toggle#toggle">
+                            <span data-details-toggle-target="showText">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                              </svg>
+                              Show details
+                            </span>
+                            <span data-details-toggle-target="hideText" class="hidden">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                              </svg>
+                              Hide details
+                            </span>
+                          </button>
+                          <div class="hidden mt-2 text-sm text-gray-600 dark:text-gray-400 p-3 bg-gray-50 dark:bg-gray-700 rounded-md" data-details-toggle-target="content">
+                            <% activity.details.except('causer_type', 'causer_id').each do |key, value| %>
+                              <div class="mb-1">
+                                <strong><%= key.to_s.humanize %>:</strong> 
+                                <% if value.is_a?(Hash) %>
+                                  <pre class="mt-1 text-xs overflow-auto max-h-40 p-2 bg-gray-100 dark:bg-gray-800 rounded"><%= JSON.pretty_generate(value) %></pre>
+                                <% elsif value.is_a?(Array) %>
+                                  <pre class="mt-1 text-xs overflow-auto max-h-40 p-2 bg-gray-100 dark:bg-gray-800 rounded"><%= JSON.pretty_generate(value) %></pre>
+                                <% else %>
+                                  <span class="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded"><%= value.to_s %></span>
+                                <% end %>
+                              </div>
+                            <% end %>
+                          </div>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 px-4 py-4 sm:px-6 border-t border-gray-200 dark:border-gray-700 flex justify-center">
+          <nav class="pagination" role="navigation" aria-label="pagination">
+            <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+          </nav>
+        </div>
+      <% else %>
+        <div class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No activities found</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            No activity logs match your current filters.
+          </p>
+          <div class="mt-6">
+            <%= link_to "Clear Filters", lead_activities_path(@lead), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

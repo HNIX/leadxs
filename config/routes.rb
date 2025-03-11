@@ -46,7 +46,9 @@ Rails.application.routes.draw do
   end
   
   # Lead management
-  resources :leads, only: [:index, :show]
+  resources :leads, only: [:index, :show] do
+    resources :activities, controller: 'lead_activities', only: [:index, :show], as: 'activities'
+  end
   
   resources :campaigns do
     # Campaign Distributions for this campaign

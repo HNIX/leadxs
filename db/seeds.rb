@@ -294,5 +294,8 @@ if Rails.env.development?
   # Create compliance records
   require_relative "seeds/compliance_records"
   
+  # Create lead activity logs
+  require_relative "seeds/lead_activity_logs"
+  
   puts "Development seed data created successfully!"
 end

@@ -1,6 +1,10 @@
 import consumer from "./consumer"
 
-export default consumer.subscriptions.create("BidAnalyticsChannel", {
+// Only create the subscription if we're on a relevant page
+const isRelevantPage = document.querySelector('[data-channel="bid-analytics"]')
+
+const channel = isRelevantPage ? 
+  consumer.subscriptions.create("BidAnalyticsChannel", {
   connected() {
     console.log("Connected to BidAnalyticsChannel")
   },
@@ -19,9 +23,11 @@ export default consumer.subscriptions.create("BidAnalyticsChannel", {
       updateRealtimeBidCounter(data.bid)
     }
   }
-})
+}) : null
 
-// Function to update dashboard metrics
+// Only define these functions if we're on a relevant page
+if (isRelevantPage) {
+  // Function to update dashboard metrics
 function updateDashboardMetrics(metrics) {
   Object.keys(metrics).forEach(key => {
     const element = document.getElementById(`metric-${key}`)
@@ -69,3 +75,4 @@ function updateRealtimeBidCounter(bid) {
     }
   }
 }
+} // Close the if (isRelevantPage) block

@@ -1,6 +1,9 @@
 class Lead < ApplicationRecord
   acts_as_tenant :account
   
+  # Add association to activity logs
+  has_many :lead_activity_logs, dependent: :destroy
+  
   belongs_to :campaign
   belongs_to :source, optional: true
   belongs_to :bid_request, optional: true

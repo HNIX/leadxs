@@ -499,6 +499,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_041302) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "lead_activity_logs", force: :cascade do |t|
+    t.bigint "lead_id", null: false
+    t.bigint "user_id"
+    t.bigint "account_id", null: false
+    t.string "causer_type"
+    t.bigint "causer_id"
+    t.integer "activity_type", null: false
+    t.jsonb "details", default: {}
+    t.string "ip_address"
+    t.string "user_agent"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_lead_activity_logs_on_account_id"
+    t.index ["activity_type"], name: "index_lead_activity_logs_on_activity_type"
+    t.index ["causer_type", "causer_id"], name: "index_lead_activity_logs_on_causer"
+    t.index ["lead_id", "created_at"], name: "index_lead_activity_logs_on_lead_id_and_created_at"
+    t.index ["lead_id"], name: "index_lead_activity_logs_on_lead_id"
+    t.index ["user_id"], name: "index_lead_activity_logs_on_user_id"
+  end
+
   create_table "lead_data", force: :cascade do |t|
     t.bigint "lead_id", null: false
     t.bigint "campaign_field_id", null: false
@@ -953,6 +974,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_041302) do
   add_foreign_key "filters", "campaign_fields"
   add_foreign_key "filters", "campaigns"
   add_foreign_key "headers", "distributions"
+  add_foreign_key "lead_activity_logs", "accounts"
+  add_foreign_key "lead_activity_logs", "leads"
+  add_foreign_key "lead_activity_logs", "users"
   add_foreign_key "lead_data", "campaign_fields"
   add_foreign_key "lead_data", "leads"
   add_foreign_key "leads", "accounts"

@@ -1,3 +1,4 @@
+
 <div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold dark:text-white">Lead Details</h1>
@@ -155,7 +156,7 @@
             
             <div class="mt-6">
               <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Recent Requests</h3>
-              <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+              <ul class="divide-y divide-gray-200 dark:divide-gray-700 list-none">
                 <% @api_requests.first(5).each do |api_request| %>
                   <li class="py-3">
                     <div class="flex justify-between">
@@ -192,6 +193,78 @@
           <p class="text-sm text-gray-500 dark:text-gray-400">No API requests found for this lead.</p>
         <% end %>
       </div>
+    </div>
+  </div>
+  
+  <!-- Lead Activity Timeline -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <h2 class="text-lg font-medium dark:text-white">Lead Activity Timeline</h2>
+      <%= link_to "View Full Timeline", lead_activities_path(@lead), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800" %>
+    </div>
+    
+    <div class="p-6">
+      <% if @lead.lead_activity_logs.any? %>
+        <div class="flow-root">
+          <ul role="list" class="-mb-8 list-none">
+            <% @lead.lead_activity_logs.recent_first.limit(5).each_with_index do |activity, activity_idx| %>
+              <li>
+                <div class="relative pb-8">
+                  <% if activity_idx != 4 && activity_idx != @lead.lead_activity_logs.recent_first.limit(5).size - 1 %>
+                    <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700" aria-hidden="true"></span>
+                  <% end %>
+                  <div class="relative flex items-start space-x-3">
+                    <div class="relative">
+                      <div class="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                        <div class="text-gray-500 dark:text-gray-400">
+                          <%= activity_icon(activity) %>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <div class="text-sm">
+                          <span class="font-medium text-gray-900 dark:text-white"><%= activity_title(activity) %></span>
+                          <span class="ml-2"><%= content_tag :span, activity.activity_type.titleize, class: activity_badge(activity) %></span>
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                          <%= time_ago_in_words(activity.created_at) %> ago
+                          <% if activity.user.present? %>
+                            by <%= activity.user.name %>
+                          <% end %>
+                        </p>
+                      </div>
+                      <div class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                        <p><%= activity_description(activity) %></p>
+                        
+                        <% if activity.details.present? && activity.details.except('causer_type', 'causer_id').any? %>
+                          <%= link_to "View Details", lead_activity_path(@lead, activity), class: "mt-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+          
+          <% if @lead.lead_activity_logs.count > 5 %>
+            <div class="text-center mt-4">
+              <%= link_to "View All Activities (#{@lead.lead_activity_logs.count})", lead_activities_path(@lead), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600" %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-10">
+          <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No activity logs</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            There are no activity logs recorded for this lead yet.
+          </p>
+        </div>
+      <% end %>
     </div>
   </div>
   

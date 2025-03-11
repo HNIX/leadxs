@@ -26,15 +26,3 @@ pin "@floating-ui/utils", to: "@floating-ui--utils.js" # @0.2.8
 pin "@floating-ui/utils/dom", to: "@floating-ui--utils--dom.js" # @0.2.8
 pin "@rails/request.js", to: "@rails--request.js.js" # @0.0.11
 pin "sortablejs" # @1.15.6pin "codemirror" # @6.0.1
-
-# Pin Ace Editor core
-pin "ace-builds", to: "node_modules/ace-builds/src-min-noconflict/ace.js"
-
-# Pin common modes and themes
-pin "ace-builds/mode-ruby", to: "node_modules/ace-builds/src-min-noconflict/mode-ruby.js"
-pin "ace-builds/mode-javascript", to: "node_modules/ace-builds/src-min-noconflict/mode-javascript.js"
-pin "ace-builds/mode-html", to: "node_modules/ace-builds/src-min-noconflict/mode-html.js"
-pin "ace-builds/mode-css", to: "node_modules/ace-builds/src-min-noconflict/mode-css.js"
-pin "ace-builds/theme-monokai", to: "node_modules/ace-builds/src-min-noconflict/theme-monokai.js"
-pin "ace-builds/theme-github", to: "node_modules/ace-builds/src-min-noconflict/theme-github.js"
-

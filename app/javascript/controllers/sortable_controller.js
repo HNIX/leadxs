@@ -1,7 +1,7 @@
 // app/javascript/controllers/sortable_controller.js
 import { Controller } from "@hotwired/stimulus"
 import Sortable from "sortablejs";
-import { put } from "@rails/request.js";
+import { put } from "@rails/request";
 
 // example use:
 //
