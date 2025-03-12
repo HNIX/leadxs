@@ -3,7 +3,7 @@
   <head>
     <%= render "head" %>
   </head>
-  <body class="dark:bg-gray-900 overflow-x-hidden" data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %> sidebar" data-theme-preference-value="<%= current_user&.theme %>">
+  <body class="bg-gray-100 dark:bg-gray-900 overflow-x-hidden" data-controller="theme bridge--menu-button <%= "bridge--notification-token" if user_signed_in? %> sidebar" data-theme-preference-value="<%= current_user&.theme %>">
     <!-- Sidebar overlay - only visible on mobile when sidebar is open -->
     <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity opacity-0 hidden z-20 lg:hidden" 
          data-sidebar-target="overlay" 

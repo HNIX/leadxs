@@ -3,23 +3,50 @@ class BidDashboardController < ApplicationController
   before_action :set_account
   
   def index
-    # Get the latest metrics
-    @latest_hourly = BidAnalyticSnapshot.hourly.last
-    @latest_daily = BidAnalyticSnapshot.daily.last
-    @latest_weekly = BidAnalyticSnapshot.weekly.last
-    
-    # Get time series data for charts
-    @hourly_data = BidAnalyticSnapshot.hourly.last(24)
-    @daily_data = BidAnalyticSnapshot.daily.last(30)
-    
-    # Get campaign and distribution specific data
-    @campaigns = Campaign.all
-    @campaign_data = {}
-    @campaigns.each do |campaign|
-      @campaign_data[campaign.id] = {
-        name: campaign.name,
-        snapshots: BidAnalyticSnapshot.daily.for_campaign(campaign).last(7)
+    # Filter by campaign if specified
+    if params[:campaign_id].present?
+      @campaign = Campaign.find(params[:campaign_id])
+      @title = "Bid Dashboard for #{@campaign.name}"
+      
+      # Get the latest metrics filtered by campaign
+      @latest_hourly = BidAnalyticSnapshot.hourly.for_campaign(@campaign.id).last
+      @latest_daily = BidAnalyticSnapshot.daily.for_campaign(@campaign.id).last
+      @latest_weekly = BidAnalyticSnapshot.weekly.for_campaign(@campaign.id).last
+      
+      # Get time series data for charts
+      @hourly_data = BidAnalyticSnapshot.hourly.for_campaign(@campaign.id).last(24)
+      @daily_data = BidAnalyticSnapshot.daily.for_campaign(@campaign.id).last(30)
+      
+      # Set campaign data for this specific campaign
+      @campaigns = [@campaign]
+      @campaign_data = {
+        @campaign.id => {
+          name: @campaign.name,
+          snapshots: BidAnalyticSnapshot.daily.for_campaign(@campaign.id).last(7)
+        }
       }
+    else
+      # Default behavior without filtering
+      @title = "Bid Dashboard"
+      
+      # Get the latest metrics
+      @latest_hourly = BidAnalyticSnapshot.hourly.last
+      @latest_daily = BidAnalyticSnapshot.daily.last
+      @latest_weekly = BidAnalyticSnapshot.weekly.last
+      
+      # Get time series data for charts
+      @hourly_data = BidAnalyticSnapshot.hourly.last(24)
+      @daily_data = BidAnalyticSnapshot.daily.last(30)
+      
+      # Get campaign and distribution specific data
+      @campaigns = Campaign.all
+      @campaign_data = {}
+      @campaigns.each do |campaign|
+        @campaign_data[campaign.id] = {
+          name: campaign.name,
+          snapshots: BidAnalyticSnapshot.daily.for_campaign(campaign).last(7)
+        }
+      end 
     end
     
     # Fallbacks if no data exists yet
@@ -64,11 +91,25 @@ class BidDashboardController < ApplicationController
   end
   
   def real_time
-    # Get the latest metrics for initial display
-    @latest_hourly = BidAnalyticSnapshot.hourly.last
-    
-    # Get campaigns for the account
-    @campaigns = Campaign.all
+    # Filter by campaign if specified
+    if params[:campaign_id].present?
+      @campaign = Campaign.find(params[:campaign_id])
+      @title = "Real-time Bid Dashboard for #{@campaign.name}"
+      
+      # Get the latest metrics filtered by campaign
+      @latest_hourly = BidAnalyticSnapshot.hourly.for_campaign(@campaign.id).last
+      
+      # Get only this campaign for the account
+      @campaigns = [@campaign]
+    else
+      @title = "Real-time Bid Dashboard"
+      
+      # Get the latest metrics for initial display
+      @latest_hourly = BidAnalyticSnapshot.hourly.last
+      
+      # Get all campaigns for the account
+      @campaigns = Campaign.all
+    end
     
     # Ensure we have dummy data if no real data exists yet
     @latest_hourly ||= BidAnalyticSnapshot.new(

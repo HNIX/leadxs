@@ -1,62 +1,213 @@
-<div class="max-w-6xl mx-auto px-4">
+<div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Distributions</h1>
+    <h1 class="text-2xl font-bold dark:text-white">Distributions</h1>
     <%= link_to new_distribution_path, class: "btn btn-primary" do %>
-      <i class="fas fa-plus mr-1"></i> New Distribution
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      New Distribution
     <% end %>
   </div>
-  
-  <% if @distributions.any? %>
-    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-      <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-        <% @distributions.each do |distribution| %>
-          <li>
-            <%= link_to distribution_path(distribution), class: "block hover:bg-gray-50 dark:hover:bg-gray-700" do %>
-              <div class="px-4 py-4 sm:px-6">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <p class="text-sm font-medium text-primary-600 truncate">
-                      <%= distribution.name %>
-                    </p>
-                    <div class="ml-2 flex-shrink-0 flex">
-                      <% status_color = distribution.active? ? "green" : "gray" %>
-                      <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-<%= status_color %>-100 text-<%= status_color %>-800 dark:bg-<%= status_color %>-900 dark:text-<%= status_color %>-200">
-                        <%= distribution.status.titleize %>
-                      </p>
-                    </div>
-                  </div>
-                  <div class="ml-2 flex-shrink-0 flex">
-                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      <%= distribution.request_method.upcase %> / <%= distribution.request_format.upcase %>
-                    </p>
-                  </div>
-                </div>
-                <div class="mt-2 sm:flex sm:justify-between">
-                  <div class="sm:flex">
-                    <p class="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                      <i class="fas fa-building flex-shrink-0 mr-1.5 text-gray-400 dark:text-gray-500"></i>
-                      <%= distribution.company&.name || "No company" %>
-                    </p>
-                  </div>
-                  <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400 sm:mt-0">
-                    <i class="fas fa-globe flex-shrink-0 mr-1.5 text-gray-400 dark:text-gray-500"></i>
-                    <p class="truncate">
-                      <%= distribution.endpoint_url %>
-                    </p>
-                  </div>
-                </div>
+
+  <!-- Filters -->
+  <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <%= form_with url: distributions_path, method: :get, class: "", data: { turbo_frame: "_top" } do |f| %>
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Basic Filters (Always Visible) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Distribution Name</label>
+            <%= f.text_field :name, placeholder: "Search by name...", value: params[:name], 
+                      class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+            <%= f.select :status, [['All Statuses', '']] + Distribution.statuses.keys.map { |s| [s.titleize, s] }, 
+                      { selected: params[:status] }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
+            <%= f.select :sort_by, 
+                      [
+                        ['Newest First', 'newest'],
+                        ['Oldest First', 'oldest'],
+                        ['Name A-Z', 'name_asc'],
+                        ['Name Z-A', 'name_desc'],
+                        ['Request Method', 'method'],
+                        ['Format', 'format'],
+                        ['Status', 'status']
+                      ], 
+                      { selected: params[:sort_by] || 'newest' }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+          </div>
+          
+          <div class="flex items-end">
+            <%= f.button "Apply", class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+            <%= link_to "Clear", distributions_path, class: "ml-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm" %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Filters (Toggleable) -->
+      <div data-controller="toggle">
+        <div class="px-4 py-2 flex justify-between items-center cursor-pointer border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900" data-action="click->toggle#toggle">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Advanced Filters</h3>
+          <div class="flex items-center">
+            <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">Show more options</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 transition-transform duration-200" 
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+        
+        <div class="p-4 hidden" data-toggle-target="toggleable">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
+              <%= f.select :company_id, [['All Companies', '']] + current_account.companies.active.sorted.map { |c| [c.name, c.id] }, 
+                        { selected: params[:company_id] }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Request Method</label>
+              <%= f.select :request_method, [['All Methods', '']] + Distribution.request_methods.keys.map { |m| [m.upcase, m] }, 
+                        { selected: params[:request_method] }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Request Format</label>
+              <%= f.select :request_format, [['All Formats', '']] + Distribution.request_formats.keys.map { |f| [f.upcase, f] }, 
+                        { selected: params[:request_format] }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bidding Strategy</label>
+              <%= f.select :bidding_strategy, [['All Strategies', '']] + Distribution.bidding_strategies.keys.map { |b| [b.titleize, b] }, 
+                        { selected: params[:bidding_strategy] }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Range</label>
+              <div class="grid grid-cols-2 gap-2">
+                <%= f.date_field :created_after, value: params[:created_after], 
+                            placeholder: "From", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+                <%= f.date_field :created_before, value: params[:created_before], 
+                            placeholder: "To", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
               </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Items Per Page</label>
+              <%= f.select :per_page, [['10 items', '10'], ['20 items', '20'], ['50 items', '50'], ['100 items', '100']], 
+                        { selected: params[:per_page] || '10' }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @distributions.any? %>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Method</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Format</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Bidding</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <% @distributions.each do |distribution| %>
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="window.location='<%= distribution_path(distribution) %>'">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <%= link_to distribution_path(distribution), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
+                    <span class="font-medium"><%= distribution.name %></span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  <% if distribution.company %>
+                    <%= link_to distribution.company.name, company_path(distribution.company), class: "no-underline text-gray-700 dark:text-gray-300 hover:text-indigo-700 dark:hover:text-indigo-300" %>
+                  <% else %>
+                    <span class="text-gray-500 dark:text-gray-500">Not assigned</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <%= distribution.request_method.upcase %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                    <%= distribution.request_format.upcase %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% case distribution.status %>
+                  <% when 'active' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                      Active
+                    </span>
+                  <% when 'paused' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                      Paused
+                    </span>
+                  <% when 'archived' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                      Archived
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  <% if distribution.bidding_enabled? %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                      <%= distribution.bidding_strategy.titleize %>
+                    </span>
+                  <% else %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                      Disabled
+                    </span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <%= link_to edit_distribution_path(distribution), class: "inline-flex items-center justify-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-500 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:bg-indigo-900 dark:hover:text-indigo-300" do %>
+                    Edit
+                  <% end %>
+                </td>
+              </tr>
             <% end %>
-          </li>
-        <% end %>
-      </ul>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <%== pagy_nav(@pagy) %>
     </div>
   <% else %>
-    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md p-6 text-center">
-      <p class="text-gray-500 dark:text-gray-400">No distributions found.</p>
-      <p class="mt-2">
-        <%= link_to "Create your first distribution", new_distribution_path, class: "text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" %>
-      </p>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
+      <div class="mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-medium text-gray-700 dark:text-gray-200 mb-1">No distributions found</h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-4">Get started by creating your first distribution.</p>
+      <%= link_to "Create Distribution", new_distribution_path, class: "btn btn-primary" %>
     </div>
   <% end %>
 </div>

@@ -125,33 +125,7 @@
       </div>
     </div>
     
-    <!-- Campaign Setup Progress Bar -->
-    <% 
-      setup_steps = [
-        @campaign_fields.any?,
-        @validation_rules.any?,
-        @campaign.sources.any?,
-        @campaign.distributions.any?
-      ]
-      progress_percent = (setup_steps.count(true) * 100 / setup_steps.size).round
-      progress_color = case progress_percent
-                        when 0..25 then "bg-red-500"
-                        when 26..50 then "bg-yellow-500"
-                        when 51..75 then "bg-blue-500"
-                        else "bg-green-500"
-                       end
-    %>
     
-    <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2">
-      <div class="<%= progress_color %> h-2.5 rounded-full" style="width: <%= progress_percent %>%"></div>
-    </div>
-    
-    <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-      <span class="<%= @campaign_fields.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Fields</span>
-      <span class="<%= @validation_rules.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Validation</span>
-      <span class="<%= @campaign.sources.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Sources</span>
-      <span class="<%= @campaign.distributions.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Distributions</span>
-    </div>
   </div>
 
   <!-- Performance Analytics & Quick Stats -->
@@ -327,6 +301,34 @@
             <p class="text-gray-900 dark:text-white"><%= @campaign.description %></p>
           </div>
         <% end %>
+
+        <!-- Campaign Setup Progress Bar -->
+        <% 
+          setup_steps = [
+            @campaign_fields.any?,
+            @validation_rules.any?,
+            @campaign.sources.any?,
+            @campaign.distributions.any?
+          ]
+          progress_percent = (setup_steps.count(true) * 100 / setup_steps.size).round
+          progress_color = case progress_percent
+                            when 0..25 then "bg-red-500"
+                            when 26..50 then "bg-yellow-500"
+                            when 51..75 then "bg-blue-500"
+                            else "bg-green-500"
+                          end
+        %>
+        
+        <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2">
+          <div class="<%= progress_color %> h-2.5 rounded-full" style="width: <%= progress_percent %>%"></div>
+        </div>
+        
+        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-6">
+          <span class="<%= @campaign_fields.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Fields</span>
+          <span class="<%= @validation_rules.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Validation</span>
+          <span class="<%= @campaign.sources.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Sources</span>
+          <span class="<%= @campaign.distributions.any? ? 'text-green-600 dark:text-green-400 font-medium' : '' %>">Distributions</span>
+        </div>
         
         <!-- Next Steps Section -->
         <div class="mb-6">
@@ -426,57 +428,6 @@
           </div>
         </div>
         
-        <!-- Quick Access Links -->
-        <div>
-          <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Quick Access</h4>
-          
-          <div class="grid grid-cols-1 gap-2">
-            <%= link_to campaign_campaign_fields_path(@campaign), class: "flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" do %>
-              <div class="w-8 h-8 rounded-md bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <span class="text-sm text-gray-900 dark:text-white">Manage Fields</span>
-            <% end %>
-            
-            <%= link_to campaign_validation_rules_path(@campaign), class: "flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" do %>
-              <div class="w-8 h-8 rounded-md bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <span class="text-sm text-gray-900 dark:text-white">Validation Rules</span>
-            <% end %>
-            
-            <%= link_to campaign_calculated_fields_path(@campaign), class: "flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" do %>
-              <div class="w-8 h-8 rounded-md bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <span class="text-sm text-gray-900 dark:text-white">Calculated Fields</span>
-            <% end %>
-            
-            <%= link_to campaign_source_filters_path(@campaign), class: "flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" do %>
-              <div class="w-8 h-8 rounded-md bg-red-100 dark:bg-red-900 flex items-center justify-center mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-              </div>
-              <span class="text-sm text-gray-900 dark:text-white">Source Filters</span>
-            <% end %>
-            
-            <%= link_to campaign_distribution_filters_path(@campaign), class: "flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" do %>
-              <div class="w-8 h-8 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-              </div>
-              <span class="text-sm text-gray-900 dark:text-white">Distribution Filters</span>
-            <% end %>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -610,8 +561,34 @@
               Monthly
             <% end %>
           </div>
-          <div>
-            <%= link_to "See Full Bid Analytics", campaign_bid_report_path(@campaign.id), class: "btn btn-sm btn-primary" %>
+          <div class="flex space-x-2">
+            <%= link_to bid_dashboard_path(campaign_id: @campaign.id), class: "btn btn-sm btn-outline" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z" />
+              </svg>
+              Dashboard
+            <% end %>
+            
+            <%= link_to real_time_bid_dashboard_path(campaign_id: @campaign.id), class: "btn btn-sm btn-outline" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Real-time
+            <% end %>
+            
+            <%= link_to dashboard_bid_requests_path(campaign_id: @campaign.id), class: "btn btn-sm btn-outline" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              Requests
+            <% end %>
+            
+            <%= link_to campaign_bid_report_path(@campaign.id), class: "btn btn-sm btn-primary" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Reports
+            <% end %>
           </div>
         </div>
       </div>

@@ -1,4 +1,7 @@
 class Api::BaseController < ActionController::API
+  # Add support for rendering templates
+  include ActionController::MimeResponds
+  include ActionController::ImplicitRender
   include AbstractController::Translation
   include ActionController::Caching
   include Turbo::Native::Navigation

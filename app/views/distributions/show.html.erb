@@ -1,4 +1,4 @@
-<div class="max-w-5xl mx-auto px-4">
+<div class="max-w-5xl container mx-auto px-4 py-6 md:py-8">
   <div class="flex justify-between items-center mb-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white"><%= @distribution.name %></h1>
@@ -9,7 +9,7 @@
         <i class="fas fa-link mr-1"></i> Test Connection
       <% end %>
       
-      <%= button_to toggle_status_distribution_path(@distribution), method: :patch, class: "btn #{@distribution.active? ? 'btn-warning' : 'btn-success'}" do %>
+      <%= button_to toggle_status_distribution_path(@distribution), method: :patch, class: "btn #{@distribution.active? ? 'bg-yellow-400' : 'btn-success'}" do %>
         <% if @distribution.active? %>
           <i class="fas fa-pause mr-1"></i> Pause
         <% else %>
@@ -17,7 +17,7 @@
         <% end %>
       <% end %>
       
-      <%= link_to edit_distribution_path(@distribution), class: "btn btn-white" do %>
+      <%= link_to edit_distribution_path(@distribution), class: "btn btn-secondary" do %>
         <i class="fas fa-edit mr-1"></i> Edit
       <% end %>
       
@@ -144,7 +144,7 @@
     
     <% if campaigns.any? %>
       <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700 list-none">
           <% campaigns.each do |campaign| %>
             <% campaign_distribution = @distribution.campaign_distributions.find_by(campaign: campaign) %>
             <li>

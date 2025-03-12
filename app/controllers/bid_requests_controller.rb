@@ -6,35 +6,82 @@ class BidRequestsController < ApplicationController
   end
   
   def dashboard
-    # Active bid requests count
-    @active_bid_requests_count = BidRequest.active.count
+    # Filter by campaign if specified
+    if params[:campaign_id].present?
+      @campaign = Campaign.find(params[:campaign_id])
+      @title = "Bid Request Dashboard for #{@campaign.name}"
+      
+      # Active bid requests count for this campaign
+      @active_bid_requests_count = BidRequest.where(campaign_id: @campaign.id).active.count
+      
+      # Bids received today for this campaign
+      @bids_today_count = Bid.joins(:bid_request)
+                            .where(bid_requests: {campaign_id: @campaign.id})
+                            .where('bids.created_at > ?', 24.hours.ago)
+                            .count
+      
+      # Average bid amount for this campaign
+      @average_bid_amount = Bid.joins(:bid_request)
+                              .where(bid_requests: {campaign_id: @campaign.id})
+                              .where(status: [:pending, :accepted])
+                              .average(:amount) || 0
+      
+      # Single campaign entry
+      @top_campaigns = Campaign.where(id: @campaign.id)
+                              .joins(bid_requests: :bids)
+                              .select('campaigns.id, campaigns.name, COUNT(bids.id) as bid_count, AVG(bids.amount) as avg_bid_amount')
+                              .group('campaigns.id, campaigns.name')
+                              .limit(5)
+      
+      # Top distributions for this campaign
+      @top_distributions = Distribution.joins(bids: :bid_request)
+                                       .where(bid_requests: {campaign_id: @campaign.id})
+                                       .select('distributions.id, distributions.name, 
+                                               AVG(bids.amount) as avg_bid_amount,
+                                               SUM(CASE WHEN bids.status = 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(bids.id) as win_rate')
+                                       .group('distributions.id, distributions.name')
+                                       .order('avg_bid_amount DESC')
+                                       .limit(5)
+      
+      # Recent bids for this campaign
+      @recent_bids = Bid.joins(:bid_request)
+                        .where(bid_requests: {campaign_id: @campaign.id})
+                        .includes(:distribution, bid_request: :campaign)
+                        .order(created_at: :desc)
+                        .limit(10)
+    else
+      @title = "Bid Request Dashboard"
     
-    # Bids received today
-    @bids_today_count = Bid.where('created_at > ?', 24.hours.ago).count
-    
-    # Average bid amount
-    @average_bid_amount = Bid.where(status: [:pending, :accepted]).average(:amount) || 0
-    
-    # Top campaigns by bid volume
-    @top_campaigns = Campaign.joins(bid_requests: :bids)
-                                   .select('campaigns.id, campaigns.name, COUNT(bids.id) as bid_count, AVG(bids.amount) as avg_bid_amount')
-                                   .group('campaigns.id, campaigns.name')
-                                   .order('bid_count DESC')
-                                   .limit(5)
-    
-    # Top distributions by bid amount and win rate
-    @top_distributions = Distribution.joins(:bids)
-                                      .select('distributions.id, distributions.name, 
-                                              AVG(bids.amount) as avg_bid_amount,
-                                              SUM(CASE WHEN bids.status = 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(bids.id) as win_rate')
-                                      .group('distributions.id, distributions.name')
-                                      .order('avg_bid_amount DESC')
-                                      .limit(5)
-    
-    # Recent bids
-    @recent_bids = Bid.includes(:distribution, bid_request: :campaign)
-                                 .order(created_at: :desc)
-                                 .limit(10)
+      # Active bid requests count
+      @active_bid_requests_count = BidRequest.active.count
+      
+      # Bids received today
+      @bids_today_count = Bid.where('created_at > ?', 24.hours.ago).count
+      
+      # Average bid amount
+      @average_bid_amount = Bid.where(status: [:pending, :accepted]).average(:amount) || 0
+      
+      # Top campaigns by bid volume
+      @top_campaigns = Campaign.joins(bid_requests: :bids)
+                                     .select('campaigns.id, campaigns.name, COUNT(bids.id) as bid_count, AVG(bids.amount) as avg_bid_amount')
+                                     .group('campaigns.id, campaigns.name')
+                                     .order('bid_count DESC')
+                                     .limit(5)
+      
+      # Top distributions by bid amount and win rate
+      @top_distributions = Distribution.joins(:bids)
+                                        .select('distributions.id, distributions.name, 
+                                                AVG(bids.amount) as avg_bid_amount,
+                                                SUM(CASE WHEN bids.status = 10 THEN 1 ELSE 0 END) * 100.0 / COUNT(bids.id) as win_rate')
+                                        .group('distributions.id, distributions.name')
+                                        .order('avg_bid_amount DESC')
+                                        .limit(5)
+      
+      # Recent bids
+      @recent_bids = Bid.includes(:distribution, bid_request: :campaign)
+                                   .order(created_at: :desc)
+                                   .limit(10)
+    end
   end
   
   def show

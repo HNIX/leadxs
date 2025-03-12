@@ -3,8 +3,18 @@ class DistributionsController < ApplicationController
   before_action :set_companies, only: [:new, :edit, :create, :update]
 
   def index
-    # With acts_as_tenant, we can just query Distribution directly
-    @distributions = Distribution.includes(:company).order(:name)
+    # Start with base query
+    @distributions = Distribution.includes(:company)
+    
+    # Apply filters
+    @distributions = apply_filters(@distributions)
+    
+    # Apply sorting
+    @distributions = apply_sorting(@distributions)
+    
+    # Paginate the results
+    items_per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+    @pagy, @distributions = pagy(@distributions, items: items_per_page)
     
     respond_to do |format|
       format.html
@@ -108,6 +118,52 @@ class DistributionsController < ApplicationController
       :request_method, :request_format, :template, :status,
       headers_attributes: [:id, :name, :value, :_destroy]
     )
+  end
+  
+  def apply_filters(scope)
+    # Filter by name
+    scope = scope.where("name ILIKE ?", "%#{params[:name]}%") if params[:name].present?
+    
+    # Filter by status
+    scope = scope.where(status: params[:status]) if params[:status].present?
+    
+    # Filter by company
+    scope = scope.where(company_id: params[:company_id]) if params[:company_id].present?
+    
+    # Filter by request method
+    scope = scope.where(request_method: params[:request_method]) if params[:request_method].present?
+    
+    # Filter by request format
+    scope = scope.where(request_format: params[:request_format]) if params[:request_format].present?
+    
+    # Filter by bidding strategy
+    scope = scope.where(bidding_strategy: params[:bidding_strategy]) if params[:bidding_strategy].present?
+    
+    # Filter by creation date
+    scope = scope.where("created_at >= ?", Date.parse(params[:created_after])) if params[:created_after].present?
+    scope = scope.where("created_at <= ?", Date.parse(params[:created_before]) + 1.day) if params[:created_before].present?
+    
+    scope
+  end
+  
+  def apply_sorting(scope)
+    case params[:sort_by]
+    when "oldest"
+      scope.order(created_at: :asc)
+    when "name_asc"
+      scope.order(name: :asc)
+    when "name_desc"
+      scope.order(name: :desc)
+    when "method"
+      scope.order(request_method: :asc)
+    when "format"
+      scope.order(request_format: :asc)
+    when "status"
+      scope.order(status: :asc)
+    else
+      # Default to newest first
+      scope.order(created_at: :desc)
+    end
   end
   
   def test_endpoint_connection(distribution)

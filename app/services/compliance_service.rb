@@ -177,10 +177,15 @@ class ComplianceService
     # Ensure we have a report_id
     report_id ||= SecureRandom.uuid
     
-    # Get a safe secret key - use a fallback if not available
-    secret_key = Rails.application.credentials.secret_key_base || 
-                 ENV['SECRET_KEY_BASE'] || 
-                 SecureRandom.hex(64)
+    # Get a safe secret key - use a consistent approach to match the verification
+    if Rails.env.production?
+      # In production, we should always use a secure credential
+      secret_key = Rails.application.credentials.secret_key_base || ENV['SECRET_KEY_BASE']
+    else
+      # In development/test, use a stable key for testing
+      # THIS IS NOT SECURE FOR PRODUCTION - USE ONLY IN DEV/TEST
+      secret_key = "development_key_for_compliance_reports"
+    end
     
     # Generate an expiration timestamp
     expires_at = Time.current.to_i + expires_in.to_i
@@ -211,10 +216,15 @@ class ComplianceService
 
   # Sign a report with HMAC to verify its integrity
   def sign_report(report_data)
-    # Get a safe secret key - use a fallback if not available
-    secret_key = Rails.application.credentials.secret_key_base || 
-                 ENV['SECRET_KEY_BASE'] || 
-                 SecureRandom.hex(64)
+    # Get a safe secret key - use a consistent approach to match the verification
+    if Rails.env.production?
+      # In production, we should always use a secure credential
+      secret_key = Rails.application.credentials.secret_key_base || ENV['SECRET_KEY_BASE']
+    else
+      # In development/test, use a stable key for testing
+      # THIS IS NOT SECURE FOR PRODUCTION - USE ONLY IN DEV/TEST
+      secret_key = "development_key_for_compliance_reports"
+    end
                  
     # Convert the report to a canonical JSON string
     json_data = report_data.to_json

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regulatory Compliance Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+  <div class="container mx-auto px-4 py-8 max-w-5xl">
+    <!-- Report Header -->
+    <div class="mb-8 text-center">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Regulatory Compliance Report</h1>
+      <p class="text-gray-600"><%= @report&.dig(:report_id) || "Report ID not available" %></p>
+      <p class="text-gray-600 text-sm">Generated: <%= @report&.dig(:generated_at)&.to_datetime&.strftime("%B %d, %Y %H:%M:%S") || Time.current.strftime("%B %d, %Y %H:%M:%S") %></p>
+    </div>
+
+    <% if @report&.dig(:error).present? %>
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+        <div class="flex">
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Error Generating Report</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <p><%= @report[:error] %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Report Metadata -->
+    <div class="bg-white shadow-md rounded-lg mb-6">
+      <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
+        <h3 class="text-lg font-medium text-gray-900">Report Information</h3>
+      </div>
+      <div class="px-4 py-5 sm:p-6">
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Account</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @report&.dig(:account_name) || "Not available" %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Report Period</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <% if @report&.dig(:period_start) && @report&.dig(:period_end) %>
+                <%= @report[:period_start].to_date.strftime("%b %d, %Y") %> to <%= @report[:period_end].to_date.strftime("%b %d, %Y") %>
+              <% else %>
+                Not available
+              <% end %>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Total Compliance Events</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @report&.dig(:total_compliance_events) || 0 %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Cryptographic Signature</dt>
+            <dd class="mt-1 text-sm text-gray-900 truncate" title="<%= @report&.dig(:signature) || 'Not available' %>">
+              <%= @report&.dig(:signature)&.truncate(30) || "Not available" %>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="bg-white shadow-md rounded-lg mb-6">
+      <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
+        <h3 class="text-lg font-medium text-gray-900">Activity Summary</h3>
+      </div>
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Consents -->
+          <div class="bg-blue-50 overflow-hidden shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <dt class="text-sm font-medium text-blue-700 truncate">Consents Collected</dt>
+              <dd class="mt-1 text-3xl font-semibold text-blue-900">
+                <%= @report&.dig(:consent_statistics, :consents_given) || 0 %>
+              </dd>
+            </div>
+          </div>
+
+          <!-- Distributions -->
+          <div class="bg-purple-50 overflow-hidden shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <dt class="text-sm font-medium text-purple-700 truncate">Successful Distributions</dt>
+              <dd class="mt-1 text-3xl font-semibold text-purple-900">
+                <%= @report&.dig(:distribution_statistics, :distributions_succeeded) || 0 %>
+              </dd>
+            </div>
+          </div>
+
+          <!-- Data Access -->
+          <div class="bg-yellow-50 overflow-hidden shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <dt class="text-sm font-medium text-yellow-700 truncate">Data Access Events</dt>
+              <dd class="mt-1 text-3xl font-semibold text-yellow-900">
+                <%= @report&.dig(:data_access_report, :total_access_events) || 0 %>
+              </dd>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Types -->
+    <% if @report.is_a?(Hash) && @report[:events_by_type].present? && @report[:events_by_type].is_a?(Hash) && @report[:events_by_type].any? %>
+      <div class="bg-white shadow-md rounded-lg mb-6">
+        <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
+          <h3 class="text-lg font-medium text-gray-900">Events by Type</h3>
+        </div>
+        <div class="px-4 py-5 sm:p-6">
+          <ul class="divide-y divide-gray-200">
+            <% @report[:events_by_type].sort_by { |_, count| -count.to_i }.each do |type, count| %>
+              <li class="py-4 flex justify-between">
+                <div class="flex items-center">
+                  <span class="text-sm font-medium text-gray-900"><%= type.to_s.humanize %></span>
+                </div>
+                <div class="ml-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <%= count %> events
+                  </span>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Legal Footer -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-700">
+      <p class="font-medium">Legal Disclaimer</p>
+      <p class="mt-2">
+        This report is generated in compliance with federal and state regulations. The contents of this report are confidential
+        and intended solely for authorized regulatory entities. Unauthorized access, disclosure, copying, distribution, or use
+        of the contents of this report is prohibited and may be unlawful.
+      </p>
+    </div>
+
+    <div class="mt-8 text-center text-xs text-gray-500">
+      <p>Report ID: <%= @report&.dig(:report_id) || "Not available" %></p>
+      <p>Generated by LeadXS Compliance System</p>
+    </div>
+  </div>
+</body>
+</html>

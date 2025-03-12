@@ -19,6 +19,18 @@
 @import "./themes/jumpstart-dark.css" layer(theme);
 @import "./themes/jumpstart.css" layer(theme);
 
+/* Custom animations */
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
 @import "./components/base.css" layer(components);
 @import "./components/actiontext.css" layer(components);
 @import "./components/alert.css" layer(components);

@@ -34,6 +34,11 @@ namespace :api, defaults: {format: :json} do
         get :analytics
       end
     end
+    
+    # Compliance reports API
+    namespace :compliance do
+      resources :reports, only: [:show]
+    end
   end
 end
 
