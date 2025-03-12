@@ -31,12 +31,21 @@
         <% end %>
       </li>
 
+      <li>
+        <%= link_to campaign_dashboard_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-4 py-2 rounded-md #{controller_name == 'campaign_dashboard' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-100" data-highlight="true" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Campaign Dashboard
+        <% end %>
+      </li>
+
       <li>  
         <%= link_to dashboard_bid_requests_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-4 py-2 rounded-md #{controller_name == 'bid_requests' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-100" data-highlight="true"  viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          Reporting
+          Bid Reports
         <% end %>
       </li>
 

@@ -21,6 +21,9 @@ Rails.application.routes.draw do
   get 'bid_dashboard', to: 'bid_dashboard#index', as: :bid_dashboard
   get 'bid_dashboard/real_time', to: 'bid_dashboard#real_time', as: :real_time_bid_dashboard
   
+  # Campaign performance dashboard
+  get 'campaign_dashboard', to: 'campaign_dashboard#index', as: :campaign_dashboard
+  
   # Campaign and distribution specific reports
   get 'bid_reports/campaign/:id', to: 'bid_reports#campaign', as: :campaign_bid_report
   get 'bid_reports/distribution/:id', to: 'bid_reports#distribution', as: :distribution_bid_report
