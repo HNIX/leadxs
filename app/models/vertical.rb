@@ -12,6 +12,9 @@ class Vertical < AccountRecord
   validates :primary_category, presence: true
   validates :archived, inclusion: {in: [true, false]}
   validates :base, inclusion: {in: [true, false]}
+  
+  # Callbacks
+  after_create :apply_standard_fields
 
   # Scopes
   scope :active, -> { where(archived: false) }
@@ -98,5 +101,17 @@ class Vertical < AccountRecord
       
       new_vertical
     end
+  end
+  
+  private
+  
+  # Apply standard fields to this vertical when it's created
+  def apply_standard_fields
+    # Skip applying standard fields if this is a duplicate (fields will be copied)
+    # We can detect this by checking if fields already exist
+    return if vertical_fields.exists?
+    
+    # Apply standard fields from the account
+    StandardField.apply_to_vertical(self)
   end
 end

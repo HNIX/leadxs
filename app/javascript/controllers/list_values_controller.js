@@ -4,56 +4,60 @@ export default class extends Controller {
   static targets = ["container", "template"]
 
   connect() {
-    // Ensure we have at least one list value field when the form loads
-    if (this.element.querySelectorAll('.list-value-item').length === 0) {
-      this.add();
-    }
+    this.nextIndex = this.containerTarget.children.length
   }
 
-  add(event) {
-    if (event) event.preventDefault();
+  addValue(event) {
+    event.preventDefault()
     
-    // Find the container to add the new list value
-    const container = this.element.closest('form').querySelector('.list-values-container');
-    if (!container) return;
+    // Get the template content
+    const template = this.templateTarget.innerHTML
     
-    // Get the template and create a new list value row
-    const template = document.getElementById('list-value-template');
-    if (!template) return;
+    // Replace placeholders with actual values
+    const html = template
+      .replace(/{index}/g, this.nextIndex)
+      .replace(/{position}/g, this.nextIndex + 1)
+      
+    // Add to container
+    this.containerTarget.insertAdjacentHTML('beforeend', html)
     
-    // Generate a unique index for the new row
-    const newIndex = new Date().getTime();
-    
-    // Create the new row from the template
-    let newRow = template.innerHTML.replace(/NEW_RECORD/g, newIndex);
-    
-    // Create a temporary element to properly create DOM nodes
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = newRow;
-    
-    // Add the new row to the container
-    container.appendChild(tempDiv.firstElementChild);
+    // Increment index
+    this.nextIndex++
   }
-
-  remove(event) {
-    console.log("test")
-
-    if (event) event.preventDefault();
-
-    // Find the list value item to remove
-    const item = event.currentTarget.closest('.list-value-item');
-    if (!item) return;
+  
+  removeValue(event) {
+    event.preventDefault()
     
-    // Check if this is an existing record that needs to be marked for destruction
-    const destroyCheckbox = item.querySelector('.destroy-checkbox');
+    // Find the button that was clicked
+    const button = event.target.closest('button')
+    if (!button) return
     
-    if (destroyCheckbox) {
-      // Mark for destruction and hide
-      destroyCheckbox.checked = true;
-      item.style.display = 'none';
+    // Remove this list value field
+    const field = button.closest('.list-value-fields')
+    if (field) field.remove()
+  }
+  
+  removeExistingValue(event) {
+    event.preventDefault()
+    
+    // Find the button that was clicked
+    const button = event.target.closest('button')
+    if (!button) return
+    
+    // Get the row and find destroy checkbox
+    const field = button.closest('.list-value-fields')
+    if (!field) return
+    
+    const destroyInput = field.querySelector('input[type="checkbox"]')
+    
+    // Mark for destruction and hide the row
+    if (destroyInput) {
+      destroyInput.value = "1"
+      destroyInput.checked = true
+      field.style.display = 'none'
     } else {
-      // Simply remove from DOM for new records
-      item.remove();
+      // If we can't find the destroy checkbox, just remove the row
+      field.remove()
     }
   }
 }

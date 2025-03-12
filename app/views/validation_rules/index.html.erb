@@ -1,225 +1,431 @@
 <% content_for :title, "Validation Rules" %>
 
-<div class="mx-auto max-w-full px-4 sm:px-6 lg:px-8 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-        <% if @vertical %>
-          Validation Rules for <%= @vertical.name %> Vertical
-        <% elsif @campaign %>
-          Validation Rules for <%= @campaign.name %> Campaign
-        <% else %>
-          Validation Rules for <%= @validatable.name.titleize %>
-        <% end %>
-      </h1>
-      <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
-        Manage validation rules to ensure data quality and consistency
-        <%= link_to validation_rules_documentation_path, class: "ml-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
-          <span class="inline-flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+<div class="container mx-auto px-4 py-6">
+  <%# Breadcrumb navigation - visible on all screen sizes %>
+  <div class="mb-6">
+    <nav class="flex" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3 list-none">
+        <li class="inline-flex items-center">
+          <%= link_to root_path, class: "inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500" do %>
+            <svg class="w-3 h-3 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
             </svg>
-            View Documentation
-          </span>
-        <% end %>
-      </p>
-    </div>
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-      <%= link_to "Add Rule", 
-                  case
-                  when @vertical
-                    new_vertical_validation_rule_path(@vertical)
-                  when @campaign 
-                    new_campaign_validation_rule_path(@campaign)
-                  end,
-                  class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
-    </div>
-  </div>
-  
-  <div class="mt-8 flow-root">
-    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-          <% if @validation_rules.any? %>
-            <div class="sortable" data-controller="sortable" data-sortable-animation-value="150" data-sortable-resource-url-value="<%= 
-              case
-              when @vertical
-                vertical_validation_rules_path(@vertical)
-              when @campaign
-                campaign_validation_rules_path(@campaign)
-              end
-            %>"
-            >
-              <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th scope="col" class="w-10 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">#</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Name</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Type</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Severity</th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Status</th>
-                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span class="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900 sortable-items">
-                  <% @validation_rules.each do |rule| %>
-                    <tr class="sortable-item" data-id="<%= rule.id %>">
-                      <td class="whitespace-nowrap py-4 pl-3 pr-3 text-sm font-medium text-gray-900 dark:text-gray-200 sortable-handle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-move" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                      </td>
-                      <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-200">
-                        <%= link_to rule.name, 
-                            case
-                            when @vertical
-                              vertical_validation_rule_path(@vertical, rule)
-                            when @campaign
-                              campaign_validation_rule_path(@campaign, rule)
-                            end,
-                            class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
-                      </td>
-                      <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                        <%= rule.rule_type.humanize %>
-                      </td>
-                      <td class="whitespace-nowrap px-3 py-4 text-sm">
-                        <% case rule.severity %>
-                        <% when 'info' %>
-                          <span class="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-200">
-                            Info
-                          </span>
-                        <% when 'warning' %>
-                          <span class="inline-flex items-center rounded-md bg-yellow-50 dark:bg-yellow-900 px-2 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-200">
-                            Warning
-                          </span>
-                        <% else %>
-                          <span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-200">
-                            Error
-                          </span>
-                        <% end %>
-                      </td>
-                      <td class="whitespace-nowrap px-3 py-4 text-sm">
-                        <% if rule.active? %>
-                          <span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-200">
-                            Active
-                          </span>
-                        <% else %>
-                          <span class="inline-flex items-center rounded-md bg-gray-50 dark:bg-gray-700 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">
-                            Inactive
-                          </span>
-                        <% end %>
-                      </td>
-                      <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <div class="flex justify-end space-x-2">
-                          <% view_path = case
-                             when @vertical 
-                               vertical_validation_rule_path(@vertical, rule)
-                             when @campaign
-                               campaign_validation_rule_path(@campaign, rule)
-                             end %>
-                             
-                          <%= link_to view_path,
-                                      class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                              <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                            </svg>
-                          <% end %>
-                          
-                          <% edit_path = case
-                             when @vertical
-                               edit_vertical_validation_rule_path(@vertical, rule)
-                             when @campaign
-                               edit_campaign_validation_rule_path(@campaign, rule)
-                             end %>
-                          
-                          <%= link_to edit_path,
-                                      class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                            </svg>
-                          <% end %>
-                          
-                          <% toggle_path = case
-                             when @vertical
-                               vertical_validation_rule_path(@vertical, rule, toggle_active: true)
-                             when @campaign
-                               campaign_validation_rule_path(@campaign, rule, toggle_active: true)
-                             end %>
-                          
-                          <%= link_to toggle_path,
-                                      data: { turbo_method: :patch },
-                                      class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
-                            <% if rule.active? %>
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                              </svg>
-                            <% else %>
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                              </svg>
-                            <% end %>
-                          <% end %>
-                          
-                          <% delete_path = case
-                             when @vertical 
-                               vertical_validation_rule_path(@vertical, rule)
-                             when @campaign 
-                               campaign_validation_rule_path(@campaign, rule)
-                             end %>
-                          
-                          <%= link_to delete_path,
-                                      data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this validation rule?" },
-                                      class: "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" do %>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                          <% end %>
-                        </div>
-                      </td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-            
-            <!-- Drag & Drop Instructions -->
-            <div class="text-sm text-gray-500 dark:text-gray-400 my-2 px-4">
-              <p>Drag and drop to reorder validation rules. Rules are evaluated in the order shown here, from top to bottom.</p>
-            </div>
-          <% else %>
-            <div class="bg-white dark:bg-gray-900 px-4 py-12 text-center">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-              </svg>
-              <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-200">No validation rules</h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new validation rule.</p>
-              <div class="mt-6">
-                <%= link_to "Add Rule", 
-                  case
-                  when @vertical
-                    new_vertical_validation_rule_path(@vertical)
-                  when @campaign 
-                    new_campaign_validation_rule_path(@campaign)
-                  end,
-                  class: "inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
-              </div>
-            </div>
+            Home
           <% end %>
-        </div>
+        </li>
+        
+        <% if @vertical %>
+          <li>
+            <div class="flex items-center">
+              <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+              </svg>
+              <%= link_to "Verticals", verticals_path, class: "ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-blue-500" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+              </svg>
+              <%= link_to @vertical.name, vertical_path(@vertical), class: "ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-blue-500" %>
+            </div>
+          </li>
+        <% elsif @campaign %>
+          <li>
+            <div class="flex items-center">
+              <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+              </svg>
+              <%= link_to "Campaigns", campaigns_path, class: "ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-blue-500" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+              </svg>
+              <%= link_to @campaign.name, campaign_path(@campaign), class: "ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-blue-500" %>
+            </div>
+          </li>
+        <% end %>
+          
+        <li aria-current="page">
+          <div class="flex items-center">
+            <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+            </svg>
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">Validation Rules</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <%# Main content section with header %>
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+      <div>
+        <h1 class="text-xl font-medium text-gray-900 dark:text-white">
+          <% if @vertical %>
+            Validation Rules for <%= @vertical.name %>
+          <% elsif @campaign %>
+            Validation Rules for <%= @campaign.name %> 
+          <% else %>
+            Validation Rules for <%= @validatable.name.titleize %>
+          <% end %>
+        </h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Define and manage validation rules to ensure data quality
+          <%= link_to validation_rules_documentation_path, target: "_blank", class: "ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" do %>
+            <span class="inline-flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+              View Documentation
+            </span>
+          <% end %>
+        </p>
+      </div>
+      
+      <div class="mt-4 sm:mt-0">
+        <%= link_to "Add Rule", 
+                    case
+                    when @vertical
+                      new_vertical_validation_rule_path(@vertical)
+                    when @campaign 
+                      new_campaign_validation_rule_path(@campaign)
+                    end,
+                    class: "btn btn-primary" %>
       </div>
     </div>
   </div>
   
-  <!-- Back Button -->
-  <div class="mt-4">
-    <% case
-       when @vertical %>
-      <%= link_to "Back to Vertical", vertical_path(@vertical), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium" %>
-    <% when @campaign %>
-      <%= link_to "Back to Campaign", campaign_path(@campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium" %>
-    <% end %>
-  </div>
+  <% if @validation_rules.any? %>
+    <%# Information card about rule ordering %>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6 p-4">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white">About Validation Rules</h3>
+          <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p>Rules are evaluated in the order shown here, from top to bottom. <span class="hidden sm:inline">Drag and drop to reorder validation rules.</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <%# Desktop Table View (hidden on mobile) %>
+    <div class="hidden sm:block overflow-hidden bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="sortable" data-controller="sortable" data-sortable-animation-value="150" data-sortable-resource-url-value="<%= 
+        case
+        when @vertical
+          vertical_validation_rules_path(@vertical)
+        when @campaign
+          campaign_validation_rules_path(@campaign)
+        end
+      %>">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th scope="col" class="w-10 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">#</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Name</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Type</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Severity</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200">Status</th>
+              <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span class="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 sortable-items">
+            <% @validation_rules.each do |rule| %>
+              <tr class="sortable-item hover:bg-gray-50 dark:hover:bg-gray-700" data-id="<%= rule.id %>">
+                <td class="whitespace-nowrap py-4 pl-3 pr-3 text-sm font-medium text-gray-900 dark:text-gray-200 sortable-handle">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-move" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </td>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-200">
+                  <%= link_to rule.name, 
+                      case
+                      when @vertical
+                        vertical_validation_rule_path(@vertical, rule)
+                      when @campaign
+                        campaign_validation_rule_path(@campaign, rule)
+                      end,
+                      class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                  <%= rule.rule_type.humanize %>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                  <% case rule.severity %>
+                  <% when 'info' %>
+                    <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-200">
+                      Info
+                    </span>
+                  <% when 'warning' %>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-200">
+                      Warning
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-200">
+                      Error
+                    </span>
+                  <% end %>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                  <% if rule.active? %>
+                    <span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-200">
+                      Active
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Inactive
+                    </span>
+                  <% end %>
+                </td>
+                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                  <div class="flex justify-end space-x-3">
+                    <%= link_to case
+                       when @vertical 
+                         vertical_validation_rule_path(@vertical, rule)
+                       when @campaign
+                         campaign_validation_rule_path(@campaign, rule)
+                       end,
+                       class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300",
+                       title: "View" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                      </svg>
+                    <% end %>
+                    
+                    <%= link_to case
+                       when @vertical
+                         edit_vertical_validation_rule_path(@vertical, rule)
+                       when @campaign
+                         edit_campaign_validation_rule_path(@campaign, rule)
+                       end,
+                       class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300",
+                       title: "Edit" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                    <% end %>
+                    
+                    <%= link_to case
+                       when @vertical
+                         vertical_validation_rule_path(@vertical, rule, toggle_active: true)
+                       when @campaign
+                         campaign_validation_rule_path(@campaign, rule, toggle_active: true)
+                       end,
+                       data: { turbo_method: :patch },
+                       class: rule.active? ? "text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300" : "text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300",
+                       title: rule.active? ? "Disable" : "Enable" do %>
+                      <% if rule.active? %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                      <% else %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                      <% end %>
+                    <% end %>
+                    
+                    <%= link_to case
+                       when @vertical 
+                         vertical_validation_rule_path(@vertical, rule)
+                       when @campaign 
+                         campaign_validation_rule_path(@campaign, rule)
+                       end,
+                       data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this validation rule?" },
+                       class: "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300",
+                       title: "Delete" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <%# Mobile Card View (hidden on desktop) %>
+    <div class="sm:hidden">
+      <div class="space-y-4">
+        <div class="sortable" data-controller="sortable" data-sortable-animation-value="150" data-sortable-resource-url-value="<%= 
+          case
+          when @vertical
+            vertical_validation_rules_path(@vertical)
+          when @campaign
+            campaign_validation_rules_path(@campaign)
+          end
+        %>">
+          <div class="sortable-items space-y-4">
+            <% @validation_rules.each do |rule| %>
+              <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden sortable-item" data-id="<%= rule.id %>">
+                <div class="px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+                  <div class="flex items-center space-x-2">
+                    <div class="sortable-handle cursor-move">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[200px]">
+                      <%= rule.name %>
+                    </h3>
+                  </div>
+                  <div class="flex items-center space-x-1">
+                    <% case rule.severity %>
+                    <% when 'info' %>
+                      <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-200">
+                        Info
+                      </span>
+                    <% when 'warning' %>
+                      <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-200">
+                        Warning
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900 px-2 py-0.5 text-xs font-medium text-red-800 dark:text-red-200">
+                        Error
+                      </span>
+                    <% end %>
+                    
+                    <% if rule.active? %>
+                      <span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900 px-2 py-0.5 text-xs font-medium text-green-800 dark:text-green-200">
+                        Active
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-300">
+                        Inactive
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+                
+                <div class="px-4 py-2 flex justify-between items-center">
+                  <div class="text-xs text-gray-500 dark:text-gray-400">
+                    <%= rule.rule_type.humanize %> rule
+                  </div>
+                  
+                  <%= link_to case
+                     when @vertical 
+                       vertical_validation_rule_path(@vertical, rule)
+                     when @campaign
+                       campaign_validation_rule_path(@campaign, rule)
+                     end,
+                     class: "text-xs text-blue-600 dark:text-blue-400 flex items-center" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                      <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                    </svg>
+                    View
+                  <% end %>
+                </div>
+                
+                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 flex justify-between">
+                  <% edit_path = case
+                     when @vertical
+                       edit_vertical_validation_rule_path(@vertical, rule)
+                     when @campaign
+                       edit_campaign_validation_rule_path(@campaign, rule)
+                     end %>
+                  
+                  <%= link_to edit_path,
+                      class: "btn btn-sm btn-outline" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                    Edit
+                  <% end %>
+                  
+                  <% toggle_path = case
+                     when @vertical
+                       vertical_validation_rule_path(@vertical, rule, toggle_active: true)
+                     when @campaign
+                       campaign_validation_rule_path(@campaign, rule, toggle_active: true)
+                     end %>
+                  
+                  <%= link_to toggle_path,
+                      data: { turbo_method: :patch },
+                      class: rule.active? ? "btn btn-sm btn-outline-yellow" : "btn btn-sm btn-outline-green" do %>
+                    <% if rule.active? %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                      </svg>
+                      Disable
+                    <% else %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                      </svg>
+                      Enable
+                    <% end %>
+                  <% end %>
+                  
+                  <% delete_path = case
+                     when @vertical 
+                       vertical_validation_rule_path(@vertical, rule)
+                     when @campaign 
+                       campaign_validation_rule_path(@campaign, rule)
+                     end %>
+                  
+                  <%= button_to delete_path,
+                      method: :delete, 
+                      form: { data: { turbo_confirm: "Are you sure you want to delete this validation rule?" } },
+                      class: "btn btn-sm btn-outline-red" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    Delete
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <%# Mobile Drag & Drop Instructions %>
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-900">
+          <p class="text-sm text-blue-700 dark:text-blue-300 flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+            <span>Drag rules to reorder. Rules are evaluated from top to bottom.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <%# Empty State %>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg px-4 py-10 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-200">No validation rules</h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new validation rule.</p>
+      <div class="mt-6">
+        <%= link_to "Add Rule", 
+          case
+          when @vertical
+            new_vertical_validation_rule_path(@vertical)
+          when @campaign 
+            new_campaign_validation_rule_path(@campaign)
+          end,
+          class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+  
+  <%= turbo_frame_tag "modal" %>
 </div>

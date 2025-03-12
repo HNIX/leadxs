@@ -4,6 +4,104 @@
     <%= link_to "New Campaign", new_campaign_path, class: "btn btn-primary" %>
   </div>
 
+  <!-- Filters -->
+  <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <%= form_with url: campaigns_path, method: :get, class: "", data: { turbo_frame: "_top" } do |f| %>
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Basic Filters (Always Visible) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Campaign Name</label>
+            <%= f.text_field :name, placeholder: "Search by name...", value: params[:name], 
+                      class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+            <%= f.select :status, [['All Statuses', '']] + Campaign::STATUSES.map { |s| [s.titleize, s] }, 
+                      { selected: params[:status] }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
+            <%= f.select :sort_by, 
+                      [
+                        ['Newest First', 'newest'],
+                        ['Oldest First', 'oldest'],
+                        ['Name A-Z', 'name_asc'],
+                        ['Name Z-A', 'name_desc']
+                      ], 
+                      { selected: params[:sort_by] || 'newest' }, 
+                      { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+          </div>
+          
+          <div class="flex items-end">
+            <%= f.button "Apply", class: "rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" %>
+            <%= link_to "Clear", campaigns_path, class: "ml-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm" %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Filters (Toggleable) -->
+      <div data-controller="toggle">
+        <div class="px-4 py-2 flex justify-between items-center cursor-pointer border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900" data-action="click->toggle#toggle">
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Advanced Filters</h3>
+          <div class="flex items-center">
+            <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">Show more options</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 transition-transform duration-200" 
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+        
+        <div class="p-4 hidden" data-toggle-target="toggleable">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vertical</label>
+              <%= f.select :vertical_id, [['All Verticals', '']] + Vertical.active.order(:name).map { |v| [v.name, v.id] }, 
+                        { selected: params[:vertical_id] }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Campaign Type</label>
+              <%= f.select :campaign_type, [['All Types', '']] + Campaign::CAMPAIGN_TYPES.map { |t| [t.titleize, t] }, 
+                        { selected: params[:campaign_type] }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Distribution Method</label>
+              <%= f.select :distribution_method, [['All Methods', '']] + Campaign::DISTRIBUTION_METHODS.map { |d| [d.titleize, d] }, 
+                        { selected: params[:distribution_method] }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Range</label>
+              <div class="grid grid-cols-2 gap-2">
+                <%= f.date_field :created_after, value: params[:created_after], 
+                            placeholder: "From", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+                <%= f.date_field :created_before, value: params[:created_before], 
+                            placeholder: "To", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Items Per Page</label>
+              <%= f.select :per_page, [['10 items', '10'], ['20 items', '20'], ['50 items', '50'], ['100 items', '100']], 
+                        { selected: params[:per_page] || '10' }, 
+                        { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
   <% if @campaigns.any? %>
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div class="overflow-x-auto">
@@ -20,50 +118,55 @@
           </thead>
           <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             <% @campaigns.each do |campaign| %>
-              <tr>
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="window.location='<%= campaign_path(campaign) %>'">
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <%= link_to campaign.name, campaign_path(campaign), class: "text-blue-600 dark:text-blue-400 hover:underline" %>
+                  <%= link_to campaign_path(campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" do %>
+                    <span class="font-medium"><%= campaign.name %></span>
+                  <% end %>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                  <%= campaign.vertical.name %>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  <%= link_to campaign.vertical.name, vertical_path(campaign.vertical), class: "no-underline text-gray-700 dark:text-gray-300 hover:text-indigo-700 dark:hover:text-indigo-300" %>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                   <%= campaign.campaign_type.titleize %>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <% case campaign.status %>
                   <% when 'active' %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                       Active
                     </span>
                   <% when 'paused' %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
                       Paused
                     </span>
                   <% when 'draft' %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100">
                       Draft
                     </span>
                   <% when 'archived' %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
                       Archived
                     </span>
                   <% end %>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                   <%= campaign.distribution_method.titleize %>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div class="flex items-center justify-end space-x-2">
-                    <%= link_to "Edit", edit_campaign_path(campaign), class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
-                    <%= button_to "Delete", campaign_path(campaign), method: :delete, class: "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300", form: { data: { turbo_confirm: "Are you sure you want to delete this campaign? This action cannot be undone." } } %>
-                  </div>
+                  <%= link_to edit_campaign_path(campaign), class: "inline-flex items-center justify-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-500 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:bg-indigo-900 dark:hover:text-indigo-300" do %>
+                    Edit
+                  <% end %>
                 </td>
               </tr>
             <% end %>
           </tbody>
         </table>
       </div>
+    </div>
+
+    <div class="mt-6">
+      <%== pagy_nav(@pagy) %>
     </div>
   <% else %>
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">

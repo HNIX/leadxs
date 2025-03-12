@@ -25,6 +25,7 @@ class VerticalFieldsController < ApplicationController
   
     def index
       @fields = @vertical.vertical_fields.order(position: :asc)
+      @standard_fields = current_account.standard_fields.order(position: :asc)
   
       respond_to do |format|
         format.html

@@ -28,6 +28,7 @@
 @import "./components/buttons.css" layer(components);
 @import "./components/cards.css" layer(components);
 @import "./components/direct_uploads.css" layer(components);
+@import "./components/dropdowns.css" layer(components);
 @import "./components/docs.css" layer(components);
 @import "./components/forms.css" layer(components);
 @import "./components/hotwire_native.css" layer(components);

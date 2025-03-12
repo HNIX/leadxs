@@ -90,10 +90,79 @@
     </div>
   </div>
 
-  <div class="my-8">
-    <h1><%= t(".title") %></h1>
-
-    <p class="mb-2">This is the homepage for logged in users.</p>
-    <p>You can customize this page in <code>app/views/dashboard/show.html.erb</code></p>
+  <!-- Data Management Overview -->
+  <div class="my-6">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Data Management</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Standard Fields Card -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="bg-indigo-100 dark:bg-indigo-900 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h2 class="text-lg font-medium">Standard Fields</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              <%= current_account.standard_fields.count %> fields configured
+            </p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+          Manage fields that will be automatically added to all new verticals. Setup once, apply everywhere.
+        </p>
+        <div class="mt-6">
+          <%= link_to "Manage Standard Fields", standard_fields_path, class: "btn btn-sm btn-outline w-full" %>
+        </div>
+      </div>
+      
+      <!-- Verticals Card -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h2 class="text-lg font-medium">Verticals</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              <%= current_account.verticals.count %> verticals configured
+            </p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+          Manage your industry verticals, field templates, and validation rules.
+        </p>
+        <div class="mt-6">
+          <%= link_to "Manage Verticals", verticals_path, class: "btn btn-sm btn-outline w-full" %>
+        </div>
+      </div>
+      
+      <!-- Campaigns Card -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="bg-green-100 dark:bg-green-900 p-3 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h2 class="text-lg font-medium">Campaigns</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              <%= current_account.campaigns.count %> campaigns configured
+            </p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+          Manage your campaigns, fields, and distribution settings.
+        </p>
+        <div class="mt-6">
+          <%= link_to "Manage Campaigns", campaigns_path, class: "btn btn-sm btn-outline w-full" %>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

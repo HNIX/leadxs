@@ -179,7 +179,10 @@ if Rails.env.development?
     end
   end
   
-  # Create standard fields for the verticals
+  # Create standard fields for the account
+  require_relative "seeds/standard_fields_setup"
+  
+  # Create vertical fields based on the standard fields
   require_relative "seeds/standard_vertical_fields"
   
   ActsAsTenant.with_tenant(account) do

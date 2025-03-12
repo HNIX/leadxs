@@ -21,7 +21,10 @@ class ContactsController < ApplicationController
     @contact = @company.contacts.new(contact_params)
 
     if @contact.save
-      redirect_to company_contact_path(@company, @contact), notice: "Contact was successfully created."
+      respond_to do |format|
+        format.html { redirect_to company_contact_path(@company, @contact), notice: "Contact was successfully created." }
+        format.turbo_stream { redirect_to company_path(@company), notice: "Contact was successfully created." }
+      end
     else
       render :new, status: :unprocessable_entity
     end
@@ -29,7 +32,10 @@ class ContactsController < ApplicationController
 
   def update
     if @contact.update(contact_params)
-      redirect_to company_contact_path(@company, @contact), notice: "Contact was successfully updated."
+      respond_to do |format|
+        format.html { redirect_to company_contact_path(@company, @contact), notice: "Contact was successfully updated." }
+        format.turbo_stream { redirect_to company_path(@company), notice: "Contact was successfully updated." }
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -37,7 +43,7 @@ class ContactsController < ApplicationController
 
   def destroy
     @contact.destroy
-    redirect_to company_contacts_path(@company), notice: "Contact was successfully deleted."
+    redirect_to company_path(@company), notice: "Contact was successfully deleted."
   end
 
   private

@@ -1,0 +1,606 @@
+<div class="container mx-auto px-4 py-6 md:py-8">
+  <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center">
+      <%= link_to campaign_path(@campaign), class: "mr-2 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      <% end %>
+      <h1 class="text-xl sm:text-2xl font-bold dark:text-white truncate max-w-md">
+        <%= @campaign.name %> Configuration
+      </h1>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Sidebar Navigation -->
+    <div class="lg:col-span-1">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="px-4 py-5 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Configuration</h3>
+        </div>
+        <nav class="space-y-1 px-3 py-3">
+          <!-- Fields Section (Campaign Fields + Calculated Fields) -->
+          <%= link_to configure_campaign_path(@campaign, section: 'fields'), 
+            class: "flex items-center px-3 py-2 rounded-md text-sm font-medium #{@section == 'fields' || @section == 'calculated_fields' ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" do %>
+            <div class="mr-3 w-6 h-6 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 #{@section == 'fields' || @section == 'calculated_fields' ? 'text-primary-500 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <span>Fields & Calculations</span>
+            <span class="ml-auto bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs py-0.5 px-2 rounded-full">
+              <%= @campaign.campaign_fields.count + @campaign.calculated_fields.count %>
+            </span>
+          <% end %>
+
+          <!-- Validation Rules -->
+          <%= link_to configure_campaign_path(@campaign, section: 'validation_rules'), 
+            class: "flex items-center px-3 py-2 rounded-md text-sm font-medium #{@section == 'validation_rules' ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" do %>
+            <div class="mr-3 w-6 h-6 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 #{@section == 'validation_rules' ? 'text-primary-500 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span>Validation Rules</span>
+            <span class="ml-auto bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs py-0.5 px-2 rounded-full">
+              <%= @campaign.validation_rules.count %>
+            </span>
+          <% end %>
+
+          <!-- Sources Section (Sources + Source Filters) -->
+          <%= link_to configure_campaign_path(@campaign, section: 'sources'), 
+            class: "flex items-center px-3 py-2 rounded-md text-sm font-medium #{@section == 'sources' || @section == 'source_filters' ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" do %>
+            <div class="mr-3 w-6 h-6 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 #{@section == 'sources' || @section == 'source_filters' ? 'text-primary-500 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <span>Sources & Filters</span>
+            <span class="ml-auto bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs py-0.5 px-2 rounded-full">
+              <%= @campaign.sources.count + @campaign.source_filters.count %>
+            </span>
+          <% end %>
+
+          <!-- Distributions Section (Distributions + Distribution Filters) -->
+          <%= link_to configure_campaign_path(@campaign, section: 'distributions'), 
+            class: "flex items-center px-3 py-2 rounded-md text-sm font-medium #{@section == 'distributions' || @section == 'distribution_filters' ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" do %>
+            <div class="mr-3 w-6 h-6 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 #{@section == 'distributions' || @section == 'distribution_filters' ? 'text-primary-500 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+            </div>
+            <span>Distributions & Filters</span>
+            <span class="ml-auto bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs py-0.5 px-2 rounded-full">
+              <%= @campaign.distributions.count + @campaign.distribution_filters.count %>
+            </span>
+          <% end %>
+        </nav>
+
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          <%= link_to campaign_path(@campaign), class: "btn btn-white w-full" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Campaign
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="lg:col-span-3">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <% if @section == 'fields' %>
+          <!-- Fields Section Tabs -->
+          <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div class="flex flex-wrap gap-4 mb-1">
+                <%= link_to configure_campaign_path(@campaign, section: 'fields', subsection: 'campaign_fields'), 
+                    class: "pb-2 text-sm font-medium #{@subsection == 'campaign_fields' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}" do %>
+                  Campaign Fields (<%= @campaign.campaign_fields.count %>)
+                <% end %>
+                
+                <%= link_to configure_campaign_path(@campaign, section: 'fields', subsection: 'calculated_fields'), 
+                    class: "pb-2 text-sm font-medium #{@subsection == 'calculated_fields' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}" do %>
+                  Calculated Fields (<%= @campaign.calculated_fields.count %>)
+                <% end %>
+              </div>
+              
+              <div>
+                <% if @subsection == 'campaign_fields' %>
+                  <%= link_to "Add Field", new_campaign_campaign_field_path(@campaign), class: "btn btn-primary w-full sm:w-auto", data: { turbo_frame: "modal" } %>
+                <% else %>
+                  <%= link_to "Add Calculated Field", new_campaign_calculated_field_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% elsif @section == 'sources' %>
+          <!-- Sources Section Tabs -->
+          <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div class="flex flex-wrap gap-4 mb-1">
+                <%= link_to configure_campaign_path(@campaign, section: 'sources', subsection: 'sources_list'), 
+                    class: "pb-2 text-sm font-medium #{@subsection == 'sources_list' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}" do %>
+                  Sources (<%= @campaign.sources.count %>)
+                <% end %>
+                
+                <%= link_to configure_campaign_path(@campaign, section: 'sources', subsection: 'source_filters'), 
+                    class: "pb-2 text-sm font-medium #{@subsection == 'source_filters' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}" do %>
+                  Source Filters (<%= @campaign.source_filters.count %>)
+                <% end %>
+              </div>
+              
+              <div>
+                <% if @subsection == 'sources_list' %>
+                  <%= link_to "Add Source", new_campaign_source_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+                <% else %>
+                  <%= link_to "Add Source Filter", new_campaign_source_filter_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% elsif @section == 'distributions' %>
+          <!-- Distributions Section Tabs -->
+          <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div class="flex flex-wrap gap-4 mb-1">
+                <%= link_to configure_campaign_path(@campaign, section: 'distributions', subsection: 'distributions_list'), 
+                    class: "pb-2 text-sm font-medium #{@subsection == 'distributions_list' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}" do %>
+                  Distributions (<%= @campaign.distributions.count %>)
+                <% end %>
+                
+                <%= link_to configure_campaign_path(@campaign, section: 'distributions', subsection: 'distribution_filters'), 
+                    class: "pb-2 text-sm font-medium #{@subsection == 'distribution_filters' ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}" do %>
+                  Distribution Filters (<%= @campaign.distribution_filters.count %>)
+                <% end %>
+              </div>
+              
+              <div>
+                <% if @subsection == 'distributions_list' %>
+                  <%= link_to "Add Distribution", new_campaign_campaign_distribution_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+                <% else %>
+                  <%= link_to "Add Distribution Filter", new_campaign_distribution_filter_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <!-- Regular header for Validation Rules -->
+          <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                Validation Rules
+              </h2>
+
+              <div>
+                <%= link_to "Add Validation Rule", new_campaign_validation_rule_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="p-6">
+          <!-- Content based on selected section and subsection -->
+          <% if @section == 'fields' && @subsection == 'campaign_fields' %>
+            <% if @campaign_fields.any? %>
+              <div class="overflow-x-auto">
+                <div id="campaign_fields" class="divide-y divide-gray-200 dark:divide-gray-700" data-controller="sortable" data-sortable-resource-url-value="<%= campaign_campaign_fields_path(@campaign) %>">
+                  <%= render partial: "campaign_fields/list", locals: { campaign_fields: @campaign_fields, campaign: @campaign } %>
+                </div>
+                
+                <!-- Pagination for campaign fields -->
+                <% if @pagy.pages > 1 %>
+                  <div class="mt-4 flex justify-center">
+                    <%== pagy_nav(@pagy) %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="p-6 text-center">
+                <div class="mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No fields configured</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add fields to customize your campaign data requirements.</p>
+                <%= link_to "Add First Field", new_campaign_campaign_field_path(@campaign), class: "btn btn-primary", data: { turbo_frame: "modal" } %>
+              </div>
+            <% end %>
+
+          <% elsif @section == 'fields' && @subsection == 'calculated_fields' %>
+            <% if @calculated_fields&.any? %>
+              <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Formula</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <% @calculated_fields.each do |field| %>
+                      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <p class="font-medium text-sm text-gray-900 dark:text-white"><%= field.name %></p>
+                        </td>
+                        <td class="px-4 py-3">
+                          <p class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs"><%= field.formula %></p>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= field.status == 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
+                            <%= field.status.capitalize %>
+                          </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                          <%= link_to "Edit", edit_campaign_calculated_field_path(@campaign, field), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-2" %>
+                          <%= button_to "Delete", campaign_calculated_field_path(@campaign, field), method: :delete, class: "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 inline", form: { data: { turbo_confirm: "Are you sure you want to delete this calculated field?" } } %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="p-6 text-center">
+                <div class="mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No calculated fields</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add calculated fields to derive values from other fields.</p>
+                <%= link_to "Add First Calculated Field", new_campaign_calculated_field_path(@campaign), class: "btn btn-primary" %>
+              </div>
+            <% end %>
+
+          <% elsif @section == 'validation_rules' %>
+            <% if @validation_rules&.any? %>
+              <div class="overflow-x-auto">
+                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @validation_rules.each do |rule| %>
+                    <li class="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 justify-between hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <div class="min-w-0 flex-1">
+                        <div class="flex items-center space-x-3">
+                          <div class="flex-shrink-0">
+                            <% case rule.rule_type %>
+                            <% when 'condition' %>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                              </svg>
+                            <% when 'pattern' %>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600 dark:text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                              </svg>
+                            <% else %>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600 dark:text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                              </svg>
+                            <% end %>
+                          </div>
+                          <div>
+                            <p class="font-medium text-sm text-gray-900 dark:text-white"><%= rule.name %></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                              <% if rule.rule_type == 'condition' %>
+                                <%= rule.condition.truncate(50) %>
+                              <% elsif rule.parameters.present? && rule.parameters['field_name'].present? %>
+                                Field: <%= rule.parameters['field_name'] %>
+                              <% else %>
+                                <%= rule.rule_type.humanize %>
+                              <% end %>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="flex items-center justify-between sm:justify-end space-x-2">
+                        <span class="<%= 
+                          case rule.severity
+                          when 'info' then 'text-blue-600 dark:text-blue-400'
+                          when 'warning' then 'text-yellow-600 dark:text-yellow-400'
+                          else 'text-red-600 dark:text-red-400'
+                          end %> text-xs font-medium">
+                          <%= rule.severity.capitalize %>
+                        </span>
+                        <div class="flex items-center space-x-1">
+                          <%= link_to edit_campaign_validation_rule_path(@campaign, rule), class: "text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400" do %>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            </svg>
+                          <% end %>
+
+                          <%= link_to campaign_validation_rule_path(@campaign, rule, toggle_active: true),
+                                      data: { turbo_method: :patch },
+                                      class: "text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400" do %>
+                            <% if rule.active? %>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                              </svg>
+                            <% else %>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                              </svg>
+                            <% end %>
+                          <% end %>
+
+                          <%= link_to campaign_validation_rule_path(@campaign, rule),
+                                      data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this validation rule?" },
+                                      class: "text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400" do %>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                          <% end %>
+                        </div>
+                      </div>
+                    </li>
+                  <% end %>
+                </ul>
+                
+                <!-- Pagination for validation rules -->
+                <% if @pagy.pages > 1 %>
+                  <div class="mt-4 flex justify-center">
+                    <%== pagy_nav(@pagy) %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="p-6 text-center">
+                <div class="mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No validation rules</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Create validation rules to ensure data quality across your campaign.</p>
+                <%= link_to "Add First Rule", new_campaign_validation_rule_path(@campaign), class: "btn btn-primary" %>
+              </div>
+            <% end %>
+
+          <% elsif @section == 'sources' && @subsection == 'source_filters' %>
+            <% if @source_filters&.any? %>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Field</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Condition</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <% @source_filters.each do |filter| %>
+                      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <p class="font-medium text-sm text-gray-900 dark:text-white"><%= filter.campaign_field.label || filter.campaign_field.name %></p>
+                        </td>
+                        <td class="px-4 py-3">
+                          <p class="text-sm text-gray-500 dark:text-gray-400">
+                            <% if filter.operator == Filter::OPERATORS[:between] %>
+                              Between <%= filter.min_value %> and <%= filter.max_value %>
+                            <% else %>
+                              <%= filter.operator.humanize %> <%= filter.value.truncate(30) %>
+                            <% end %>
+                          </p>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= filter.status == 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
+                            <%= filter.status.capitalize %>
+                          </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                          <%= link_to "Edit", edit_campaign_source_filter_path(@campaign, filter), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-2" %>
+                          <%= button_to "Delete", campaign_source_filter_path(@campaign, filter), method: :delete, class: "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 inline", form: { data: { turbo_confirm: "Are you sure you want to delete this filter?" } } %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="p-6 text-center">
+                <div class="mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No source filters</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add filters to control which leads are accepted from your sources.</p>
+                <%= link_to "Add First Source Filter", new_campaign_source_filter_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+              </div>
+            <% end %>
+
+          <% elsif @section == 'distributions' && @subsection == 'distribution_filters' %>
+            <% if @distribution_filters&.any? %>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Field</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Condition</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <% @distribution_filters.each do |filter| %>
+                      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <p class="font-medium text-sm text-gray-900 dark:text-white"><%= filter.campaign_field.label || filter.campaign_field.name %></p>
+                        </td>
+                        <td class="px-4 py-3">
+                          <p class="text-sm text-gray-500 dark:text-gray-400">
+                            <% if filter.operator == Filter::OPERATORS[:between] %>
+                              Between <%= filter.min_value %> and <%= filter.max_value %>
+                            <% else %>
+                              <%= filter.operator.humanize %> <%= filter.value.truncate(30) %>
+                            <% end %>
+                          </p>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= filter.status == 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
+                            <%= filter.status.capitalize %>
+                          </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                          <%= link_to "Edit", edit_campaign_distribution_filter_path(@campaign, filter), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-2" %>
+                          <%= button_to "Delete", campaign_distribution_filter_path(@campaign, filter), method: :delete, class: "text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 inline", form: { data: { turbo_confirm: "Are you sure you want to delete this filter?" } } %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="p-6 text-center">
+                <div class="mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No distribution filters</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add filters to control which leads are sent to your distributions.</p>
+                <%= link_to "Add First Distribution Filter", new_campaign_distribution_filter_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+              </div>
+            <% end %>
+
+          <% elsif @section == 'sources' && @subsection == 'sources_list' %>
+            <% if @sources&.any? %>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                      <th scope="col" class="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th scope="col" class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                      <th scope="col" class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Payout</th>
+                      <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <% @sources.each do |source| %>
+                      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <%= link_to source.name, source_path(source), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 font-medium" %>
+                          <div class="sm:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <%= source.company&.name || "N/A" %>
+                          </div>
+                        </td>
+                        <td class="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-gray-900 dark:text-gray-200">
+                          <%= source.company&.name || "N/A" %>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            <%= source.status == 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                               source.status == 'paused' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 
+                               'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' %>">
+                            <%= source.status.titleize %>
+                          </span>
+                          <div class="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <%= source.integration_type.titleize %> • <%= source.display_payout %>
+                          </div>
+                        </td>
+                        <td class="hidden md:table-cell px-4 py-3 whitespace-nowrap text-gray-900 dark:text-gray-200">
+                          <%= source.integration_type.titleize %>
+                        </td>
+                        <td class="hidden md:table-cell px-4 py-3 whitespace-nowrap text-gray-900 dark:text-gray-200">
+                          <%= source.display_payout %>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                          <%= link_to "View", source_path(source), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-2" %>
+                          <%= link_to "Edit", edit_source_path(source), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="p-6 text-center">
+                <div class="mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No sources added</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add sources to receive leads for this campaign.</p>
+                <%= link_to "Add First Source", new_campaign_source_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+              </div>
+            <% end %>
+
+          <% elsif @section == 'distributions' && @subsection == 'distributions_list' %>
+            <% if @distributions&.any? %>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                      <th scope="col" class="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company</th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th scope="col" class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Endpoint</th>
+                      <th scope="col" class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Method</th>
+                      <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <% @distributions.each do |distribution| %>
+                      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <%= link_to distribution.name, distribution_path(distribution), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 font-medium" %>
+                          <div class="sm:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <%= distribution.company&.name || "N/A" %>
+                          </div>
+                        </td>
+                        <td class="hidden sm:table-cell px-4 py-3 whitespace-nowrap text-gray-900 dark:text-gray-200">
+                          <%= distribution.company&.name || "N/A" %>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            <%= distribution.active? ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                               'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' %>">
+                            <%= distribution.status.titleize %>
+                          </span>
+                          <div class="md:hidden text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <%= distribution.request_method.upcase %> • <%= distribution.endpoint_url.truncate(20) %>
+                          </div>
+                        </td>
+                        <td class="hidden md:table-cell px-4 py-3 whitespace-nowrap">
+                          <span class="text-gray-900 dark:text-gray-200 text-sm truncate max-w-xs block">
+                            <%= distribution.endpoint_url.truncate(30) %>
+                          </span>
+                        </td>
+                        <td class="hidden md:table-cell px-4 py-3 whitespace-nowrap text-gray-900 dark:text-gray-200">
+                          <%= distribution.request_method.upcase %>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                          <%= link_to "View", distribution_path(distribution), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-2" %>
+                          <%= link_to "Edit", edit_distribution_path(distribution), class: "text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="p-6 text-center">
+                <div class="mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                </div>
+                <h3 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No distributions added</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add distributions to send leads to your buyers.</p>
+                <%= link_to "Add First Distribution", new_campaign_campaign_distribution_path(@campaign), class: "btn btn-primary w-full sm:w-auto" %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

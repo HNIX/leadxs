@@ -1,10 +1,63 @@
 class CampaignsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_campaign, only: [:show, :edit, :update, :destroy]
+  before_action :set_campaign, only: [:show, :edit, :update, :destroy, :sync_vertical_fields, :configure]
   before_action :set_verticals, only: [:new, :create, :edit, :update]
 
   def index
-    @campaigns = Campaign.includes(:vertical)
+    # Start with base scope
+    campaigns = Campaign.includes(:vertical)
+    
+    # Apply search filter if provided
+    if params[:name].present?
+      campaigns = campaigns.where("name ILIKE ?", "%#{params[:name]}%")
+    end
+    
+    # Apply vertical filter if provided
+    if params[:vertical_id].present?
+      campaigns = campaigns.where(vertical_id: params[:vertical_id])
+    end
+    
+    # Apply status filter if provided
+    if params[:status].present?
+      campaigns = campaigns.where(status: params[:status])
+    end
+    
+    # Apply campaign type filter if provided
+    if params[:campaign_type].present?
+      campaigns = campaigns.where(campaign_type: params[:campaign_type])
+    end
+    
+    # Apply distribution method filter if provided
+    if params[:distribution_method].present?
+      campaigns = campaigns.where(distribution_method: params[:distribution_method])
+    end
+    
+    # Apply date range filters if provided
+    if params[:created_after].present?
+      date = Date.parse(params[:created_after]) rescue nil
+      campaigns = campaigns.where("created_at >= ?", date.beginning_of_day) if date
+    end
+    
+    if params[:created_before].present?
+      date = Date.parse(params[:created_before]) rescue nil
+      campaigns = campaigns.where("created_at <= ?", date.end_of_day) if date
+    end
+    
+    # Apply sorting
+    if params[:sort_by] == 'oldest'
+      campaigns = campaigns.order(created_at: :asc)
+    elsif params[:sort_by] == 'name_asc'
+      campaigns = campaigns.order(name: :asc)
+    elsif params[:sort_by] == 'name_desc'
+      campaigns = campaigns.order(name: :desc)
+    else
+      # Default to newest first
+      campaigns = campaigns.order(created_at: :desc)
+    end
+    
+    # Paginate results
+    per_page = params[:per_page].present? ? params[:per_page].to_i : 10
+    @pagy, @campaigns = pagy(campaigns, items: per_page)
   end
 
   def new
@@ -51,6 +104,44 @@ class CampaignsController < ApplicationController
     @bid_metrics = calculate_bid_metrics(@bid_analytics)
   end
   
+  def configure
+    @campaign = Campaign.find(params[:id])
+    @section = params[:section] || 'fields'
+    @subsection = params[:subsection]
+    
+    # Load the appropriate data based on the selected section
+    case @section
+    when 'fields'
+      @subsection ||= 'campaign_fields'
+      if @subsection == 'campaign_fields'
+        # Add pagination for campaign fields
+        @pagy, @campaign_fields = pagy(@campaign.campaign_fields.ordered, items: 15)
+      else
+        @calculated_fields = @campaign.calculated_fields.ordered
+      end
+    when 'validation_rules'
+      # Add pagination for validation rules
+      @pagy, @validation_rules = pagy(@campaign.validation_rules.ordered, items: 15)
+    when 'sources'
+      @subsection ||= 'sources_list'
+      @sources = @campaign.sources.includes(:company)
+      @source_filters = @campaign.source_filters.where(type: 'SourceFilter').includes(:campaign_field)
+    when 'distributions'
+      @subsection ||= 'distributions_list'
+      @distributions = @campaign.distributions.includes(:company)
+      @distribution_filters = @campaign.distribution_filters.where(type: 'DistributionFilter').includes(:campaign_field)
+    when 'calculated_fields', 'source_filters', 'distribution_filters'
+      # Redirect legacy URLs to the new consolidated sections
+      new_section = case @section
+                    when 'calculated_fields' then 'fields'
+                    when 'source_filters' then 'sources'
+                    when 'distribution_filters' then 'distributions'
+                    end
+      redirect_to configure_campaign_path(@campaign, section: new_section, subsection: @section)
+      return
+    end
+  end
+  
   
 
   def edit
@@ -73,6 +164,21 @@ class CampaignsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to campaigns_path, notice: "Campaign was successfully destroyed." }
       format.json { head :no_content }
+    end
+  end
+  
+  def sync_vertical_fields
+    if @campaign.vertical.present?
+      # Use the CampaignFieldGenerator service to sync vertical fields
+      synced_count = CampaignFieldGenerator.new(@campaign).sync_vertical_fields
+      
+      if synced_count > 0
+        redirect_to campaign_campaign_fields_path(@campaign), notice: "#{synced_count} vertical fields were successfully synchronized with this campaign."
+      else
+        redirect_to campaign_campaign_fields_path(@campaign), notice: "No fields needed synchronization. All vertical fields are already present."
+      end
+    else
+      redirect_to campaign_campaign_fields_path(@campaign), alert: "Cannot sync fields: this campaign does not have a vertical assigned."
     end
   end
 

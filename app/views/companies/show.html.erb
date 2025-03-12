@@ -1,29 +1,69 @@
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="mb-6">
-    <%= link_to "&larr; Back to Companies".html_safe, companies_path, class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
-  </div>
+<div class="container mx-auto px-4 py-8">
+  <!-- Breadcrumb Navigation -->
+  <nav class="mb-8 flex items-center text-sm text-gray-500 dark:text-gray-400">
+    <%= link_to "Companies", companies_path, class: "hover:text-gray-700 dark:hover:text-gray-300" %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+    <span class="text-gray-700 dark:text-gray-300 font-medium"><%= @company.name %></span>
+  </nav>
 
-  <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-6">
-    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-      <div>
-        <h3 class="text-xl leading-6 font-medium text-gray-900 dark:text-white"><%= @company.name %></h3>
+  <!-- Header Section -->
+  <div class="md:flex md:items-center md:justify-between mb-6">
+    <div class="min-w-0 flex-1">
+      <h1 class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:text-3xl sm:tracking-tight">
+        <%= @company.name %>
+      </h1>
+      <div class="mt-1 flex flex-wrap items-center">
         <% badge = @company.status_badge %>
-        <span class="mt-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-<%= badge[:color] %>-100 dark:bg-<%= badge[:color] %>-900 text-<%= badge[:color] %>-800 dark:text-<%= badge[:color] %>-300">
+        <span class="mr-3 px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-<%= badge[:color] %>-100 dark:bg-<%= badge[:color] %>-900 text-<%= badge[:color] %>-800 dark:text-<%= badge[:color] %>-300">
           <%= badge[:label] %>
         </span>
-      </div>
-      <div class="flex">
-        <%= link_to "Edit", edit_company_path(@company), class: "btn btn-secondary mr-2" %>
-        <%= link_to "Delete", company_path(@company), 
-            data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this company?" }, 
-            class: "btn btn-danger" %>
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          <% if @company.city.present? || @company.state.present? %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <%= [@company.city, @company.state].reject(&:blank?).join(", ") %>
+          <% end %>
+        </span>
       </div>
     </div>
-    <div class="border-t border-gray-200 dark:border-gray-700">
-      <dl>
-        <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Address</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
+    <div class="mt-4 flex space-x-3 md:ml-4 md:mt-0">
+      <%= link_to edit_company_path(@company), class: "btn btn-outline" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 0L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit
+      <% end %>
+      
+      <%= link_to company_path(@company), 
+          data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this company?" }, 
+          class: "btn btn-danger" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Delete
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Company Details Card -->
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Company Details</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+        Business and contact information.
+      </p>
+    </div>
+
+    <div class="px-4 py-5 sm:p-0">
+      <dl class="sm:divide-y sm:divide-gray-200 sm:dark:divide-gray-700">
+        <!-- Address -->
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Address</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:col-span-2 sm:mt-0">
             <% if @company.address.present? %>
               <%= @company.address %><br>
               <% if @company.city.present? || @company.state.present? || @company.zip_code.present? %>
@@ -35,42 +75,45 @@
           </dd>
         </div>
         
-        <div class="bg-white dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Billing Cycle</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
-            <% if @company.billing_cycle.present? %>
-              <%= @company.billing_cycle.titleize %>
-            <% else %>
-              <span class="text-gray-400 dark:text-gray-500">Not specified</span>
-            <% end %>
+        <!-- Billing Information -->
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Billing Information</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:col-span-2 sm:mt-0">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-6">
+              <div>
+                <span class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Billing Cycle</span>
+                <% if @company.billing_cycle.present? %>
+                  <%= @company.billing_cycle.titleize %>
+                <% else %>
+                  <span class="text-gray-400 dark:text-gray-500">Not specified</span>
+                <% end %>
+              </div>
+              
+              <div>
+                <span class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Payment Terms</span>
+                <% if @company.payment_terms.present? %>
+                  <%= @company.payment_terms.titleize.gsub('_', ' ') %>
+                <% else %>
+                  <span class="text-gray-400 dark:text-gray-500">Not specified</span>
+                <% end %>
+              </div>
+              
+              <div>
+                <span class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Currency</span>
+                <% if @company.currency.present? %>
+                  <%= @company.currency %>
+                <% else %>
+                  <span class="text-gray-400 dark:text-gray-500">Not specified</span>
+                <% end %>
+              </div>
+            </div>
           </dd>
         </div>
         
-        <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Payment Terms</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
-            <% if @company.payment_terms.present? %>
-              <%= @company.payment_terms.titleize.gsub('_', ' ') %>
-            <% else %>
-              <span class="text-gray-400 dark:text-gray-500">Not specified</span>
-            <% end %>
-          </dd>
-        </div>
-        
-        <div class="bg-white dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Currency</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
-            <% if @company.currency.present? %>
-              <%= @company.currency %>
-            <% else %>
-              <span class="text-gray-400 dark:text-gray-500">Not specified</span>
-            <% end %>
-          </dd>
-        </div>
-        
-        <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Tax ID</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
+        <!-- Tax ID -->
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tax ID</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:col-span-2 sm:mt-0">
             <% if @company.tax_id.present? %>
               <%= @company.tax_id %>
             <% else %>
@@ -79,60 +122,129 @@
           </dd>
         </div>
         
-        <div class="bg-white dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Notes</dt>
-          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:mt-0 sm:col-span-2">
-            <% if @company.notes.present? %>
+        <!-- Notes -->
+        <% if @company.notes.present? %>
+          <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Notes</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:col-span-2 sm:mt-0">
               <p class="whitespace-pre-line"><%= @company.notes %></p>
-            <% else %>
-              <span class="text-gray-400 dark:text-gray-500">No notes</span>
-            <% end %>
+            </dd>
+          </div>
+        <% end %>
+        
+        <!-- Created & Updated -->
+        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Record Information</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200 sm:col-span-2 sm:mt-0">
+            <div class="space-y-1">
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                Created <%= time_ago_in_words(@company.created_at) %> ago
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                Last updated <%= time_ago_in_words(@company.updated_at) %> ago
+              </div>
+            </div>
           </dd>
         </div>
       </dl>
     </div>
   </div>
-  
+
+  <!-- Contacts Section -->
   <div class="mt-8">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-xl font-medium text-gray-900 dark:text-white">Contacts</h3>
-      <%= link_to "Manage Contacts", company_contacts_path(@company), class: "btn btn-primary" %>
+    <div class="md:flex md:items-center md:justify-between mb-6">
+      <div class="min-w-0 flex-1">
+        <h2 class="text-xl font-bold leading-7 text-gray-900 dark:text-white">
+          Contacts
+          <% if @company.contacts.any? %>
+            <span class="ml-2 px-2.5 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full">
+              <%= @company.contacts.count %>
+            </span>
+          <% end %>
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          People associated with <%= @company.name %>
+        </p>
+      </div>
+      <div class="mt-4 flex md:ml-4 md:mt-0">
+        <%= link_to new_company_contact_path(@company), class: "btn btn-primary", data: { turbo_frame: "modal" } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Contact
+        <% end %>
+      </div>
     </div>
-    
+
+    <!-- Contacts List -->
     <% contacts = @company.contacts.sorted.limit(5) %>
     
     <% if contacts.any? %>
-      <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
+      <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
         <ul class="divide-y divide-gray-200 dark:divide-gray-700 list-none">
           <% contacts.each do |contact| %>
-            <li class="px-6 py-4">
-              <div class="flex items-center justify-between">
+            <li class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+              <%= link_to company_contact_path(@company, contact), class: "flex items-center justify-between group", data: { turbo_frame: "modal" } do %>
                 <div>
-                  <h4 class="text-sm font-medium text-gray-900 dark:text-white"><%= contact.full_name %></h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    <%= contact.email %> <%= "• #{contact.phone}" if contact.phone.present? %>
-                  </p>
+                  <h4 class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-150"><%= contact.full_name %></h4>
+                  <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                    <% if contact.email.present? %>
+                      <div class="flex items-center mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <%= contact.email %>
+                      </div>
+                    <% end %>
+                    <% if contact.phone.present? %>
+                      <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        <%= contact.phone %>
+                      </div>
+                    <% end %>
+                  </div>
                 </div>
-                <div>
-                  <%= link_to "View", company_contact_path(@company, contact), class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+                
+                <div class="text-gray-400 dark:text-gray-500 group-hover:text-blue-400 dark:group-hover:text-blue-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
-              </div>
+              <% end %>
             </li>
           <% end %>
         </ul>
+
+        <% if @company.contacts.count > 5 %>
+          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 text-center">
+            <%= link_to company_contacts_path(@company), class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium" do %>
+              View all <%= @company.contacts.count %> contacts
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            <% end %>
+          </div>
+        <% end %>
       </div>
-      
-      <% if @company.contacts.count > 5 %>
-        <div class="mt-4 text-center">
-          <%= link_to "View all #{@company.contacts.count} contacts", company_contacts_path(@company), class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
-        </div>
-      <% end %>
     <% else %>
-      <div class="bg-white dark:bg-gray-900 shadow sm:rounded-lg p-6 text-center">
-        <p class="text-gray-500 dark:text-gray-400">No contacts found for this company.</p>
-        <p class="mt-2">
-          <%= link_to "Add your first contact", new_company_contact_path(@company), class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
-        </p>
+      <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+        <div class="py-12 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <h3 class="mt-3 text-md font-medium text-gray-700 dark:text-gray-200 mb-1">No contacts yet</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">
+            Add contacts to this company to keep track of important people and their contact information.
+          </p>
+          <%= link_to new_company_contact_path(@company), class: "btn btn-sm btn-primary", data: { turbo_frame: "modal" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add First Contact
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>

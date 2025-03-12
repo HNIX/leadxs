@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_10_041302) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_11_235138) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -825,6 +825,33 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_041302) do
     t.index ["token"], name: "index_sources_on_token", unique: true
   end
 
+  create_table "standard_fields", force: :cascade do |t|
+    t.string "name"
+    t.string "label"
+    t.integer "data_type"
+    t.integer "value_acceptance", default: 0
+    t.boolean "required", default: false
+    t.text "description"
+    t.boolean "is_pii", default: false
+    t.boolean "ping_required", default: false
+    t.boolean "post_required", default: false
+    t.boolean "post_only", default: false
+    t.boolean "hide", default: false
+    t.string "default_value"
+    t.string "example_value"
+    t.string "validation_regex"
+    t.integer "min_length"
+    t.integer "max_length"
+    t.decimal "min_value", precision: 10, scale: 2
+    t.decimal "max_value", precision: 10, scale: 2
+    t.bigint "account_id", null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "name"], name: "index_standard_fields_on_account_id_and_name", unique: true
+    t.index ["account_id"], name: "index_standard_fields_on_account_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -910,6 +937,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_041302) do
     t.decimal "max_value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "validation_regex"
+    t.integer "min_length"
+    t.integer "max_length"
+    t.text "description"
     t.index ["account_id", "position"], name: "index_vertical_fields_on_account_id_and_position"
     t.index ["account_id", "vertical_id", "name"], name: "index_vertical_fields_on_account_id_and_vertical_id_and_name", unique: true
     t.index ["account_id"], name: "index_vertical_fields_on_account_id"
@@ -995,6 +1026,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_041302) do
   add_foreign_key "sources", "accounts"
   add_foreign_key "sources", "campaigns"
   add_foreign_key "sources", "companies"
+  add_foreign_key "standard_fields", "accounts"
   add_foreign_key "validation_rules", "accounts"
   add_foreign_key "vertical_fields", "accounts"
   add_foreign_key "vertical_fields", "verticals"

@@ -1,5 +1,8 @@
 # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  resources :standard_fields do
+    resource :positions, only: [:update], module: :standard_fields
+  end
   # Compliance routes
   get "compliance", to: "compliance#index", as: :compliance
   get "compliance/dashboard", to: "compliance#dashboard", as: :compliance_dashboard
@@ -51,6 +54,11 @@ Rails.application.routes.draw do
   end
   
   resources :campaigns do
+    member do
+      post 'sync_vertical_fields'
+      get 'configure'
+    end
+    
     # Campaign Distributions for this campaign
     resources :campaign_distributions, path: 'distributions', only: [:index, :new, :create]
     resources :campaign_fields do
@@ -132,6 +140,8 @@ Rails.application.routes.draw do
     member do
       patch :archive
       patch :unarchive
+      post :apply_standard_fields
+      post :sync_standard_fields
     end
 
     resources :vertical_fields do

@@ -1,0 +1,32 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <%= link_to "&larr; Back to Campaign".html_safe, campaign_path(@campaign), class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+  </div>
+
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fields for <%= @campaign.name %></h1>
+    <div class="flex space-x-2">
+      <% if @campaign.vertical.present? %>
+        <%= button_to "Sync Vertical Fields", "/campaigns/#{@campaign.id}/sync_vertical_fields", method: :post, class: "btn btn-secondary", form: { data: { turbo_confirm: "This will add any missing fields from the vertical to this campaign. Continue?" } } %>
+      <% end %>
+      <%= link_to "Add New Field", new_campaign_campaign_field_path(@campaign), class: "btn btn-primary", data: { turbo_frame: "modal" } %>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+    <% if @campaign_fields.any? %>
+      <%= render 'campaign_fields/list', campaign_fields: @campaign_fields, campaign: @campaign %>
+    <% else %>
+      <div class="p-6 text-center">
+        <p class="text-gray-500 dark:text-gray-400">No fields defined for this campaign yet.</p>
+        <div class="mt-4">
+          <% if @campaign.vertical.present? && @campaign.vertical.vertical_fields.any? %>
+            <%= button_to "Import Fields from Vertical", "/campaigns/#{@campaign.id}/sync_vertical_fields", method: :post, class: "btn btn-primary", form: { data: { turbo_confirm: "This will import all fields from the vertical to this campaign. Continue?" } } %>
+          <% else %>
+            <%= link_to "Add your first field", new_campaign_campaign_field_path(@campaign), class: "btn btn-primary", data: { turbo_frame: "modal" } %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,211 @@
+<%= form_with(model: standard_field, local: true, data: { controller: "field-type" }) do |form| %>
+  <% if standard_field.errors.any? %>
+    <div class="bg-red-50 text-red-500 p-4 rounded mb-6">
+      <h2 class="text-lg font-semibold mb-2"><%= pluralize(standard_field.errors.count, "error") %> prevented this field from being saved:</h2>
+      <ul class="list-disc pl-5">
+        <% standard_field.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.text_field :name, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md", placeholder: "e.g. first_name", required: true %>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Unique identifier for this field (no spaces)</p>
+    </div>
+
+    <div>
+      <%= form.label :label, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.text_field :label, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md", placeholder: "e.g. First Name" %>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Display label for forms (optional)</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <%= form.label :data_type, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.select :data_type, StandardField.data_types.keys.map { |key| [key.titleize, key] }, 
+        { include_blank: false }, 
+        { class: "mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white",
+          data: { field_type_target: "dataType", action: "change->field-type#updateFieldType" }
+        } %>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Determines validation and input type</p>
+    </div>
+
+    <div>
+      <%= form.label :value_acceptance, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.select :value_acceptance, StandardField.value_acceptances.keys.map { |key| [key.titleize, key] }, 
+        { include_blank: false }, 
+        { class: "mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white",
+          data: { field_type_target: "valueAcceptance", action: "change->field-type#updateValueAcceptance" }
+        } %>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Determines field validation constraints</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="flex items-center">
+      <%= form.check_box :required, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= form.label :required, "Required", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+    </div>
+    
+    <div class="flex items-center">
+      <%= form.check_box :is_pii, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= form.label :is_pii, "PII", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+    </div>
+    
+    <div class="flex items-center">
+      <%= form.check_box :ping_required, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= form.label :ping_required, "Ping Required", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+    </div>
+    
+    <div class="flex items-center">
+      <%= form.check_box :post_required, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= form.label :post_required, "Post Required", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="flex items-center">
+      <%= form.check_box :post_only, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= form.label :post_only, "Post Only", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+      <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">(Only included in full leads)</span>
+    </div>
+    
+    <div class="flex items-center">
+      <%= form.check_box :hide, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= form.label :hide, "Hidden", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+      <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">(Not visible on forms)</span>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :description, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+    <%= form.text_area :description, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white" %>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Additional details about this field</p>
+  </div>
+
+  <!-- Range constraints (for number type) -->
+  <div data-field-type-target="rangeSection" class="hidden mb-6">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Range Constraints</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= form.label :min_value, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.number_field :min_value, step: "any", class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Minimum allowed value</p>
+      </div>
+
+      <div>
+        <%= form.label :max_value, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.number_field :max_value, step: "any", class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Maximum allowed value</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text constraints -->
+  <div data-field-type-target="textSection" class="hidden mb-6">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Text Constraints</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div>
+        <%= form.label :min_length, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.number_field :min_length, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Minimum text length</p>
+      </div>
+
+      <div>
+        <%= form.label :max_length, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.number_field :max_length, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Maximum text length</p>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <%= form.label :validation_regex, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <%= form.text_field :validation_regex, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md", placeholder: "e.g. [A-Za-z0-9]+" %>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Regular expression pattern for validation</p>
+    </div>
+  </div>
+
+  <!-- List values section -->
+  <div data-field-type-target="listSection" class="hidden mb-6">
+    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">List Values</h3>
+      
+      <div id="list-values" class="space-y-2" data-controller="list-values">
+        <template data-list-values-target="template">
+          <div class="list-value-fields flex items-center gap-4 mt-2">
+            <div class="flex-grow">
+              <input type="text" name="standard_field[list_values_attributes][{index}][list_value]" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md" placeholder="Enter value" />
+              <input type="hidden" name="standard_field[list_values_attributes][{index}][position]" value="{position}" />
+            </div>
+            <div class="flex-shrink-0">
+              <button type="button" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" data-action="click->list-values#removeValue">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </template>
+        
+        <div data-list-values-target="container">
+          <%= form.fields_for :list_values do |list_value_form| %>
+            <div class="list-value-fields flex items-center gap-4 mt-2">
+              <div class="flex-grow">
+                <%= list_value_form.text_field :list_value, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md", placeholder: "Enter value" %>
+                <%= list_value_form.hidden_field :position, class: 'position-field' %>
+              </div>
+              <div class="flex-shrink-0">
+                <%= list_value_form.check_box :_destroy, class: "hidden" %>
+                <button type="button" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" data-action="click->list-values#removeExistingValue">
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <div class="links mt-4">
+          <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:border-blue-700 focus:shadow-outline-blue active:bg-blue-700 transition duration-150 ease-in-out" data-action="click->list-values#addValue">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Add Value
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Field values section -->
+  <div class="border-t border-gray-200 dark:border-gray-700 pt-6 mb-6">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Default & Example Values</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= form.label :default_value, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.text_field :default_value, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Pre-filled value on forms</p>
+      </div>
+
+      <div>
+        <%= form.label :example_value, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= form.text_field :example_value, class: "mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-md" %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Example shown to users</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end">
+    <%= link_to "Cancel", standard_fields_path, class: "btn btn-white mr-2" %>
+    <%= form.submit class: "btn btn-primary" %>
+  </div>
+<% end %>

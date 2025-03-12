@@ -6,6 +6,20 @@
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fields for <%= @vertical.name %></h1>
     <div class="flex space-x-2">
+      <% if @standard_fields.any? %>
+        <div class="dropdown inline-block relative mr-2">
+          <button class="btn btn-secondary inline-flex items-center">
+            <span>Standard Field Actions</span>
+            <svg class="fill-current h-4 w-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+            </svg>
+          </button>
+          <div class="dropdown-menu absolute hidden text-gray-700 pt-1 z-10 right-0 w-64">
+            <%= button_to "Add Missing Standard Fields", apply_standard_fields_vertical_path(@vertical), method: :post, class: "w-full text-left bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white block py-2 px-4 text-sm", form: { data: { turbo_confirm: "This will add any missing standard fields to this vertical. Continue?" } } %>
+            <%= button_to "Sync Existing Standard Fields", sync_standard_fields_vertical_path(@vertical), method: :post, class: "w-full text-left bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white block py-2 px-4 text-sm", form: { data: { turbo_confirm: "This will update existing fields to match the current standard field definitions. Continue?" } } %>
+          </div>
+        </div>
+      <% end %>
       <%= link_to "Add New Field", new_vertical_vertical_field_path(@vertical), class: "btn btn-primary", data: { turbo_frame: "modal" } %>
     </div>
   </div>
@@ -40,63 +54,4 @@
       </p>
     </div>
   <% end %>
-
-  <div class="mt-8">
-    <h2 class="text-xl font-medium text-gray-900 dark:text-white mb-4">Standard Fields</h2>
-    <p class="text-gray-600 dark:text-gray-400 mb-4">These standard fields are available for all verticals and don't need to be defined explicitly:</p>
-
-    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-700">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">first_name</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">text</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Lead's first name</td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">last_name</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">text</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Lead's last name</td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">email</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">email</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Lead's email address</td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">phone</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">phone</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Lead's phone number</td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">address</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">text</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">Street address</td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">city</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">text</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">City</td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">state</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">text</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">State or province</td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">postal_code</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">text</td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">ZIP or postal code</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
 </div>
