@@ -1,5 +1,31 @@
 # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  # Anomaly detection routes
+  resources :anomaly_detections, path: "anomalies" do
+    collection do
+      get :dashboard
+      post :run_detection
+      get :export
+    end
+    
+    member do
+      post :acknowledge
+      post :resolve
+      get :history
+    end
+  end
+  
+  resources :anomaly_thresholds, path: "anomaly-thresholds" do
+    member do
+      post :toggle_status
+      post :test
+    end
+    
+    collection do
+      get :export
+      post :import
+    end
+  end
   resources :standard_fields do
     resource :positions, only: [:update], module: :standard_fields
   end

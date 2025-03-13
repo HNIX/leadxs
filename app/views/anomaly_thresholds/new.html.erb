@@ -1,0 +1,264 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create New Anomaly Threshold</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-400">Define rules to detect abnormal patterns in your metrics</p>
+      </div>
+      <%= link_to anomaly_thresholds_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Thresholds
+      <% end %>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Threshold Details</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Configure how anomalies should be detected for a specific metric</p>
+    </div>
+
+    <%= form_with model: @anomaly_threshold, class: "p-6 space-y-6" do |f| %>
+      <% if @anomaly_threshold.errors.any? %>
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400 dark:text-red-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                <%= pluralize(@anomaly_threshold.errors.count, "error") %> prohibited this threshold from being saved:
+              </h3>
+              <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @anomaly_threshold.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Basic information -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+          <%= f.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.text_field :name, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white", placeholder: "e.g., High Bid Rejection Rate" %>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">A descriptive name for this threshold</p>
+        </div>
+
+        <div>
+          <%= f.label :metric, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select :metric, 
+                      options_for_select(@available_metrics.map { |m| [m[:name], m[:key]] }, @anomaly_threshold.metric), 
+                      { include_blank: "Select a metric to monitor" }, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                       data: { action: "change->threshold-form#updateMetricDescription" } } %>
+          <p id="metric-description" class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select a metric to see its description</p>
+        </div>
+      </div>
+
+      <!-- Threshold configuration -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div>
+          <%= f.label :threshold_type, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select :threshold_type, 
+                      options_for_select([
+                        ["Absolute Value", "absolute"],
+                        ["Percentage Change", "percentage"],
+                        ["Standard Deviation", "std_dev"]
+                      ], @anomaly_threshold.threshold_type), 
+                      { include_blank: "Select threshold type" }, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                       data: { action: "change->threshold-form#updateTypeHelp" } } %>
+          <p id="threshold-type-help" class="mt-1 text-sm text-gray-500 dark:text-gray-400">How to evaluate if a value is anomalous</p>
+        </div>
+
+        <div>
+          <%= f.label :threshold_value, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.number_field :threshold_value, step: 0.01, min: 0, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">The value that triggers this threshold</p>
+        </div>
+
+        <div>
+          <%= f.label "Direction", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select "metadata[direction]", 
+                     options_for_select([
+                       ["Above threshold", "above"],
+                       ["Below threshold", "below"]
+                     ], @anomaly_threshold.metadata["direction"]), 
+                     {}, 
+                     { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">When to trigger (above or below threshold)</p>
+        </div>
+      </div>
+
+      <!-- Monitoring and alerting configuration -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div>
+          <%= f.label :lookback_period, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select :lookback_period, 
+                     options_for_select([
+                       ["Hourly", "hourly"],
+                       ["Daily", "daily"],
+                       ["Weekly", "weekly"],
+                       ["Monthly", "monthly"]
+                     ], @anomaly_threshold.lookback_period), 
+                     { include_blank: "Select period" }, 
+                     { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">How far back to analyze data</p>
+        </div>
+
+        <div>
+          <%= f.label :severity, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= f.select :severity, 
+                     options_for_select([
+                       ["Warning", "warning"],
+                       ["Critical", "critical"]
+                     ], @anomaly_threshold.severity), 
+                     { include_blank: "Select severity" }, 
+                     { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">How serious is this anomaly</p>
+        </div>
+
+        <div>
+          <div class="flex items-start">
+            <%= f.check_box :auto_resolve, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1 dark:bg-gray-700 dark:border-gray-600" %>
+            <%= f.label :auto_resolve, "Auto-resolve anomalies", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+          </div>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Automatically resolve anomalies when values return to normal</p>
+        </div>
+      </div>
+
+      <!-- Scope configuration -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-5">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Scope</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Limit this threshold to a specific campaign or distribution, or leave blank for account-wide</p>
+        
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div>
+            <%= f.label :campaign_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= f.select :campaign_id, 
+                       options_for_select(Campaign.all.map { |c| [c.name, c.id] }, @anomaly_threshold.campaign_id), 
+                       { include_blank: "Apply to all campaigns" }, 
+                       { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                         data: { action: "change->threshold-form#toggleEntitySelection" } } %>
+          </div>
+
+          <div>
+            <%= f.label :distribution_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= f.select :distribution_id, 
+                       options_for_select(Distribution.all.map { |d| [d.name, d.id] }, @anomaly_threshold.distribution_id), 
+                       { include_blank: "Apply to all distributions" }, 
+                       { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                         data: { action: "change->threshold-form#toggleEntitySelection" } } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <%= f.label :description, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+        <%= f.text_area :description, rows: 3, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white", placeholder: "Provide additional context about when and why this threshold might be triggered..." %>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Optional notes about this threshold's purpose or expected behavior</p>
+      </div>
+
+      <!-- Active status -->
+      <div class="flex items-start">
+        <%= f.check_box :active, checked: true, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1 dark:bg-gray-700 dark:border-gray-600" %>
+        <%= f.label :active, "Threshold is active", class: "ml-2 block text-sm text-gray-700 dark:text-gray-300" %>
+        <p class="ml-6 text-sm text-gray-500 dark:text-gray-400">Uncheck to create but disable this threshold</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="pt-5 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+        <%= link_to "Cancel", anomaly_thresholds_path, class: "inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700" %>
+        <%= f.submit "Create Threshold", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% content_for :javascripts do %>
+  <script>
+    // Stimulus controller for the threshold form
+    application.register("threshold-form", class extends Stimulus.Controller {
+      static targets = ["metricDescription", "thresholdTypeHelp", "campaignSelect", "distributionSelect"]
+      
+      connect() {
+        this.updateMetricDescription();
+        this.updateTypeHelp();
+      }
+      
+      updateMetricDescription(event) {
+        const metricSelect = this.element.querySelector('[name="anomaly_threshold[metric]"]');
+        const metricDescription = document.getElementById('metric-description');
+        
+        if (!metricSelect || !metricDescription) return;
+        
+        const selectedMetric = metricSelect.value;
+        if (!selectedMetric) {
+          metricDescription.textContent = "Select a metric to see its description";
+          return;
+        }
+        
+        // Get the metric description from the available metrics array
+        const metrics = <%= raw @available_metrics.to_json %>;
+        const metric = metrics.find(m => m.key === selectedMetric);
+        
+        if (metric) {
+          metricDescription.textContent = metric.description;
+        } else {
+          metricDescription.textContent = "No description available for this metric";
+        }
+      }
+      
+      updateTypeHelp(event) {
+        const typeSelect = this.element.querySelector('[name="anomaly_threshold[threshold_type]"]');
+        const typeHelp = document.getElementById('threshold-type-help');
+        
+        if (!typeSelect || !typeHelp) return;
+        
+        const selectedType = typeSelect.value;
+        
+        switch (selectedType) {
+          case 'absolute':
+            typeHelp.textContent = "Trigger when value is above/below a specific number";
+            break;
+          case 'percentage':
+            typeHelp.textContent = "Trigger when value changes by X% compared to historical average";
+            break;
+          case 'std_dev':
+            typeHelp.textContent = "Trigger when value deviates by X standard deviations from normal";
+            break;
+          default:
+            typeHelp.textContent = "How to evaluate if a value is anomalous";
+        }
+      }
+      
+      toggleEntitySelection(event) {
+        const campaignSelect = this.element.querySelector('[name="anomaly_threshold[campaign_id]"]');
+        const distributionSelect = this.element.querySelector('[name="anomaly_threshold[distribution_id]"]');
+        
+        // If one is selected, disable the other
+        if (event.target === campaignSelect && campaignSelect.value) {
+          distributionSelect.value = "";
+          distributionSelect.disabled = true;
+        } else if (event.target === distributionSelect && distributionSelect.value) {
+          campaignSelect.value = "";
+          campaignSelect.disabled = true;
+        } else {
+          // If the selection was cleared, re-enable both
+          campaignSelect.disabled = false;
+          distributionSelect.disabled = false;
+        }
+      }
+    });
+  </script>
+<% end %>

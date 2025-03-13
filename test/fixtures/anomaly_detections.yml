@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  metric: MyString
+  value: 1.5
+  expected_value: 1.5
+  deviation_percent: 1.5
+  severity: MyString
+  detected_at: 2025-03-12 22:43:54
+  resolved_at: 2025-03-12 22:43:54
+  anomaly_threshold: one
+  account: one
+
+two:
+  metric: MyString
+  value: 1.5
+  expected_value: 1.5
+  deviation_percent: 1.5
+  severity: MyString
+  detected_at: 2025-03-12 22:43:54
+  resolved_at: 2025-03-12 22:43:54
+  anomaly_threshold: two
+  account: two

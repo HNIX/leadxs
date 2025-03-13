@@ -25,3 +25,15 @@ end
 every '0 3 1 * *' do
   runner "GenerateBidAnalyticsJob.perform_later(period_type: :monthly, all_campaigns: true, all_distributions: true)"
 end
+
+# Anomaly Detection Jobs
+
+# Run anomaly detection every hour
+every 1.hour do
+  runner "AnomalyDetectionJob.perform_later"
+end
+
+# Send daily anomaly summary emails at 7:00 AM
+every 1.day, at: '7:00 am' do
+  runner "AnomalySummaryEmailJob.perform_later"
+end

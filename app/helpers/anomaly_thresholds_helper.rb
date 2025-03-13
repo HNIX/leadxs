@@ -1,0 +1,2 @@
+module AnomalyThresholdsHelper
+end

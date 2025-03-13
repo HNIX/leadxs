@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_13_020922) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -117,6 +117,59 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_020922) do
     t.datetime "published_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "anomaly_detections", force: :cascade do |t|
+    t.string "metric"
+    t.float "value"
+    t.float "expected_value"
+    t.float "deviation_percent"
+    t.string "severity"
+    t.string "status", default: "open"
+    t.datetime "detected_at"
+    t.datetime "resolved_at"
+    t.datetime "acknowledged_at"
+    t.text "notes"
+    t.jsonb "context_data", default: {}
+    t.bigint "anomaly_threshold_id", null: false
+    t.bigint "account_id", null: false
+    t.bigint "campaign_id"
+    t.bigint "distribution_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "metric", "detected_at"], name: "idx_on_account_id_metric_detected_at_703a797b02"
+    t.index ["account_id", "status", "detected_at"], name: "idx_on_account_id_status_detected_at_09972a8fa8"
+    t.index ["account_id"], name: "index_anomaly_detections_on_account_id"
+    t.index ["anomaly_threshold_id"], name: "index_anomaly_detections_on_anomaly_threshold_id"
+    t.index ["campaign_id"], name: "index_anomaly_detections_on_campaign_id"
+    t.index ["distribution_id"], name: "index_anomaly_detections_on_distribution_id"
+    t.index ["status"], name: "index_anomaly_detections_on_status"
+    t.index ["user_id"], name: "index_anomaly_detections_on_user_id"
+  end
+
+  create_table "anomaly_thresholds", force: :cascade do |t|
+    t.string "name"
+    t.string "metric"
+    t.string "threshold_type"
+    t.float "threshold_value"
+    t.string "lookback_period"
+    t.string "severity"
+    t.jsonb "metadata", default: {}
+    t.boolean "active", default: true
+    t.boolean "auto_resolve", default: false
+    t.text "description"
+    t.bigint "account_id", null: false
+    t.bigint "campaign_id"
+    t.bigint "distribution_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "campaign_id", "metric"], name: "idx_on_account_id_campaign_id_metric_1de04ced12", where: "(campaign_id IS NOT NULL)"
+    t.index ["account_id", "distribution_id", "metric"], name: "idx_on_account_id_distribution_id_metric_a2116c0906", where: "(distribution_id IS NOT NULL)"
+    t.index ["account_id", "metric", "active"], name: "index_anomaly_thresholds_on_account_id_and_metric_and_active"
+    t.index ["account_id"], name: "index_anomaly_thresholds_on_account_id"
+    t.index ["campaign_id"], name: "index_anomaly_thresholds_on_campaign_id"
+    t.index ["distribution_id"], name: "index_anomaly_thresholds_on_distribution_id"
   end
 
   create_table "api_requests", force: :cascade do |t|
@@ -971,6 +1024,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_020922) do
   add_foreign_key "account_users", "users"
   add_foreign_key "accounts", "users", column: "owner_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "anomaly_detections", "accounts"
+  add_foreign_key "anomaly_detections", "anomaly_thresholds"
+  add_foreign_key "anomaly_detections", "campaigns"
+  add_foreign_key "anomaly_detections", "distributions"
+  add_foreign_key "anomaly_detections", "users"
+  add_foreign_key "anomaly_thresholds", "accounts"
+  add_foreign_key "anomaly_thresholds", "campaigns"
+  add_foreign_key "anomaly_thresholds", "distributions"
   add_foreign_key "api_requests", "accounts"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "bid_analytic_snapshots", "accounts"

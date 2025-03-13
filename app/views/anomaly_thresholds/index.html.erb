@@ -1,0 +1,280 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Anomaly Thresholds</h1>
+      <p class="text-lg text-gray-600 dark:text-gray-400">Configure detection rules for unusual patterns and performance deviations</p>
+    </div>
+    <div class="flex gap-4">
+      <%= link_to new_anomaly_threshold_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Add New Threshold
+      <% end %>
+      <%= link_to export_anomaly_thresholds_path(format: :csv), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Export
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Filter and Stats Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+    <!-- Filter Card -->
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h2 class="text-lg font-medium mb-4 text-gray-900 dark:text-white">Filter Thresholds</h2>
+      
+      <%= form_with url: anomaly_thresholds_path, method: :get, data: { turbo_frame: "_top" } do |f| %>
+        <div class="space-y-4">
+          <div>
+            <label for="scope" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scope</label>
+            <select name="scope" id="scope" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="all" <%= @scope == "all" ? "selected" : "" %>>All Thresholds</option>
+              <option value="global" <%= @scope == "global" ? "selected" : "" %>>Account-wide Only</option>
+              <option value="campaign" <%= @scope == "campaign" ? "selected" : "" %>>Campaign-specific Only</option>
+              <option value="distribution" <%= @scope == "distribution" ? "selected" : "" %>>Distribution-specific Only</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="campaign_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Campaign</label>
+            <select name="campaign_id" id="campaign_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="">All Campaigns</option>
+              <% Campaign.all.each do |campaign| %>
+                <option value="<%= campaign.id %>" <%= @campaign_id.to_s == campaign.id.to_s ? "selected" : "" %>><%= campaign.name %></option>
+              <% end %>
+            </select>
+          </div>
+          
+          <div>
+            <label for="distribution_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Distribution</label>
+            <select name="distribution_id" id="distribution_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="">All Distributions</option>
+              <% Distribution.all.each do |distribution| %>
+                <option value="<%= distribution.id %>" <%= @distribution_id.to_s == distribution.id.to_s ? "selected" : "" %>><%= distribution.name %></option>
+              <% end %>
+            </select>
+          </div>
+          
+          <div class="flex items-center mt-2">
+            <input type="checkbox" name="active_only" id="active_only" value="true" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600" <%= @active_only ? "checked" : "" %>>
+            <label for="active_only" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Active thresholds only</label>
+          </div>
+          
+          <div class="flex space-x-4 mt-4">
+            <button type="submit" class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800">
+              Apply Filters
+            </button>
+            <a href="<%= anomaly_thresholds_path %>" class="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 text-center">
+              Clear Filters
+            </a>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Thresholds</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white"><%= @stats[:active] %> / <%= @stats[:total] %></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-300 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Campaign Specific</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white"><%= @stats[:campaign_specific] %></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-300 mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Distribution Specific</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white"><%= @stats[:distribution_specific] %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Thresholds Section -->
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8">
+    <h2 class="text-lg font-medium mb-4 text-gray-900 dark:text-white">Import Thresholds</h2>
+    
+    <%= form_with url: import_anomaly_thresholds_path, method: :post, multipart: true, class: "flex items-end gap-4" do |f| %>
+      <div class="flex-grow">
+        <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CSV File</label>
+        <div class="mt-1 flex rounded-md shadow-sm">
+          <%= f.file_field :file, accept: '.csv', class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+      </div>
+      <div>
+        <button type="submit" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800">
+          Import
+        </button>
+      </div>
+    <% end %>
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+      Upload a CSV file with columns: name, metric, threshold_type, threshold_value, lookback_period, severity, description.
+      Optional columns: campaign_id, distribution_id, direction.
+    </p>
+  </div>
+
+  <!-- Threshold Lists by Metric -->
+  <% if @thresholds_by_metric.any? %>
+    <% @thresholds_by_metric.each do |metric, thresholds| %>
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <% metric_info = AnomalyThreshold.available_metrics.find { |m| m[:key] == metric } %>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white"><%= metric_info ? metric_info[:name] : metric %></h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400"><%= metric_info ? metric_info[:description] : "Custom metric" %></p>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-900/30">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Condition</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lookback</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Severity</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Scope</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% thresholds.each do |threshold| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <%= link_to threshold.name, anomaly_threshold_path(threshold), class: "hover:text-blue-600 dark:hover:text-blue-400" %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <% case threshold.threshold_type %>
+                    <% when "absolute" %>
+                      <%= threshold.metric_name %> <%= threshold.comparison_operator %> <%= threshold.threshold_value %>
+                    <% when "percentage" %>
+                      <%= threshold.metric_name %> changes by <%= threshold.threshold_value %>% or more
+                    <% when "std_dev" %>
+                      <%= threshold.metric_name %> deviates by <%= threshold.threshold_value %> standard deviations
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <%= threshold.lookback_period.capitalize %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if threshold.severity == "warning" %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">
+                        Warning
+                      </span>
+                    <% else %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
+                        Critical
+                      </span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <% if threshold.campaign.present? %>
+                      Campaign: <%= threshold.campaign.name %>
+                    <% elsif threshold.distribution.present? %>
+                      Distribution: <%= threshold.distribution.name %>
+                    <% else %>
+                      Account-wide
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if threshold.active? %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                        Active
+                      </span>
+                    <% else %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300">
+                        Inactive
+                      </span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <div class="flex space-x-3">
+                      <%= link_to anomaly_threshold_path(threshold), class: "text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      <% end %>
+                      
+                      <%= link_to edit_anomaly_threshold_path(threshold), class: "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300" do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      <% end %>
+                      
+                      <%= button_to toggle_status_anomaly_threshold_path(threshold), method: :post, form: { data: { turbo_confirm: "Are you sure you want to #{threshold.active? ? 'deactivate' : 'activate'} this threshold?" } }, class: "text-#{threshold.active? ? 'red' : 'green'}-600 hover:text-#{threshold.active? ? 'red' : 'green'}-900 dark:text-#{threshold.active? ? 'red' : 'green'}-400 dark:hover:text-#{threshold.active? ? 'red' : 'green'}-300" do %>
+                        <% if threshold.active? %>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          </svg>
+                        <% else %>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        <% end %>
+                      <% end %>
+                      
+                      <%= button_to test_anomaly_threshold_path(threshold), method: :post, class: "text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300" do %>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+                        </svg>
+                      <% end %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">No thresholds found</h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Get started by creating a new anomaly threshold or adjusting your filters.
+      </p>
+      <div class="mt-6">
+        <%= link_to new_anomaly_threshold_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Create First Threshold
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
