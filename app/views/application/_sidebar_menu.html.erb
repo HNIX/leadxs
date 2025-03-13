@@ -40,13 +40,24 @@
         <% end %>
       </li>
 
-      <li>  
-        <%= link_to dashboard_bid_requests_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-4 py-2 rounded-md #{controller_name == 'bid_requests' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-100" data-highlight="true"  viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          Bid Reports
-        <% end %>
+      <li class="flex flex-col gap-3 px-4 py-2">
+        <h3 class="font-mono text-sm/6 font-medium tracking-widest text-gray-500 dark:text-white uppercase sm:text-xs/6">Analytics & Reports</h3>
+        <ul class="flex flex-col gap-2 border-l border-[color-mix(in_oklab,_var(--color-gray-950),white_90%)]" role="list">
+          <li class="-ml-px flex flex-col items-start">
+            <%= link_to activity_feed_index_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'activity_feed' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+              Activity Feed
+            <% end %>
+            <%= link_to dashboard_bid_requests_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'bid_requests' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+              Bid Reports
+            <% end %>
+            <%= link_to reports_sources_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'sources' && controller.class.module_parent_name == 'Reports' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+              Source Performance
+            <% end %>
+            <%= link_to reports_buyers_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'buyers' && controller.class.module_parent_name == 'Reports' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+              Buyer Performance
+            <% end %>
+          </li>
+        </ul>
       </li>
 
       <li>

@@ -1,0 +1,254 @@
+<div class="container mx-auto p-4">
+  <div class="my-6">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Real-time Activity Feed</h1>
+    <p class="text-gray-600 dark:text-gray-300 mb-4">
+      Track lead activity, bids, and distributions in real-time. This feed automatically updates as new events occur.
+    </p>
+    
+    <!-- Filter Panel -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 mb-6">
+      <%= form_with url: activity_feed_index_path, method: :get, class: "space-y-4", data: { turbo_frame: "_top" } do |f| %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Campaign Filter -->
+          <div>
+            <%= f.label :campaign_id, "Campaign", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= f.select :campaign_id, 
+              options_from_collection_for_select(@campaigns, "id", "name", params[:campaign_id]), 
+              { include_blank: "All Campaigns" }, 
+              { class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" }
+            %>
+          </div>
+          
+          <!-- Date Range Filter -->
+          <div>
+            <%= f.label :date_range, "Date Range", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= f.select :date_range, 
+              options_for_select([
+                ["All Time", ""],
+                ["Today", "today"],
+                ["Yesterday", "yesterday"],
+                ["Last 7 Days", "week"],
+                ["Last 30 Days", "month"]
+              ], params[:date_range]),
+              {},
+              { class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" }
+            %>
+          </div>
+          
+          <!-- Activity Type Filter -->
+          <div>
+            <%= f.label :activity_type, "Activity Type", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= f.select :activity_type, 
+              options_for_select([
+                ["All Activities", ""],
+                ["Submission", "submission"],
+                ["Validation", "validation"],
+                ["Anonymization", "anonymization"],
+                ["Bid Request", "bid_request"],
+                ["Bid Received", "bid_received"],
+                ["Bid Selected", "bid_selected"],
+                ["Consent", "consent_requested"],
+                ["Distribution", "distribution"],
+                ["Buyer Response", "buyer_response"],
+                ["Status Update", "status_update"]
+              ], params[:activity_type]),
+              {},
+              { class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" }
+            %>
+          </div>
+          
+          <!-- Lead Status Filter -->
+          <div>
+            <%= f.label :lead_status, "Lead Status", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= f.select :lead_status, 
+              options_for_select([
+                ["All Statuses", ""],
+                ["New Lead", "new_lead"],
+                ["Processing", "processing"],
+                ["Distributing", "distributing"],
+                ["Distributed", "distributed"],
+                ["Rejected", "rejected"],
+                ["Error", "error"]
+              ], params[:lead_status]),
+              {},
+              { class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" }
+            %>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          <!-- Bid Status Filter -->
+          <div>
+            <%= f.label :bid_status, "Bid Status", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= f.select :bid_status, 
+              options_for_select([
+                ["All Bids", ""],
+                ["Pending", "pending"],
+                ["Accepted", "accepted"],
+                ["Rejected", "rejected"],
+                ["Timeout", "timeout"],
+                ["Error", "error"]
+              ], params[:bid_status]),
+              {},
+              { class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" }
+            %>
+          </div>
+          
+          <!-- Submit button -->
+          <div class="flex items-end md:col-span-2 lg:col-span-1">
+            <%= f.submit "Apply Filters", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" %>
+          </div>
+          
+          <!-- Reset button -->
+          <div class="flex items-end">
+            <%= link_to "Reset Filters", activity_feed_index_path, class: "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-2 px-4 rounded w-full text-center" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Main Content Grid - Revised Layout -->
+  <div class="grid grid-cols-1 gap-6">
+    <!-- Activity Stream Section -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+        <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Activity Stream
+        </h2>
+        <div class="flex space-x-2">
+          <select 
+            class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+            data-action="change->activity-feed#filter"
+            data-activity-feed-target="durationFilter">
+            <option value="all">All Time</option>
+            <option value="hour">Last Hour</option>
+            <option value="day" selected>Today</option>
+            <option value="week">This Week</option>
+          </select>
+          <button 
+            class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+            data-action="click->activity-feed#refresh">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div id="activity-stream" class="p-4 max-h-[500px] overflow-y-auto" data-controller="activity-feed">
+        <div class="mb-2 bg-gray-50 dark:bg-gray-700 rounded p-2 text-sm text-gray-500 dark:text-gray-300 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Showing most recent activities first. New activities will appear at the top automatically.</span>
+        </div>
+        <% if @activities.any? %>
+          <div class="space-y-4">
+            <% @activities.each do |activity| %>
+              <%= render partial: "lead_activities/activity", locals: { activity: activity, compact: false } %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <p>No recent activities found. Activities will appear here as leads are processed.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Side-by-side Recent Items Section -->
+    <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Recent Activity Summary</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Recent Leads -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center justify-between">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Recent Leads
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1">
+              <%= @leads.count %> of <%= @lead_count %> leads
+            </span>
+          </h2>
+        </div>
+        <div id="recent-leads" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+          <% if @leads.any? %>
+            <% @leads.each do |lead| %>
+              <%= link_to lead_path(lead), class: "block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition" do %>
+                <div class="flex justify-between items-center">
+                  <div>
+                    <p class="font-medium text-gray-800 dark:text-white"><%= lead.unique_id.first(8) %></p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      <span class="font-medium"><%= lead.campaign&.name %></span> 
+                      via <%= lead.source&.name %>
+                    </p>
+                  </div>
+                  <div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= lead_status_color(lead.status) %>">
+                      <%= lead.status.humanize %>
+                    </span>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <%= time_ago_in_words(lead.created_at) %> ago
+                </p>
+              <% end %>
+            <% end %>
+          <% else %>
+            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+              <p>No leads found.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Recent Bids -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center justify-between">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Recent Bids
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1">
+              <%= @bids.count %> of <%= @bid_count %> bids
+            </span>
+          </h2>
+        </div>
+        <div id="recent-bids" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+          <%= render partial: "bids", locals: { bids: @bids } %>
+        </div>
+      </div>
+
+      <!-- Recent Distributions -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center justify-between">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              Recent Distributions
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1">
+              <%= @distributions.count %> of <%= @distribution_count %> active
+            </span>
+          </h2>
+        </div>
+        <div id="recent-distributions" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+          <%= render partial: "distributions", locals: { distributions: @distributions } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

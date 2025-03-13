@@ -1,8 +1,8 @@
 class LeadActivityLog < ApplicationRecord
+  acts_as_tenant :account
   # Associations
   belongs_to :lead
   belongs_to :user, optional: true
-  belongs_to :account
   belongs_to :causer, polymorphic: true, optional: true
 
   # Enums
@@ -28,6 +28,9 @@ class LeadActivityLog < ApplicationRecord
   # - metadata: jsonb - additional context data
   # - timestamp: datetime - when the activity occurred
   
+  # Callbacks
+  after_create_commit :broadcast_to_activity_feed
+  
   # Scopes
   scope :chronological, -> { order(created_at: :asc) }
   scope :recent_first, -> { order(created_at: :desc) }
@@ -39,6 +42,17 @@ class LeadActivityLog < ApplicationRecord
   
   # Helps with tenant isolation
   acts_as_tenant :account
+  
+  # Instance methods
+  def causer_info
+    return nil unless causer
+    
+    {
+      id: causer.id,
+      type: causer_type,
+      name: causer.respond_to?(:name) ? causer.name : causer.to_s
+    }
+  end
 
   # Class methods
   def self.record(lead, activity_type, details = {}, user = nil, request = nil)
@@ -67,5 +81,9 @@ class LeadActivityLog < ApplicationRecord
     rescue
       nil
     end
+  end
+  
+  def broadcast_to_activity_feed
+    ActivityFeedBroadcastJob.perform_later(self, :activity)
   end
 end

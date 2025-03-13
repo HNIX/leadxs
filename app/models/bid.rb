@@ -29,7 +29,11 @@ class Bid < ApplicationRecord
   
   # Check if this bid is the winner of its bid request
   def winning_bid?
-    bid_request.winning_bid == self
+    return false unless bid_request.present?
+    return accepted? if bid_request.status == 'completed'
+    
+    # If there's a specific method to determine the winning bid
+    bid_request.respond_to?(:winning_bid) ? (bid_request.winning_bid == self) : false
   end
   
   # Accept this bid - usually called when a lead is being finalized
@@ -59,10 +63,12 @@ class Bid < ApplicationRecord
   # Broadcast new bid to the real-time dashboard
   def broadcast_new_bid
     BidAnalyticsBroadcastJob.perform_later(account_id, :new_bid, self)
+    ActivityFeedBroadcastJob.perform_later(self, :bid)
   end
   
   # Broadcast status change to the real-time dashboard
   def broadcast_status_change
     BidAnalyticsBroadcastJob.perform_later(account_id, :new_bid, self)
+    ActivityFeedBroadcastJob.perform_later(self, :bid)
   end
 end

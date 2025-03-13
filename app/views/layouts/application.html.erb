@@ -10,7 +10,7 @@
          data-action="click->sidebar#closeFromOverlay"></div>
     
     <!-- Sidebar - hidden by default on mobile -->
-    <aside class="fixed inset-y-0 left-0 z-30 w-60 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm overflow-y-auto h-screen"
+    <aside class="fixed inset-y-0 left-0 z-30 w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm overflow-y-auto h-screen"
            data-sidebar-target="sidebar"
            data-state="closed">
       <div class="flex flex-col h-full gap-y-5">
@@ -32,7 +32,7 @@
     </aside>
     
     <!-- Main content area - shifted right on desktop to make room for sidebar -->
-    <div class="lg:pl-60 flex flex-col h-screen transition-all duration-300 ease-in-out w-full overflow-x-hidden" data-sidebar-target="content">
+    <div class="lg:pl-64 flex flex-col h-screen transition-all duration-300 ease-in-out w-full overflow-x-hidden" data-sidebar-target="content">
       <%= impersonation_banner %>
       <%= render "flash" %>
       <%= render "navbar" %>

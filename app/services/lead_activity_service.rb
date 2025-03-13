@@ -26,8 +26,8 @@ class LeadActivityService
     # Record bid received from buyer
     def record_bid_received(lead, bid, details = {})
       details[:bid_id] = bid.id
-      details[:buyer_id] = bid.buyer_id
-      details[:buyer_name] = bid.buyer.name
+      details[:buyer_id] = bid.distribution_id if bid.respond_to?(:distribution_id)
+      details[:buyer_name] ||= bid.distribution.name if bid.respond_to?(:distribution) && bid.distribution
       details[:amount] = bid.amount
       details[:causer_type] = 'Bid'
       details[:causer_id] = bid.id
@@ -37,8 +37,8 @@ class LeadActivityService
     # Record winning bid selected
     def record_bid_selected(lead, bid, details = {})
       details[:bid_id] = bid.id
-      details[:buyer_id] = bid.buyer_id
-      details[:buyer_name] = bid.buyer.name
+      details[:buyer_id] = bid.distribution_id if bid.respond_to?(:distribution_id)
+      details[:buyer_name] ||= bid.distribution.name if bid.respond_to?(:distribution) && bid.distribution
       details[:amount] = bid.amount
       details[:causer_type] = 'Bid'
       details[:causer_id] = bid.id
@@ -65,22 +65,21 @@ class LeadActivityService
     
     # Record lead distribution to buyer
     def record_distribution(lead, distribution, details = {})
-      details[:distribution_id] = distribution.id
-      details[:buyer_id] = distribution.buyer_id
-      details[:buyer_name] = distribution.buyer.name
-      details[:causer_type] = 'Distribution'
-      details[:causer_id] = distribution.id
+      details[:distribution_id] = distribution.id if distribution.respond_to?(:id)
+      details[:buyer_id] = details[:distribution_id] if details[:distribution_id]
+      details[:buyer_name] ||= distribution.distribution.name if distribution.respond_to?(:distribution) && distribution.distribution 
+      details[:causer_type] = distribution.class.name
+      details[:causer_id] = distribution.id if distribution.respond_to?(:id)
       record_activity(lead, :distribution, details)
     end
     
     # Record response received from buyer
-    def record_buyer_response(lead, distribution, details = {})
-      details[:distribution_id] = distribution.id
-      details[:buyer_id] = distribution.buyer_id
-      details[:buyer_name] = distribution.buyer.name
-      details[:response_status] = distribution.response_status
-      details[:causer_type] = 'Distribution'
-      details[:causer_id] = distribution.id
+    def record_buyer_response(lead, api_request, details = {})
+      details[:distribution_id] = api_request.id if api_request.respond_to?(:id)
+      details[:buyer_id] = details[:distribution_id] if details[:distribution_id]
+      details[:response_status] = details[:response_status] || (api_request.response_code && api_request.response_code < 300 ? 'accepted' : 'rejected')
+      details[:causer_type] = api_request.class.name
+      details[:causer_id] = api_request.id if api_request.respond_to?(:id)
       record_activity(lead, :buyer_response, details)
     end
     
@@ -103,8 +102,9 @@ class LeadActivityService
     private
     
     def record_activity(lead, activity_type, details = {})
-      user = details.delete(:user) || Current.user
-      request = Current.request
+      user = details.delete(:user)
+      user ||= Current.user if defined?(Current) && Current.respond_to?(:user)
+      request = Current.request if defined?(Current) && Current.respond_to?(:request)
       
       LeadActivityLog.record(lead, activity_type, details, user, request)
     end

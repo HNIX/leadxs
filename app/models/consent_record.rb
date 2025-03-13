@@ -142,6 +142,9 @@ class ConsentRecord < ApplicationRecord
   end
   
   def create_compliance_record
+    # Skip in seeds environment to avoid Current.request errors
+    return if Rails.env.test? || ENV['SKIP_CALLBACKS'] == 'true' || !defined?(Current) || !Current.respond_to?(:request)
+    
     ComplianceRecord.record_consent_event(
       self,
       ComplianceRecord::CONSENT_GIVEN,
@@ -152,7 +155,7 @@ class ConsentRecord < ApplicationRecord
         expires_at: expires_at&.iso8601
       },
       user,
-      Current.request
+      Current.respond_to?(:request) ? Current.request : nil
     )
   end
   

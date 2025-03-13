@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_11_235138) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_13_020922) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -193,6 +193,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_11_235138) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "bid_metadata", default: {}
+    t.datetime "completed_at"
     t.index ["account_id", "unique_id"], name: "index_bid_requests_on_account_id_and_unique_id", unique: true
     t.index ["account_id"], name: "index_bid_requests_on_account_id"
     t.index ["bid_metadata"], name: "index_bid_requests_on_bid_metadata", using: :gin
@@ -244,6 +245,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_11_235138) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_used_at"
+    t.bigint "account_id", null: false
+    t.index ["account_id"], name: "index_campaign_distributions_on_account_id"
     t.index ["campaign_id", "distribution_id"], name: "idx_on_campaign_id_distribution_id_81ffb0256c", unique: true
     t.index ["campaign_id"], name: "index_campaign_distributions_on_campaign_id"
     t.index ["distribution_id"], name: "index_campaign_distributions_on_distribution_id"
@@ -981,6 +984,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_11_235138) do
   add_foreign_key "bids", "distributions"
   add_foreign_key "calculated_fields", "accounts"
   add_foreign_key "calculated_fields", "campaigns", on_delete: :cascade
+  add_foreign_key "campaign_distributions", "accounts"
   add_foreign_key "campaign_distributions", "campaigns"
   add_foreign_key "campaign_distributions", "distributions"
   add_foreign_key "campaign_fields", "accounts"

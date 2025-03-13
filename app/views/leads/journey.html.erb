@@ -1,0 +1,504 @@
+<div class="container mx-auto p-4">
+  <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+    <!-- Header with basic lead info -->
+    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+            Lead Journey Analysis
+            <span class="ml-2 px-2.5 py-0.5 rounded-full text-sm font-medium <%= lead_status_color(@lead.status) %>">
+              <%= @lead.status.humanize %>
+            </span>
+          </h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            ID: <span class="font-mono"><%= @lead.unique_id %></span>
+          </p>
+          <p class="text-gray-600 dark:text-gray-400">
+            Created: <%= @lead.created_at.strftime("%B %d, %Y at %H:%M:%S") %>
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+          <div class="flex space-x-2">
+            <%= link_to lead_path(@lead), class: "btn btn-sm btn-outline" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              View Details
+            <% end %>
+            <%= link_to lead_activities_path(@lead), class: "btn btn-sm btn-outline" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Activities
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Key lead info -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Campaign</h3>
+          <p class="mt-1 text-gray-900 dark:text-white"><%= @lead.campaign.name %></p>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Source</h3>
+          <p class="mt-1 text-gray-900 dark:text-white"><%= @lead.source&.name || "Unknown" %></p>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bid Request</h3>
+          <p class="mt-1 text-gray-900 dark:text-white">
+            <% if @bid_request %>
+              <%= link_to "View Bid Request", bid_request_path(@bid_request), class: "hover:underline text-blue-600 dark:text-blue-400" %>
+            <% else %>
+              No bid request
+            <% end %>
+          </p>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Winning Bid</h3>
+          <p class="mt-1 text-gray-900 dark:text-white">
+            <% winning_bid = @bids.find(&:winning_bid?) %>
+            <% if winning_bid %>
+              $<%= sprintf('%.2f', winning_bid.amount) %> (<%= winning_bid.distribution.name %>)
+            <% else %>
+              No winning bid
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Lead Journey Tabs -->
+    <div data-controller="tabs">
+      <!-- Tab Navigation -->
+      <div class="px-6 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+        <ul class="flex overflow-x-auto list-none">
+          <li class="mr-2">
+            <a href="#timeline" class="py-4 px-2 border-b-2 border-blue-500 font-medium text-blue-600 dark:text-blue-400 whitespace-nowrap block" 
+               data-tabs-target="tab"
+               data-action="click->tabs#change">Timeline</a>
+          </li>
+          <li class="mr-2">
+            <a href="#bidding" class="py-4 px-2 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap block" 
+               data-tabs-target="tab"
+               data-action="click->tabs#change">Bidding</a>
+          </li>
+          <li class="mr-2">
+            <a href="#api-requests" class="py-4 px-2 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap block" 
+               data-tabs-target="tab"
+               data-action="click->tabs#change">API Requests</a>
+          </li>
+          <li class="mr-2">
+            <a href="#compliance" class="py-4 px-2 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 whitespace-nowrap block" 
+               data-tabs-target="tab"
+               data-action="click->tabs#change">Compliance</a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Tab Content Panels -->
+      <div class="p-6">
+        <!-- Timeline Tab -->
+        <div id="timeline" data-tabs-target="panel">
+          <div class="space-y-6">
+            <% if @activities.empty? %>
+              <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>No activity recorded for this lead.</p>
+              </div>
+            <% else %>
+              <div class="space-y-4">
+                <% @activities.each_with_index do |activity, i| %>
+                  <%= render partial: "lead_activities/activity", locals: { 
+                    activity: activity, 
+                    last: i == @activities.size - 1,
+                    compact: false
+                  } %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Bidding Tab -->
+        <div id="bidding" class="hidden" data-tabs-target="panel">
+          <div class="space-y-6">
+            <!-- Bid request info -->
+            <div class="mb-6">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Bid Request</h3>
+              <% if @bid_request %>
+                <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-md">
+                  <div class="px-4 py-5 sm:px-6">
+                    <div class="flex justify-between">
+                      <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        <%= @bid_request.unique_id.first(8) %>
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-<%= @bid_request.status == 'completed' ? 'green' : 'blue' %>-100 text-<%= @bid_request.status == 'completed' ? 'green' : 'blue' %>-800 dark:bg-<%= @bid_request.status == 'completed' ? 'green' : 'blue' %>-900 dark:text-<%= @bid_request.status == 'completed' ? 'green' : 'blue' %>-200">
+                          <%= @bid_request.status.humanize %>
+                        </span>
+                      </h3>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Created <%= time_ago_in_words(@bid_request.created_at) %> ago
+                      </p>
+                    </div>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                      Campaign: <%= @bid_request.campaign.name %>
+                    </p>
+                  </div>
+                  <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:px-6">
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
+                      <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white"><%= @bid_request.status.humanize %></dd>
+                      </div>
+                      <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Expires</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                          <% if @bid_request.expires_at %>
+                            <%= @bid_request.expires_at.strftime("%B %d, %Y at %H:%M:%S") %>
+                            (<%= @bid_request.expires_at > Time.now ? "expires in #{time_ago_in_words(@bid_request.expires_at)}" : "expired #{time_ago_in_words(@bid_request.expires_at)} ago" %>)
+                          <% else %>
+                            No expiration
+                          <% end %>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Completed At</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                          <% if @bid_request.completed? %>
+                            <%= @bid_request.completed_at&.strftime("%B %d, %Y at %H:%M:%S") || @bid_request.updated_at.strftime("%B %d, %Y at %H:%M:%S") + " (estimated)" %>
+                          <% else %>
+                            Not completed
+                          <% end %>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution Method</dt>
+                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                          <%= @bid_request.campaign&.distribution_method&.humanize || "Not specified" %>
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              <% else %>
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>No bid request created for this lead.</p>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Bids -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Bids Received</h3>
+              <% if @bids.any? %>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Buyer
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Amount
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Created
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Winner
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                      <% @bids.each do |bid| %>
+                        <tr>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                            <%= bid.distribution.name %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= number_to_currency(bid.amount) %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= bid_status_color(bid.status) %>">
+                              <%= bid.status.humanize %>
+                            </span>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= time_ago_in_words(bid.created_at) %> ago
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <% if bid.winning_bid? %>
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                Winner
+                              </span>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>No bids received for this lead.</p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        
+        <!-- API Requests Tab -->
+        <div id="api-requests" class="hidden" data-tabs-target="panel">
+          <div class="space-y-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">API Requests</h3>
+            <% if @api_requests.any? %>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Endpoint
+                      </th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Time
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <% @api_requests.each do |request| %>
+                      <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-blue-400">
+                          <%= link_to request.id, api_request_path(request), class: "hover:underline" %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          <%= request.requestable_type %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          <%= truncate(request.endpoint, length: 30) %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          <% if request.response_code.present? %>
+                            <% if request.response_code.to_i >= 200 && request.response_code.to_i < 300 %>
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                <%= request.response_code %>
+                              </span>
+                            <% else %>
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                <%= request.response_code %>
+                              </span>
+                            <% end %>
+                          <% else %>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+                              No response
+                            </span>
+                          <% end %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          <%= time_ago_in_words(request.created_at) %> ago
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>No API requests recorded for this lead.</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Compliance Tab -->
+        <div id="compliance" class="hidden" data-tabs-target="panel">
+          <div class="space-y-6">
+            <!-- Consent Records -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Consent Records</h3>
+              <% if @consent_records.any? %>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Given At
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Expires
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                      <% @consent_records.each do |consent| %>
+                        <tr>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                            <%= consent.consent_type.humanize %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <% if consent.active? %>
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                Active
+                              </span>
+                            <% elsif consent.revoked? %>
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                Revoked
+                              </span>
+                            <% else %>
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+                                Expired
+                              </span>
+                            <% end %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= consent.consented_at.strftime("%B %d, %Y at %H:%M:%S") %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= consent.expires_at&.strftime("%B %d, %Y at %H:%M:%S") || "Never" %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>No consent records for this lead.</p>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Compliance Records -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Compliance Events</h3>
+              <% if @compliance_records.any? %>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Event Type
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Action
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Occurred At
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Details
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                      <% @compliance_records.each do |record| %>
+                        <tr>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                            <%= record.event_type.humanize %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= record.action.humanize %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= record.occurred_at.strftime("%B %d, %Y at %H:%M:%S") %>
+                          </td>
+                          <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                            <div data-controller="details-toggle" id="compliance-details-<%= record.id %>">
+                              <button type="button" 
+                                      class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                                      data-action="details-toggle#toggle"
+                                      data-details-toggle-target="button">
+                                <span data-details-toggle-target="showText">Show details</span>
+                                <span data-details-toggle-target="hideText" class="hidden">Hide details</span>
+                              </button>
+                              
+                              <div class="mt-2 hidden bg-gray-50 dark:bg-gray-800 rounded p-3 text-xs font-mono overflow-x-auto" 
+                                  data-details-toggle-target="content">
+                                <pre class="text-gray-800 dark:text-gray-200"><%= JSON.pretty_generate(record.data) rescue record.data.inspect %></pre>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>No compliance events recorded for this lead.</p>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Data Access Records -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Data Access Records</h3>
+              <% if @data_access_records.any? %>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Action
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          User
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Purpose
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Accessed At
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                      <% @data_access_records.each do |record| %>
+                        <tr>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                            <%= record.action.humanize %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= record.user&.name || "System" %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= record.purpose %>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <%= record.accessed_at.strftime("%B %d, %Y at %H:%M:%S") %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>No data access records for this lead.</p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

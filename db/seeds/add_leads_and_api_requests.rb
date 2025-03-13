@@ -135,7 +135,7 @@ phone_field = CampaignField.find_by(name: "phone", campaign: campaign) ||
         phone: lead.field_value(phone_field.id)
       }.to_json,
       response_code: i < 10 ? 200 : 400,
-      response_data: i < 10 ? 
+      response_payload: i < 10 ? 
         { status: "success", message: "Lead received" }.to_json : 
         { status: "error", message: "Invalid lead data" }.to_json,
       duration_ms: rand(50..1500),
@@ -160,7 +160,7 @@ phone_field = CampaignField.find_by(name: "phone", campaign: campaign) ||
       campaign: campaign.name
     }.to_json,
     response_code: i < 10 ? 201 : (i < 12 ? 400 : 500),
-    response_data: i < 10 ? 
+    response_payload: i < 10 ? 
       { id: "ext-#{100000 + i}", status: "accepted", price: (rand(5..15) + rand).round(2) }.to_json : 
       { error: i < 12 ? "Validation failed" : "Server error" }.to_json,
     duration_ms: rand(50..1500),
@@ -186,7 +186,7 @@ phone_field = CampaignField.find_by(name: "phone", campaign: campaign) ||
         campaign: campaign.name
       }.to_json,
       response_code: 200,
-      response_data: { id: "ext2-#{200000 + i}", status: "accepted", price: (rand(3..10) + rand).round(2) }.to_json,
+      response_payload: { id: "ext2-#{200000 + i}", status: "accepted", price: (rand(3..10) + rand).round(2) }.to_json,
       duration_ms: rand(50..1500),
       sent_at: Time.current - rand(1..30).days
     )
@@ -207,7 +207,7 @@ phone_field = CampaignField.find_by(name: "phone", campaign: campaign) ||
         campaign: campaign.name
       }.to_json,
       response_code: 503,
-      response_data: { error: "Service unavailable" }.to_json,
+      response_payload: { error: "Service unavailable" }.to_json,
       duration_ms: rand(1500..5000),
       error: "Timeout waiting for response from server",
       sent_at: nil
@@ -224,7 +224,7 @@ end
     request_method: :get,
     request_payload: {}.to_json,
     response_code: i < 3 ? 200 : 503,
-    response_data: i < 3 ? 
+    response_payload: i < 3 ? 
       { status: "ok", server: "api-#{i}", uptime: rand(1000..100000) }.to_json : 
       { error: "Service unavailable" }.to_json,
     duration_ms: i < 3 ? rand(20..100) : rand(5000..10000),

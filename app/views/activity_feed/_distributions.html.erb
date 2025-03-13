@@ -1,0 +1,31 @@
+<% if distributions.any? %>
+  <% distributions.each do |camp_dist| %>
+    <div class="p-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="font-medium text-gray-800 dark:text-white"><%= camp_dist.distribution&.name %></p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Campaign: <%= camp_dist.campaign&.name %>
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <%= camp_dist.priority || "N/A" %>
+            <span class="text-xs text-gray-500 dark:text-gray-400">priority</span>
+          </p>
+        </div>
+      </div>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <% if camp_dist.last_used_at %>
+          Last used <%= time_ago_in_words(camp_dist.last_used_at) %> ago
+        <% else %>
+          Never used
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+<% else %>
+  <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+    <p>No recent distributions found.</p>
+  </div>
+<% end %>

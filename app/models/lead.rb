@@ -20,6 +20,7 @@ class Lead < ApplicationRecord
   validates :unique_id, presence: true, uniqueness: { scope: :account_id }
   
   before_validation :generate_unique_id, on: :create
+  after_create_commit :broadcast_to_activity_feed
   
   # Status enum for tracking lead lifecycle
   enum :status, {
@@ -292,5 +293,9 @@ class Lead < ApplicationRecord
   
   def generate_unique_id
     self.unique_id ||= SecureRandom.uuid
+  end
+  
+  def broadcast_to_activity_feed
+    ActivityFeedBroadcastJob.perform_later(self, :lead)
   end
 end

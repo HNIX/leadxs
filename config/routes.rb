@@ -24,6 +24,12 @@ Rails.application.routes.draw do
   # Campaign performance dashboard
   get 'campaign_dashboard', to: 'campaign_dashboard#index', as: :campaign_dashboard
   
+  # Performance reports
+  namespace :reports do
+    resources :sources, only: [:index, :show]
+    resources :buyers, only: [:index, :show]
+  end
+  
   # Campaign and distribution specific reports
   get 'bid_reports/campaign/:id', to: 'bid_reports#campaign', as: :campaign_bid_report
   get 'bid_reports/distribution/:id', to: 'bid_reports#distribution', as: :distribution_bid_report
@@ -51,9 +57,15 @@ Rails.application.routes.draw do
     end
   end
   
+  # Activity feed
+  resources :activity_feed, only: [:index]
+  
   # Lead management
   resources :leads, only: [:index, :show] do
     resources :activities, controller: 'lead_activities', only: [:index, :show], as: 'activities'
+    member do
+      get :journey, to: 'leads#journey', as: :journey
+    end
   end
   
   resources :campaigns do

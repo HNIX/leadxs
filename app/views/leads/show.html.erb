@@ -11,6 +11,8 @@
       
       <%= link_to "View Activity Timeline", lead_activities_path(@lead), class: "px-4 py-2 bg-green-100 dark:bg-green-900 rounded-md text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800" %>
       
+      <%= link_to "View Lead Journey", journey_lead_path(@lead), class: "px-4 py-2 bg-purple-100 dark:bg-purple-900 rounded-md text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800" %>
+      
       <% if @lead.api_requests.any? %>
         <%= link_to "View API Requests", api_requests_path(lead_id: @lead.id), class: "px-4 py-2 bg-blue-100 dark:bg-blue-900 rounded-md text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800" %>
       <% end %>

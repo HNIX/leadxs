@@ -1,4 +1,6 @@
 class CampaignDistribution < ApplicationRecord
+  acts_as_tenant :account
+  
   belongs_to :campaign
   belongs_to :distribution
   has_many :mapped_fields, dependent: :destroy
@@ -9,6 +11,7 @@ class CampaignDistribution < ApplicationRecord
   validates :priority, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   
   after_create :set_default_field_mapping
+  after_update :broadcast_to_activity_feed, if: -> { saved_change_to_last_used_at? }
   
   def active?
     active
@@ -47,5 +50,9 @@ class CampaignDistribution < ApplicationRecord
         required: campaign_field.required
       )
     end
+  end
+  
+  def broadcast_to_activity_feed
+    ActivityFeedBroadcastJob.perform_later(self, :distribution)
   end
 end

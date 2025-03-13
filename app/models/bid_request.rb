@@ -61,6 +61,11 @@ class BidRequest < ApplicationRecord
     expires_at <= Time.current || status == 'expired'
   end
   
+  # Check if bid request is completed
+  def completed?
+    status == 'completed'
+  end
+  
   # Mark as expired if time has passed
   def check_expiration!
     update(status: :expired) if expires_at <= Time.current && status == 'active'
@@ -83,8 +88,8 @@ class BidRequest < ApplicationRecord
     # Accept the winning bid
     return false unless winning.accept!
     
-    # Update the bid request status
-    update(status: :completed)
+    # Update the bid request status and set completed_at timestamp
+    update(status: :completed, completed_at: Time.current)
     
     # Now distribute the lead to the winning distribution
     distribute_lead_to_winning_bid(winning)

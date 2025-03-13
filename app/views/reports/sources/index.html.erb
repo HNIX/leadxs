@@ -1,0 +1,338 @@
+<% content_for :title, @title %>
+<% content_for :head do %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-4"><%= @title %></h1>
+    
+    <!-- Filters Section -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <%= form_with url: reports_sources_path, method: :get, data: { turbo_frame: "_top" }, class: "flex flex-wrap items-end gap-4" do |f| %>
+        <div>
+          <%= f.label :period_type, "Time Period", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :period_type, 
+                      options_for_select([
+                        ["Hourly", "hourly"],
+                        ["Daily", "daily"],
+                        ["Weekly", "weekly"],
+                        ["Monthly", "monthly"]
+                      ], @period_type),
+                      {}, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <div>
+          <%= f.label :campaign_id, "Campaign", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :campaign_id, 
+                      options_from_collection_for_select(Campaign.all, :id, :name, @campaign_id),
+                      { include_blank: "All Campaigns" }, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <div>
+          <%= f.label :sort_by, "Sort By", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :sort_by, 
+                      options_for_select([
+                        ["Volume", "volume"],
+                        ["Acceptance Rate", "acceptance_rate"],
+                        ["Avg Bid Amount", "avg_bid_amount"],
+                        ["Compliance Rate", "compliance_rate"],
+                        ["Profit Per Lead", "profit_per_lead"]
+                      ], @sort_by),
+                      {}, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <div>
+          <%= f.label :sort_direction, "Direction", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :sort_direction, 
+                      options_for_select([
+                        ["Highest First", "desc"],
+                        ["Lowest First", "asc"]
+                      ], @sort_direction),
+                      {}, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <%= f.submit "Apply Filters", class: "px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      <% end %>
+    </div>
+    
+    <!-- Top Sources Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <!-- Top Sources by Volume -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Sources by Volume</h3>
+        <% if @top_sources_by_volume.present? %>
+          <ul class="space-y-2">
+            <% @top_sources_by_volume.each do |source| %>
+              <li class="flex justify-between">
+                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
+                <span class="text-gray-700"><%= number_with_delimiter(source[:volume]) %> leads</span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-500 italic">No data available</p>
+        <% end %>
+      </div>
+      
+      <!-- Top Sources by Acceptance Rate -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Sources by Acceptance Rate</h3>
+        <% if @top_sources_by_acceptance.present? %>
+          <ul class="space-y-2">
+            <% @top_sources_by_acceptance.each do |source| %>
+              <li class="flex justify-between">
+                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
+                <span class="text-gray-700"><%= number_to_percentage(source[:acceptance_rate], precision: 1) %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-500 italic">No data available</p>
+        <% end %>
+      </div>
+      
+      <!-- Top Sources by Profit Per Lead -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Sources by Profit Per Lead</h3>
+        <% if @top_sources_by_profit.present? %>
+          <ul class="space-y-2">
+            <% @top_sources_by_profit.each do |source| %>
+              <li class="flex justify-between">
+                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
+                <span class="text-gray-700"><%= number_to_currency(source[:profit_per_lead]) %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-500 italic">No data available</p>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Main Visualization Section -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900">Source Performance Comparison</h3>
+        <% if @source_metrics.present? %>
+          <div class="flex gap-2">
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-indigo-100 text-indigo-800 font-medium" data-chart="volume">Volume</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="acceptance_rate">Acceptance</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="avg_bid_amount">Bid Amount</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="compliance_rate">Compliance</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="profit_per_lead">Profit</button>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="chart-container" style="height: 300px;">
+        <% if @source_metrics.present? %>
+          <canvas id="sourceComparisonChart"></canvas>
+        <% else %>
+          <div class="flex items-center justify-center h-full">
+            <p class="text-gray-500 italic">No data available for chart visualization. Add sources and generate leads to see performance metrics.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Sources Data Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Source Performance Details</h3>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acceptance Rate</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Bid Amount</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance Rate</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Per Lead</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Revenue</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Profit</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% if @source_metrics.present? %>
+              <% @source_metrics.each do |source| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= source[:name] %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= source[:company_name] %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_with_delimiter(source[:volume]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_percentage(source[:acceptance_rate], precision: 1) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:avg_bid_amount]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_percentage(source[:compliance_rate], precision: 1) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:profit_per_lead]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:total_revenue]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:total_profit]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <%= link_to "View Details", reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-900" %>
+                  </td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                <td colspan="10" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center italic">No data available</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Run when page loads AND when Turbo navigation occurs
+  function initializeChart() {
+    const chartElement = document.getElementById('sourceComparisonChart');
+    if (!chartElement) return;
+    
+    const ctx = chartElement.getContext('2d');
+    let currentChart = null;
+    
+    // Chart data from controller
+    const chartData = <%= raw @chart_data.to_json %>;
+    
+    console.log("Chart data:", chartData);
+    
+    // Function to create/update chart
+    function updateChart(dataType) {
+      // Clear previous chart if it exists
+      if (currentChart) {
+        currentChart.destroy();
+      }
+      
+      // Update active button state
+      document.querySelectorAll('.chart-toggle').forEach(button => {
+        if (button.dataset.chart === dataType) {
+          button.classList.add('bg-indigo-100', 'text-indigo-800');
+          button.classList.remove('bg-gray-100', 'text-gray-600');
+        } else {
+          button.classList.remove('bg-indigo-100', 'text-indigo-800');
+          button.classList.add('bg-gray-100', 'text-gray-600');
+        }
+      });
+      
+      // Configure chart based on data type
+      // Ensure chartData and required properties exist
+      if (!chartData || !chartData[dataType] || !chartData[dataType].labels || !chartData[dataType].data) {
+        console.error("Missing chart data for", dataType);
+        return;
+      }
+      
+      console.log("Building chart for", dataType, "with data:", chartData[dataType]);
+    
+      let chartConfig = {
+        type: 'bar',
+        data: {
+          labels: chartData[dataType].labels,
+          datasets: [{
+            label: getChartLabel(dataType),
+            data: chartData[dataType].data,
+            backgroundColor: 'rgba(79, 70, 229, 0.6)',
+            borderColor: 'rgba(79, 70, 229, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let value = context.raw;
+                  return formatValue(value, dataType);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return formatValue(value, dataType, true);
+                }
+              }
+            }
+          }
+        }
+      };
+      
+      // Create new chart
+      currentChart = new Chart(ctx, chartConfig);
+    }
+    
+    // Format values based on data type
+    function formatValue(value, dataType, isAxis = false) {
+      switch(dataType) {
+        case 'volume':
+          return value.toLocaleString();
+        case 'acceptance_rate':
+        case 'compliance_rate':
+          return value.toFixed(1) + '%';
+        case 'avg_bid_amount':
+        case 'profit_per_lead':
+          if (isAxis) {
+            return '$' + value.toFixed(2);
+          } else {
+            return '$' + value.toFixed(2);
+          }
+        default:
+          return value;
+      }
+    }
+    
+    // Get chart label based on data type
+    function getChartLabel(dataType) {
+      switch(dataType) {
+        case 'volume':
+          return 'Lead Volume';
+        case 'acceptance_rate':
+          return 'Acceptance Rate (%)';
+        case 'avg_bid_amount':
+          return 'Average Bid Amount';
+        case 'compliance_rate':
+          return 'Compliance Rate (%)';
+        case 'profit_per_lead':
+          return 'Profit Per Lead';
+        default:
+          return dataType;
+      }
+    }
+    
+    // Only initialize chart if we have data and the element exists
+    if (Object.keys(chartData).length > 0) {
+      // Initialize chart with volume data
+      updateChart('volume');
+      
+      // Add event listeners for toggling charts
+      document.querySelectorAll('.chart-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+          updateChart(this.dataset.chart);
+        });
+      });
+    }
+  }
+  
+  // Initialize on page load and turbo navigation
+  document.addEventListener('turbo:load', initializeChart);
+  
+  // Also initialize immediately in case we're not using turbo navigation
+  initializeChart();
+</script>

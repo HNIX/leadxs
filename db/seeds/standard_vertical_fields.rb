@@ -304,7 +304,7 @@ module Seeds
       return if vertical.vertical_fields.exists?(name: attributes[:name])
       
       # If value_acceptance is list but no list_values provided, default to 'any'
-      if attributes[:value_acceptance] == "list" && list_values.nil?
+      if attributes[:value_acceptance] == "list" && (list_values.nil? || list_values.empty?)
         puts "WARNING: Field #{attributes[:name]} has value_acceptance 'list' but no list values provided. Changing to 'any'"
         attributes = attributes.merge(value_acceptance: "any")
       end

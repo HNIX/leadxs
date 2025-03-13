@@ -1,0 +1,1 @@
+require_relative 'activity_feed_seed'

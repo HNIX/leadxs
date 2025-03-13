@@ -123,6 +123,48 @@ module LeadActivitiesHelper
     end
   end
   
+  # Returns color class for lead status badge
+  def lead_status_color(status)
+    base_classes = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+    
+    case status.to_sym
+    when :new_lead
+      "#{base_classes} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+    when :processing
+      "#{base_classes} bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
+    when :distributing
+      "#{base_classes} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+    when :distributed
+      "#{base_classes} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+    when :rejected
+      "#{base_classes} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+    when :error
+      "#{base_classes} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+    else
+      "#{base_classes} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+    end
+  end
+
+  # Returns color class for bid status badge
+  def bid_status_color(status)
+    base_classes = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+    
+    case status.to_sym
+    when :pending
+      "#{base_classes} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+    when :accepted
+      "#{base_classes} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+    when :rejected
+      "#{base_classes} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+    when :expired
+      "#{base_classes} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+    when :error
+      "#{base_classes} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+    else
+      "#{base_classes} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+    end
+  end
+  
   private
   
   def validation_description(activity)

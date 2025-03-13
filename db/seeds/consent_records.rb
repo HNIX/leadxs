@@ -118,13 +118,27 @@ if defined?(ConsentRecord)
             temp_leads = []
             5.times do |i|
               # Create a temporary lead
+              # Need to find a source for the lead
+              source = Source.where(account: account).sample || 
+                Source.create!(
+                  name: "Seed Demo Source",
+                  campaign: campaign,
+                  company: Company.where(account: account).first,
+                  account: account,
+                  status: "active",
+                  integration_type: "affiliate",
+                  payout_method: "fixed",
+                  payout: 5.0
+                )
+              
               lead = Lead.new(
                 account: account,
                 campaign: campaign,
-                status: "created",
-                source_type: "seed",
+                status: "new_lead",
+                source: source,
                 ip_address: random_ip,
-                user_agent: random_user_agent
+                user_agent: random_user_agent,
+                unique_id: SecureRandom.uuid
               )
               
               # Add any required attributes for Lead model

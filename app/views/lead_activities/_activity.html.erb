@@ -1,0 +1,75 @@
+<div class="relative pb-6 <%= 'border-l border-gray-200 dark:border-gray-700 ml-5 pl-6' unless local_assigns[:last] %>">
+  <div class="relative flex space-x-3">
+    <!-- Activity Icon -->
+    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700">
+      <%= activity_icon(activity) %>
+    </div>
+    
+    <!-- Activity Content -->
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center justify-between">
+        <div class="text-sm font-medium text-gray-900 dark:text-white">
+          <%= activity_title(activity) %>
+          <span class="ml-2"><%= content_tag :span, activity.activity_type.titleize, class: activity_badge(activity) %></span>
+        </div>
+        <div class="whitespace-nowrap text-right text-sm text-gray-500 dark:text-gray-400">
+          <%= time_tag activity.created_at, title: activity.created_at.to_s do %>
+            <%= time_ago_in_words(activity.created_at) %> ago
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Activity Description -->
+      <div class="mt-1 text-sm text-gray-700 dark:text-gray-300">
+        <%= activity_description(activity) %>
+        
+        <% if activity.user.present? %>
+          <div class="mt-1 flex items-center">
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+              by <%= activity.user.name %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Activity Details (expandable) -->
+      <% if activity.details.present? && activity.details.except('causer_type', 'causer_id').any? %>
+        <div class="mt-2" data-controller="details-toggle" id="details-<%= activity.id %>">
+          <button type="button" 
+                  class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                  data-action="details-toggle#toggle"
+                  data-details-toggle-target="button">
+            <span data-details-toggle-target="showText">Show details</span>
+            <span data-details-toggle-target="hideText" class="hidden">Hide details</span>
+          </button>
+          
+          <div class="mt-2 hidden bg-gray-50 dark:bg-gray-800 rounded p-3 text-xs font-mono overflow-x-auto" 
+               data-details-toggle-target="content">
+            <% activity.details.except('causer_type', 'causer_id').each do |key, value| %>
+              <div class="mb-1">
+                <span class="font-semibold text-gray-600 dark:text-gray-300"><%= key.humanize %>:</span>
+                <% if value.is_a?(Hash) || value.is_a?(Array) %>
+                  <pre class="mt-1 text-gray-800 dark:text-gray-200"><%= JSON.pretty_generate(value) rescue value.inspect %></pre>
+                <% else %>
+                  <span class="text-gray-800 dark:text-gray-200"><%= value.to_s %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      
+      <!-- Lead Link -->
+      <% if activity.lead.present? && !local_assigns[:compact] %>
+        <div class="mt-2 flex">
+          <%= link_to lead_path(activity.lead), class: "text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            View lead details
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

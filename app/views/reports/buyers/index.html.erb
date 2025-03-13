@@ -1,0 +1,325 @@
+<% content_for :title, @title %>
+<% content_for :head do %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-4"><%= @title %></h1>
+    
+    <!-- Filters Section -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <%= form_with url: reports_buyers_path, method: :get, data: { turbo_frame: "_top" }, class: "flex flex-wrap items-end gap-4" do |f| %>
+        <div>
+          <%= f.label :period_type, "Time Period", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :period_type, 
+                      options_for_select([
+                        ["Hourly", "hourly"],
+                        ["Daily", "daily"],
+                        ["Weekly", "weekly"],
+                        ["Monthly", "monthly"]
+                      ], @period_type),
+                      {}, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <div>
+          <%= f.label :campaign_id, "Campaign", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :campaign_id, 
+                      options_from_collection_for_select(Campaign.all, :id, :name, @campaign_id),
+                      { include_blank: "All Campaigns" }, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <div>
+          <%= f.label :sort_by, "Sort By", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :sort_by, 
+                      options_for_select([
+                        ["Bids Placed", "bids_placed"],
+                        ["Win Rate", "win_rate"],
+                        ["Avg Bid Amount", "avg_bid_amount"],
+                        ["Total Spend", "total_spend"],
+                        ["Response Time", "avg_response_time"],
+                        ["Campaign Engagement", "campaign_engagement"]
+                      ], @sort_by),
+                      {}, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <div>
+          <%= f.label :sort_direction, "Direction", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.select :sort_direction, 
+                      options_for_select([
+                        ["Highest First", "desc"],
+                        ["Lowest First", "asc"]
+                      ], @sort_direction),
+                      {}, 
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+        </div>
+        
+        <%= f.submit "Apply Filters", class: "px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      <% end %>
+    </div>
+    
+    <!-- Top Buyers Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <!-- Top Buyers by Bid Volume -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Buyers by Bids Placed</h3>
+        <% if @top_buyers_by_bids.present? %>
+          <ul class="space-y-2">
+            <% @top_buyers_by_bids.each do |buyer| %>
+              <li class="flex justify-between">
+                <span class="font-medium"><%= link_to buyer[:name], reports_buyer_path(buyer[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
+                <span class="text-gray-700"><%= number_with_delimiter(buyer[:bids_placed]) %> bids</span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-500 italic">No data available</p>
+        <% end %>
+      </div>
+      
+      <!-- Top Buyers by Win Rate -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Buyers by Win Rate</h3>
+        <% if @top_buyers_by_win_rate.present? %>
+          <ul class="space-y-2">
+            <% @top_buyers_by_win_rate.each do |buyer| %>
+              <li class="flex justify-between">
+                <span class="font-medium"><%= link_to buyer[:name], reports_buyer_path(buyer[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
+                <span class="text-gray-700"><%= number_to_percentage(buyer[:win_rate], precision: 1) %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-500 italic">No data available</p>
+        <% end %>
+      </div>
+      
+      <!-- Top Buyers by Avg Bid Amount -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Buyers by Avg Bid Amount</h3>
+        <% if @top_buyers_by_avg_amount.present? %>
+          <ul class="space-y-2">
+            <% @top_buyers_by_avg_amount.each do |buyer| %>
+              <li class="flex justify-between">
+                <span class="font-medium"><%= link_to buyer[:name], reports_buyer_path(buyer[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
+                <span class="text-gray-700"><%= number_to_currency(buyer[:avg_bid_amount]) %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-500 italic">No data available</p>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Main Visualization Section -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900">Buyer Performance Comparison</h3>
+        <div class="flex gap-2">
+          <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-indigo-100 text-indigo-800 font-medium" data-chart="bids_placed">Bid Volume</button>
+          <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="win_rate">Win Rate</button>
+          <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="avg_bid_amount">Bid Amount</button>
+          <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="response_time">Response Time</button>
+          <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="campaign_engagement">Campaigns</button>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="buyerComparisonChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+    
+    <!-- Buyers Data Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Buyer Performance Details</h3>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Buyer</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bids Placed</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Win Rate</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Bid Amount</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Spend</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Response Time</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campaigns</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% if @buyer_metrics.present? %>
+              <% @buyer_metrics.each do |buyer| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= buyer[:name] %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= buyer[:company_name] %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_with_delimiter(buyer[:bids_placed]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_percentage(buyer[:win_rate], precision: 1) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(buyer[:avg_bid_amount]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(buyer[:total_spend]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= buyer[:avg_response_time] ? "#{buyer[:avg_response_time]} sec" : "N/A" %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= buyer[:campaign_engagement] %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <%= link_to "View Details", reports_buyer_path(buyer[:id]), class: "text-indigo-600 hover:text-indigo-900" %>
+                  </td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center italic">No data available</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Function to initialize and set up the chart
+  function initializeChart() {
+    const chartElement = document.getElementById('buyerComparisonChart');
+    if (!chartElement) return;
+    
+    const ctx = chartElement.getContext('2d');
+    let currentChart = null;
+    
+    // Chart data from controller
+    const chartData = <%= raw @chart_data.to_json %>;
+    
+    console.log("Chart data for buyers:", chartData);
+    
+    // Function to create/update chart
+    function updateChart(dataType) {
+      // Clear previous chart if it exists
+      if (currentChart) {
+        currentChart.destroy();
+      }
+      
+      // Update active button state
+      document.querySelectorAll('.chart-toggle').forEach(button => {
+        if (button.dataset.chart === dataType) {
+          button.classList.add('bg-indigo-100', 'text-indigo-800');
+          button.classList.remove('bg-gray-100', 'text-gray-600');
+        } else {
+          button.classList.remove('bg-indigo-100', 'text-indigo-800');
+          button.classList.add('bg-gray-100', 'text-gray-600');
+        }
+      });
+      
+      // Ensure chartData and required properties exist
+      if (!chartData || !chartData[dataType] || !chartData[dataType].labels || !chartData[dataType].data) {
+        console.error("Missing chart data for", dataType);
+        return;
+      }
+      
+      // Configure chart based on data type
+      let chartConfig = {
+        type: 'bar',
+        data: {
+          labels: chartData[dataType].labels,
+          datasets: [{
+            label: getChartLabel(dataType),
+            data: chartData[dataType].data,
+            backgroundColor: 'rgba(79, 70, 229, 0.6)',
+            borderColor: 'rgba(79, 70, 229, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let value = context.raw;
+                  return formatValue(value, dataType);
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return formatValue(value, dataType, true);
+                }
+              }
+            }
+          }
+        }
+      };
+      
+      // Create new chart
+      currentChart = new Chart(ctx, chartConfig);
+    }
+    
+    // Format values based on data type
+    function formatValue(value, dataType, isAxis = false) {
+      switch(dataType) {
+        case 'bids_placed':
+          return value.toLocaleString();
+        case 'win_rate':
+          return value.toFixed(1) + '%';
+        case 'avg_bid_amount':
+          return '$' + value.toFixed(2);
+        case 'response_time':
+          return value.toFixed(2) + ' sec';
+        case 'campaign_engagement':
+          return value.toLocaleString();
+        default:
+          return value;
+      }
+    }
+    
+    // Get chart label based on data type
+    function getChartLabel(dataType) {
+      switch(dataType) {
+        case 'bids_placed':
+          return 'Number of Bids';
+        case 'win_rate':
+          return 'Win Rate (%)';
+        case 'avg_bid_amount':
+          return 'Average Bid Amount';
+        case 'response_time':
+          return 'Avg Response Time (sec)';
+        case 'campaign_engagement':
+          return 'Campaign Engagement';
+        default:
+          return dataType;
+      }
+    }
+    
+    // Only initialize if we have data
+    if (Object.keys(chartData).length > 0) {
+      // Initialize chart with bids data
+      updateChart('bids_placed');
+      
+      // Add event listeners for toggling charts
+      document.querySelectorAll('.chart-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+          updateChart(this.dataset.chart);
+        });
+      });
+    }
+  }
+  
+  // Initialize on page load and turbo navigation
+  document.addEventListener('turbo:load', initializeChart);
+  
+  // Also initialize immediately in case we're not using turbo navigation
+  initializeChart();
+</script>

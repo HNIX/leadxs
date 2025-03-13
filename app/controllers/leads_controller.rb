@@ -1,6 +1,6 @@
 class LeadsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_lead, only: [:show]
+  before_action :set_lead, only: [:show, :journey]
 
   def index
     # Start with base scope
@@ -58,6 +58,40 @@ class LeadsController < ApplicationController
     end
   end
 
+  def journey
+    # Get the lead's full journey history
+    @activities = @lead.lead_activity_logs.includes(:user, :causer).chronological
+    
+    # Get all associated bid requests
+    @bid_request = @lead.bid_request || @lead.generated_bid_request
+    
+    # Get all bids
+    @bids = @bid_request ? @bid_request.bids.includes(:distribution).order(created_at: :desc) : []
+    
+    # Get all API requests
+    @api_requests = @lead.api_requests.includes(:requestable).order(created_at: :desc)
+    
+    # Get all compliance records
+    @compliance_records = @lead.compliance_records.order(occurred_at: :desc)
+    @consent_records = @lead.consent_records.order(consented_at: :desc)
+    @data_access_records = @lead.data_access_records.order(accessed_at: :desc)
+    
+    # Track this view in the data access log
+    if defined?(DataAccessRecord) && defined?(ComplianceService)
+      DataAccessRecord.record_access(@lead, 'view', current_user, {
+        access_context: 'journey_view',
+        purpose: 'Lead journey analysis',
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      })
+    end
+    
+    respond_to do |format|
+      format.html
+      format.json
+    end
+  end
+  
   private
 
   def set_lead
