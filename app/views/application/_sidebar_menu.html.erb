@@ -40,6 +40,16 @@
         <% end %>
       </li>
 
+      <li>
+        <%= link_to compliance_dashboard_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-4 py-2 rounded-md #{controller_name == 'compliance' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" data-highlight="true" stroke="currentColor" class="fill-gray-100">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        Compliance
+        <% end %>
+      </li>
+
+
       <li class="flex flex-col gap-3 px-4 py-2">
         <h3 class="font-mono text-sm/6 font-medium tracking-widest text-gray-500 dark:text-white uppercase sm:text-xs/6">Analytics & Reports</h3>
         <ul class="flex flex-col gap-2 border-l border-[color-mix(in_oklab,_var(--color-gray-950),white_90%)]" role="list">
@@ -60,23 +70,15 @@
         </ul>
       </li>
 
-      <li>
-        <%= link_to compliance_dashboard_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-4 py-2 rounded-md #{controller_name == 'compliance' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" data-highlight="true" stroke="currentColor" class="fill-gray-100">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-        Compliance
-        <% end %>
-      </li>
-
+      
       <li class="flex flex-col gap-3 px-4 py-2">
         <h3 class="font-mono text-sm/6 font-medium tracking-widest text-gray-500 dark:text-white uppercase sm:text-xs/6">Lead Management</h3>
         <ul class="flex flex-col gap-2 border-l border-[color-mix(in_oklab,_var(--color-gray-950),white_90%)]" role="list">
           <li class="-ml-px flex flex-col items-start">
-            <%= link_to api_requests_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'api_requests' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+            <%= link_to api_requests_path, class: "gap-3 text-base/8 sm:text-xs **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'api_requests' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
               API Requests
             <% end %>
-            <%= link_to leads_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'leads' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
+            <%= link_to leads_path, class: "gap-3 text-base/8 sm:text-xs **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'leads' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" do %>
               Leads
             <% end %>
           </li>
@@ -87,9 +89,9 @@
         <h3 class="font-mono text-sm/6 font-medium tracking-widest text-gray-500 dark:text-white uppercase sm:text-xs/6">Configuration</h3>
         <ul class="flex flex-col gap-2 border-l border-[color-mix(in_oklab,_var(--color-gray-950),white_90%)]" role="list">
           <li class="-ml-px flex flex-col items-start">
-            <%= link_to "Verticals", verticals_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'verticals' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" %>
-            <%= link_to "Standard Fields", standard_fields_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'standard_fields' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" %>
-            <%= link_to "Companies", companies_path, class: "gap-3 text-base/8 sm:text-sm/7 **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'companies' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" %>
+            <%= link_to "Verticals", verticals_path, class: "gap-3 text-base/8 sm:text-xs **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'verticals' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" %>
+            <%= link_to "Standard Fields", standard_fields_path, class: "gap-3 text-base/8 sm:text-xs **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'standard_fields' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" %>
+            <%= link_to "Companies", companies_path, class: "gap-3 text-base/8 sm:text-xs **:[svg]:size-5 **:[svg]:sm:size-4 aria-[current]:font-semibold group flex items-center group flex items-center px-6 py-2 rounded-md #{controller_name == 'companies' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-gray-950 dark:text-white dark:hover:text-gray-200 **:data-highlight:fill-white dark:**:data-highlight:fill-gray-800 **:text-gray-400 hover:**:data-highlight:fill-gray-400 dark:hover:**:data-highlight:fill-gray-200'}" %>
           </li>
         </ul>
       </li>

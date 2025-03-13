@@ -1,0 +1,545 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="h2"><%= @title %></h1>
+  </div>
+  
+  <%= render "shared/bidding_navigation" %>
+  
+  <!-- Period Selection -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+      <h2 class="text-lg font-medium dark:text-white mb-4 md:mb-0">Time Period</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div>
+          <%= form_with url: request.path, method: :get, data: { turbo_frame: "_top" }, class: "flex items-center space-x-2" do |f| %>
+            <% if @campaign %>
+              <%= f.hidden_field :id, value: @campaign.id %>
+            <% end %>
+            <% if @distribution %>
+              <%= f.hidden_field :id, value: @distribution.id %>
+            <% end %>
+            <%= f.select :period_type, period_options, { selected: @period_type }, 
+                       class: "select pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" %>
+            <%= f.submit "Update", class: "btn btn-primary btn-sm" %>
+          <% end %>
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          <%= @date_range[:start].strftime("%b %d, %Y") %> - <%= @date_range[:end].strftime("%b %d, %Y") %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Fields by Bid Impact -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-medium mb-4 dark:text-white">Fields with Highest Bid Amount Impact</h3>
+    <% if @fields_by_bid_impact.present? && @fields_by_bid_impact.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Field</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Avg. with Field</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Avg. without Field</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Impact %</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sample Size</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <% @fields_by_bid_impact.take(5).each do |field| %>
+              <tr class="<%= field[:significant] ? 'bg-green-50 dark:bg-green-900/10' : '' %>">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                  <%= field[:field_name] %>
+                  <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">(<%= field[:data_type] %>)</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
+                  <%= number_to_currency(field[:with_avg_amount]) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
+                  <%= number_to_currency(field[:without_avg_amount]) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right 
+                  <%= field[:impact_percentage] > 0 ? 'text-green-600 dark:text-green-400 font-medium' : 'text-red-600 dark:text-red-400 font-medium' %>">
+                  <%= field[:impact_percentage] > 0 ? '+' : '' %><%= number_to_percentage(field[:impact_percentage], precision: 1) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
+                  <%= number_with_delimiter(field[:with_count]) %> / <%= number_with_delimiter(field[:without_count]) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="mt-6">
+        <div class="w-full h-64">
+          <canvas id="bidImpactChart"></canvas>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No field impact data available for this period.</p>
+    <% end %>
+  </div>
+  
+  <!-- Fields by Acceptance Rate Impact -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-medium mb-4 dark:text-white">Fields with Highest Acceptance Rate Impact</h3>
+    <% if @fields_by_acceptance_impact.present? && @fields_by_acceptance_impact.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Field</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">With Field (%)</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Without Field (%)</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Impact %</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sample Size</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <% @fields_by_acceptance_impact.take(5).each do |field| %>
+              <tr class="<%= field[:significant] ? 'bg-green-50 dark:bg-green-900/10' : '' %>">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                  <%= field[:field_name] %>
+                  <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">(<%= field[:data_type] %>)</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
+                  <%= number_to_percentage(field[:with_acceptance_rate], precision: 1) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
+                  <%= number_to_percentage(field[:without_acceptance_rate], precision: 1) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right 
+                  <%= field[:impact_percentage] > 0 ? 'text-green-600 dark:text-green-400 font-medium' : 'text-red-600 dark:text-red-400 font-medium' %>">
+                  <%= field[:impact_percentage] > 0 ? '+' : '' %><%= number_to_percentage(field[:impact_percentage], precision: 1) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
+                  <%= number_with_delimiter(field[:with_count]) %> / <%= number_with_delimiter(field[:without_count]) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="mt-6">
+        <div class="w-full h-64">
+          <canvas id="acceptanceImpactChart"></canvas>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No acceptance impact data available for this period.</p>
+    <% end %>
+  </div>
+  
+  <!-- Field Completion Rates -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-medium dark:text-white">Field Completion Rates</h3>
+      <div class="flex space-x-2">
+        <button type="button" class="text-xs text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded px-3 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none dark:focus:ring-blue-700" onclick="toggleFieldFilter('all')">All</button>
+        <button type="button" class="text-xs text-white bg-yellow-600 hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-300 font-medium rounded px-3 py-1.5 dark:bg-yellow-500 dark:hover:bg-yellow-600 focus:outline-none dark:focus:ring-yellow-700" onclick="toggleFieldFilter('required')">Required</button>
+        <button type="button" class="text-xs text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 font-medium rounded px-3 py-1.5 dark:bg-purple-500 dark:hover:bg-purple-600 focus:outline-none dark:focus:ring-purple-700" onclick="toggleFieldFilter('bid')">Bid Fields</button>
+      </div>
+    </div>
+    
+    <% if @field_completion_rates.present? && @field_completion_rates.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="completionRatesTable">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Field</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Required</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Bid Field</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">PII</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Completion %</th>
+              <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Count</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <% @field_completion_rates.each do |field| %>
+              <tr class="field-row <%= field[:required] ? 'required-field' : '' %> <%= field[:shared_during_bidding] ? 'bid-field' : '' %>">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                  <%= field[:field_name] %>
+                  <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">(<%= field[:data_type] %>)</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  <% if field[:required] %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                      Required
+                    </span>
+                  <% else %>
+                    <span class="text-gray-400 dark:text-gray-500">Optional</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  <% if field[:shared_during_bidding] %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                      Bid Field
+                    </span>
+                  <% else %>
+                    <span class="text-gray-400 dark:text-gray-500">No</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  <% if field[:is_pii] %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      PII
+                    </span>
+                  <% else %>
+                    <span class="text-gray-400 dark:text-gray-500">No</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                  <div class="flex items-center justify-end">
+                    <div class="text-sm font-medium 
+                      <%= field[:completion_rate] > 90 ? 'text-green-600 dark:text-green-400' : 
+                         field[:completion_rate] > 70 ? 'text-yellow-600 dark:text-yellow-400' : 
+                         'text-red-600 dark:text-red-400' %>">
+                      <%= number_to_percentage(field[:completion_rate], precision: 1) %>
+                    </div>
+                    <div class="ml-2 w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                      <div class="h-2 rounded-full <%= field[:completion_rate] > 90 ? 'bg-green-500' : field[:completion_rate] > 70 ? 'bg-yellow-500' : 'bg-red-500' %>" 
+                           style="width: <%= field[:completion_rate] %>%"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
+                  <%= number_with_delimiter(field[:filled_count]) %> / <%= number_with_delimiter(field[:lead_count]) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No field completion data available for this period.</p>
+    <% end %>
+  </div>
+  
+  <!-- Field Value Distribution -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-medium mb-4 dark:text-white">Field Value Impact on Bid Performance</h3>
+    <% if @field_value_distribution.present? && @field_value_distribution.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <% @field_value_distribution.take(2).each_with_index do |field, index| %>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 dark:text-white mb-2"><%= field[:field_name] %></h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Amount variance: <%= number_to_currency(field[:amount_variance]) %> | 
+              Acceptance variance: <%= number_to_percentage(field[:acceptance_variance], precision: 1) %>
+            </p>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead>
+                  <tr>
+                    <th class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Value</th>
+                    <th class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Avg. Bid</th>
+                    <th class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acceptance</th>
+                    <th class="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Count</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% field[:value_metrics].each do |metric| %>
+                    <tr>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                        <%= metric[:value].to_s.truncate(20) %>
+                      </td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
+                        <%= number_to_currency(metric[:avg_amount]) %>
+                      </td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
+                        <%= number_to_percentage(metric[:acceptance_rate], precision: 1) %>
+                      </td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
+                        <%= number_with_delimiter(metric[:bid_count]) %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="mt-4 h-48">
+              <canvas id="valueDistributionChart<%= index %>"></canvas>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No field value distribution data available for this period.</p>
+    <% end %>
+  </div>
+  
+  <!-- Field Validation Failures -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-medium mb-4 dark:text-white">Top Field Validation Failures</h3>
+    <% if @field_validation_failures.present? && @field_validation_failures.any? %>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <% @field_validation_failures.take(3).each do |field| %>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="font-medium text-gray-900 dark:text-white"><%= field[:field_name] %></h4>
+              <span class="text-sm text-gray-500 dark:text-gray-400"><%= field[:data_type] %></span>
+            </div>
+            
+            <div class="flex items-center mb-4">
+              <div class="text-2xl font-bold text-red-600 dark:text-red-400"><%= number_with_delimiter(field[:total_failures]) %></div>
+              <div class="ml-2 text-sm text-gray-500 dark:text-gray-400">failures</div>
+            </div>
+            
+            <div class="space-y-2 mb-4">
+              <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300">Common Failure Types</h5>
+              <% field[:common_failures].take(3).each do |failure| %>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-700 dark:text-gray-300"><%= failure[:type].to_s.humanize %></span>
+                  <span class="text-sm text-gray-500 dark:text-gray-400">
+                    <%= number_with_delimiter(failure[:count]) %> (<%= number_to_percentage(failure[:percentage], precision: 1) %>)
+                  </span>
+                </div>
+              <% end %>
+            </div>
+            
+            <% if field[:failure_examples].any? %>
+              <div>
+                <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Example Failures</h5>
+                <div class="text-xs bg-gray-100 dark:bg-gray-600 rounded p-2 overflow-auto max-h-24">
+                  <% field[:failure_examples].each do |example| %>
+                    <div class="mb-1">
+                      <span class="text-red-600 dark:text-red-400"><%= example[:value].to_s.truncate(30) %></span>: 
+                      <%= example[:message].to_s.truncate(50) %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="mt-6">
+        <div class="w-full h-64">
+          <canvas id="validationFailuresChart"></canvas>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No field validation failure data available for this period.</p>
+    <% end %>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('turbo:load', function() {
+    // Field filter for completion rates table
+    window.toggleFieldFilter = function(filter) {
+      const rows = document.querySelectorAll('#completionRatesTable .field-row');
+      
+      rows.forEach(row => {
+        if (filter === 'all') {
+          row.style.display = '';
+        } else if (filter === 'required') {
+          row.style.display = row.classList.contains('required-field') ? '' : 'none';
+        } else if (filter === 'bid') {
+          row.style.display = row.classList.contains('bid-field') ? '' : 'none';
+        }
+      });
+    };
+    
+    // Chart configurations
+    
+    <% if @fields_by_bid_impact.present? && @fields_by_bid_impact.any? %>
+    // Bid Impact Chart
+    new Chart(
+      document.getElementById('bidImpactChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @fields_by_bid_impact.take(5).map { |f| f[:field_name] }.to_json %>,
+          datasets: [{
+            label: 'Impact on Bid Amount (%)',
+            data: <%= raw @fields_by_bid_impact.take(5).map { |f| f[:impact_percentage] }.to_json %>,
+            backgroundColor: <%= raw @fields_by_bid_impact.take(5).map { |f| f[:impact_percentage] > 0 ? "'rgba(34, 197, 94, 0.5)'" : "'rgba(239, 68, 68, 0.5)'" }.to_json %>,
+            borderColor: <%= raw @fields_by_bid_impact.take(5).map { |f| f[:impact_percentage] > 0 ? "'rgb(34, 197, 94)'" : "'rgb(239, 68, 68)'" }.to_json %>,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              title: {
+                display: true,
+                text: 'Impact Percentage (%)'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Field Impact on Bid Amount'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.raw;
+                  return `Impact: ${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+                }
+              }
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @fields_by_acceptance_impact.present? && @fields_by_acceptance_impact.any? %>
+    // Acceptance Impact Chart
+    new Chart(
+      document.getElementById('acceptanceImpactChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @fields_by_acceptance_impact.take(5).map { |f| f[:field_name] }.to_json %>,
+          datasets: [{
+            label: 'Impact on Acceptance Rate (%)',
+            data: <%= raw @fields_by_acceptance_impact.take(5).map { |f| f[:impact_percentage] }.to_json %>,
+            backgroundColor: <%= raw @fields_by_acceptance_impact.take(5).map { |f| f[:impact_percentage] > 0 ? "'rgba(34, 197, 94, 0.5)'" : "'rgba(239, 68, 68, 0.5)'" }.to_json %>,
+            borderColor: <%= raw @fields_by_acceptance_impact.take(5).map { |f| f[:impact_percentage] > 0 ? "'rgb(34, 197, 94)'" : "'rgb(239, 68, 68)'" }.to_json %>,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              title: {
+                display: true,
+                text: 'Impact Percentage (%)'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Field Impact on Acceptance Rate'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.raw;
+                  return `Impact: ${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+                }
+              }
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @field_validation_failures.present? && @field_validation_failures.any? %>
+    // Validation Failures Chart
+    new Chart(
+      document.getElementById('validationFailuresChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @field_validation_failures.take(10).map { |f| f[:field_name] }.to_json %>,
+          datasets: [{
+            label: 'Validation Failures',
+            data: <%= raw @field_validation_failures.take(10).map { |f| f[:total_failures] }.to_json %>,
+            backgroundColor: 'rgba(239, 68, 68, 0.5)',
+            borderColor: 'rgb(239, 68, 68)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Number of Failures'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Field Validation Failures'
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @field_value_distribution.present? && @field_value_distribution.any? %>
+      <% @field_value_distribution.take(2).each_with_index do |field, index| %>
+        // Value Distribution Chart <%= index %>
+        new Chart(
+          document.getElementById('valueDistributionChart<%= index %>').getContext('2d'),
+          {
+            type: 'bar',
+            data: {
+              labels: <%= raw field[:value_metrics].map { |m| m[:value].to_s.truncate(15) }.to_json %>,
+              datasets: [
+                {
+                  label: 'Average Bid Amount',
+                  data: <%= raw field[:value_metrics].map { |m| m[:avg_amount] }.to_json %>,
+                  backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                  borderColor: 'rgb(59, 130, 246)',
+                  borderWidth: 1,
+                  yAxisID: 'y'
+                },
+                {
+                  label: 'Acceptance Rate (%)',
+                  data: <%= raw field[:value_metrics].map { |m| m[:acceptance_rate] }.to_json %>,
+                  backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                  borderColor: 'rgb(16, 185, 129)',
+                  borderWidth: 1,
+                  type: 'line',
+                  yAxisID: 'y1'
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Bid Amount ($)'
+                  },
+                  position: 'left'
+                },
+                y1: {
+                  beginAtZero: true,
+                  max: 100,
+                  title: {
+                    display: true,
+                    text: 'Acceptance Rate (%)'
+                  },
+                  position: 'right',
+                  grid: {
+                    drawOnChartArea: false
+                  }
+                }
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Value Impact on Bid Performance'
+                }
+              }
+            }
+          }
+        );
+      <% end %>
+    <% end %>
+  });
+</script>

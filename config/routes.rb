@@ -20,6 +20,8 @@ Rails.application.routes.draw do
   # Economics and revenue analysis reports 
   get 'bid_economics', to: 'bid_reports#economics', as: :bid_economics_report
   get 'bid_revenue', to: 'bid_reports#revenue', as: :bid_revenue_report
+  get 'bid_compliance', to: 'bid_reports#compliance', as: :bid_compliance_report
+  get 'bid_field_analysis', to: 'bid_reports#field_analysis', as: :bid_field_analysis_report
   
   # Real-time bid dashboard
   get 'bid_dashboard', to: 'bid_dashboard#index', as: :bid_dashboard
@@ -43,6 +45,10 @@ Rails.application.routes.draw do
   get 'bid_economics/distribution/:id', to: 'bid_reports#distribution_economics', as: :distribution_economics_report
   get 'bid_revenue/campaign/:id', to: 'bid_reports#campaign_revenue', as: :campaign_revenue_report
   get 'bid_revenue/distribution/:id', to: 'bid_reports#distribution_revenue', as: :distribution_revenue_report
+  get 'bid_compliance/campaign/:id', to: 'bid_reports#campaign_compliance', as: :campaign_compliance_report
+  get 'bid_compliance/distribution/:id', to: 'bid_reports#distribution_compliance', as: :distribution_compliance_report
+  get 'bid_field_analysis/campaign/:id', to: 'bid_reports#campaign_field_analysis', as: :campaign_field_analysis_report
+  get 'bid_field_analysis/distribution/:id', to: 'bid_reports#distribution_field_analysis', as: :distribution_field_analysis_report
   # Distributions (buyers/endpoints)
   resources :distributions do
     member do
