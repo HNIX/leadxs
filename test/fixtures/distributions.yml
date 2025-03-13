@@ -1,37 +1,64 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  account: one
-  name: Buyer API Endpoint
-  description: Primary endpoint for lead delivery
-  company: one
+post_distribution:
+  account: company
+  company: acme
+  name: Default Post Endpoint
   endpoint_url: https://example.com/api/leads
-  authentication_token: token123
-  status: 0 # active
-  request_method: 1 # post
-  request_format: 1 # json
-  template: '{"lead": {"firstName": "{first_name}", "lastName": "{last_name}", "email": "{email}", "phone": "{phone}"}}'
-
-two:
-  account: one
-  name: Secondary Endpoint
-  description: Backup endpoint
-  company: two
-  endpoint_url: https://backup.example.com/api/leads
-  authentication_token: token456
-  status: 0 # active
-  request_method: 1 # post
-  request_format: 1 # json
-  template: null
+  request_method: post
+  request_format: json
+  status: active
+  endpoint_type: post_only
+  authentication_method: none
   
-paused:
-  account: one
-  name: Paused Endpoint
-  description: Temporarily paused endpoint
-  company: one
-  endpoint_url: https://paused.example.com/api/leads
-  authentication_token: token789
-  status: 1 # paused
-  request_method: 1 # post
-  request_format: 1 # json
-  template: null
+ping_post_distribution:
+  account: company
+  company: acme
+  name: Ping-Post Endpoint
+  endpoint_url: https://example.com/api/ping
+  post_endpoint_url: https://example.com/api/post
+  request_method: post
+  request_format: json
+  status: active
+  endpoint_type: ping_post
+  authentication_method: none
+  
+basic_auth_distribution:
+  account: company
+  company: acme
+  name: Basic Auth Endpoint
+  endpoint_url: https://example.com/api/leads
+  request_method: post
+  request_format: json
+  status: active
+  endpoint_type: post_only
+  authentication_method: basic_auth
+  username: testuser
+  password: testpass
+
+token_distribution:
+  account: company
+  company: globex
+  name: Token Auth Endpoint
+  endpoint_url: https://example.com/api/leads
+  request_method: post
+  request_format: json
+  status: active
+  endpoint_type: post_only
+  authentication_method: token
+  authentication_token: api_key_123456
+  api_key_name: X-API-Key
+
+oauth_distribution:
+  account: company
+  company: globex
+  name: OAuth2 Endpoint
+  endpoint_url: https://example.com/api/leads
+  request_method: post
+  request_format: json
+  status: active
+  endpoint_type: post_only
+  authentication_method: oauth2
+  client_id: client_123
+  client_secret: secret_456
+  token_url: https://example.com/oauth/token

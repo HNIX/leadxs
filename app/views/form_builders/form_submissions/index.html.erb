@@ -1,0 +1,106 @@
+<h1 class="text-2xl font-bold mb-4">Form Submissions for <%= @form_builder.name %></h1>
+
+<div class="mb-6">
+  <div class="bg-white rounded-lg shadow p-4">
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="text-lg font-medium text-gray-900">Submissions</h2>
+        <p class="text-sm text-gray-500">View and manage form submissions</p>
+      </div>
+      
+      <div class="flex space-x-2">
+        <%= link_to "Back to Form", campaign_form_builder_path(@campaign, @form_builder), class: "btn btn-white" %>
+      </div>
+    </div>
+    
+    <div class="mt-4">
+      <div class="flex flex-wrap gap-2 mb-4">
+        <%= link_to "All Submissions", campaign_form_builder_form_submissions_path(@campaign, @form_builder), class: "px-3 py-1 rounded-full text-sm #{params[:status].blank? ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800'}" %>
+        <% FormSubmission::STATUSES.each do |status| %>
+          <%= link_to status.titleize, campaign_form_builder_form_submissions_path(@campaign, @form_builder, status: status), class: "px-3 py-1 rounded-full text-sm #{params[:status] == status ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800'}" %>
+        <% end %>
+      </div>
+      
+      <% if @submissions.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @submissions.each do |submission| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <%= link_to submission.id, campaign_form_builder_form_submission_path(@campaign, @form_builder, submission), class: "text-indigo-600 hover:text-indigo-900" %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% status_class = case submission.status
+                                      when 'submitted'
+                                        'bg-yellow-100 text-yellow-800'
+                                      when 'processing'
+                                        'bg-blue-100 text-blue-800'
+                                      when 'completed'
+                                        'bg-green-100 text-green-800'
+                                      when 'rejected'
+                                        'bg-red-100 text-red-800'
+                                      else
+                                        'bg-gray-100 text-gray-800'
+                                      end
+                    %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_class %>">
+                      <%= submission.status.titleize %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if submission.lead %>
+                      <%= link_to submission.lead.id, lead_path(submission.lead), class: "text-indigo-600 hover:text-indigo-900" %>
+                    <% else %>
+                      <span class="text-gray-500">—</span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <%= l submission.created_at, format: :short %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <%= submission.ip_address || "—" %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                      <%= link_to "View", campaign_form_builder_form_submission_path(@campaign, @form_builder, submission), class: "text-indigo-600 hover:text-indigo-900" %>
+                      <% if submission.status == 'error' || submission.status == 'rejected' %>
+                        <%= button_to "Delete", campaign_form_builder_form_submission_path(@campaign, @form_builder, submission), method: :delete, class: "text-red-600 hover:text-red-900", data: { confirm: "Are you sure you want to delete this submission?" } %>
+                      <% end %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-4">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% else %>
+        <div class="text-center py-8">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No submissions found</h3>
+          <p class="mt-1 text-sm text-gray-500">There are no form submissions matching your filters.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <%= link_to "Back to Form Builder", campaign_form_builder_path(@campaign, @form_builder), class: "text-indigo-600 hover:text-indigo-900" %>
+</div>

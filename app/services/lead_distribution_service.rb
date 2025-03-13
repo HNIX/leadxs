@@ -167,11 +167,17 @@ class LeadDistributionService
       # Format the payload according to distribution requirements
       formatted_payload = format_payload(distribution, payload)
       
-      # Send the request
-      response = send_request(distribution, formatted_payload)
+      # Determine the request type based on the distribution endpoint type
+      # For ping_post distributions in post mode, we use :post to use the post_endpoint_url
+      # For all others, we use regular :post (default)
+      request_type = (distribution.endpoint_type == "ping_post") ? :post : :post
       
-      # Record the API request
-      api_request = record_api_request(distribution, formatted_payload, response)
+      # Send the request
+      response = send_request(distribution, formatted_payload, request_type)
+      
+      # Record the API request with the endpoint URL that was actually used
+      endpoint_url = select_endpoint_url(distribution, request_type)
+      api_request = record_api_request(distribution, formatted_payload, response, nil, endpoint_url)
       
       # Update last_used_at timestamp for round robin distribution
       update_last_used_timestamp(campaign_distribution) if api_request.successful?
@@ -187,9 +193,10 @@ class LeadDistributionService
           distribution_id: distribution.id,
           distribution_name: distribution.name,
           distribution_type: distribution.integration_type,
-          endpoint_url: distribution.endpoint_url,
+          endpoint_url: endpoint_url,
           request_method: distribution.request_method,
-          response_code: api_request.response_code
+          response_code: api_request.response_code,
+          request_type: request_type.to_s
         })
         
         # Log buyer response
@@ -209,7 +216,8 @@ class LeadDistributionService
           ComplianceRecord::DISTRIBUTION_SUCCEEDED, 
           { 
             api_request_id: api_request.id,
-            response_code: api_request.response_code
+            response_code: api_request.response_code,
+            endpoint_url: endpoint_url
           }
         )
       else
@@ -227,13 +235,17 @@ class LeadDistributionService
           { 
             api_request_id: api_request.id,
             response_code: api_request.response_code,
-            error: api_request.error || "HTTP Error: #{api_request.response_code}"
+            error: api_request.error || "HTTP Error: #{api_request.response_code}",
+            endpoint_url: endpoint_url
           }
         )
       end
     rescue => e
+      # For error case, use the default endpoint URL
+      endpoint_url = select_endpoint_url(distribution, :post)
+      
       # Record the failed API request with the error
-      api_request = record_api_request(distribution, payload, nil, e.message)
+      api_request = record_api_request(distribution, payload, nil, e.message, endpoint_url)
       
       @failed_distributions << {
         distribution: distribution,
@@ -249,7 +261,8 @@ class LeadDistributionService
         { 
           api_request_id: api_request.id,
           error: e.message,
-          error_class: e.class.name
+          error_class: e.class.name,
+          endpoint_url: endpoint_url
         }
       )
     end
@@ -270,12 +283,16 @@ class LeadDistributionService
     end
   end
 
-  def send_request(distribution, payload)
+  def send_request(distribution, payload, request_type = :post)
     start_time = Time.now
     
-    uri = URI.parse(distribution.endpoint_url)
+    # Select appropriate endpoint URL based on request type and distribution endpoint type
+    endpoint_url = select_endpoint_url(distribution, request_type)
+    
+    uri = URI.parse(endpoint_url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == 'https'
+    http.read_timeout = 30 # 30 seconds timeout
     
     # Create the appropriate request object based on method
     request = case distribution.request_method
@@ -296,6 +313,9 @@ class LeadDistributionService
                 req
               end
     
+    # Apply authentication based on method
+    apply_authentication(request, distribution)
+    
     # Add headers
     distribution.headers.each do |header|
       request[header.name] = header.value
@@ -303,6 +323,15 @@ class LeadDistributionService
     
     # Send the request
     response = http.request(request)
+    
+    # Handle OAuth token refresh if needed
+    if response.code.to_i == 401 && distribution.authentication_method == "oauth2"
+      if refresh_oauth_token(distribution)
+        # Try the request again with new token
+        apply_authentication(request, distribution)
+        response = http.request(request)
+      end
+    end
     
     # Calculate duration
     duration_ms = ((Time.now - start_time) * 1000).to_i
@@ -317,6 +346,135 @@ class LeadDistributionService
       error: e.message,
       duration_ms: ((Time.now - start_time) * 1000).to_i
     }
+  end
+  
+  # Select the appropriate endpoint URL based on the request type and distribution endpoint type
+  def select_endpoint_url(distribution, request_type)
+    case request_type
+    when :ping
+      # For ping, use bid_endpoint_url if available (for backwards compatibility)
+      distribution.bid_endpoint_url.presence || distribution.endpoint_url
+    when :post
+      # For post, use post_endpoint_url if available (for ping_post type), otherwise regular endpoint_url
+      if distribution.endpoint_type == "ping_post" && distribution.post_endpoint_url.present?
+        distribution.post_endpoint_url
+      else
+        distribution.endpoint_url
+      end
+    else
+      distribution.endpoint_url
+    end
+  end
+  
+  # Apply authentication to the request based on the distribution's authentication method
+  def apply_authentication(request, distribution)
+    if distribution.authentication_method_token?
+      # Add API key to header or query param based on location
+      if distribution.api_key_location == "header"
+        request[distribution.api_key_name] = distribution.authentication_token
+      else
+        # Add to query params for GET or to body for others
+        # Implementation depends on your payload structure
+      end
+    elsif distribution.authentication_method_basic_auth?
+      # Use HTTP Basic Auth
+      request.basic_auth(distribution.username, distribution.password)
+    elsif distribution.authentication_method_oauth2?
+      # Get or refresh OAuth token
+      token = get_oauth_token(distribution)
+      request["Authorization"] = "Bearer #{token}" if token.present?
+    elsif distribution.authentication_method_jwt?
+      # Generate JWT
+      token = generate_jwt(distribution)
+      request["Authorization"] = "Bearer #{token}" if token.present?
+    end
+  end
+  
+  # Get OAuth token, refreshing if necessary
+  def get_oauth_token(distribution)
+    # Check if token exists and is still valid
+    if distribution.access_token.present? && distribution.token_expires_at.present?
+      # If token expires in the next 5 minutes, refresh it
+      if distribution.token_expires_at > Time.current + 5.minutes
+        return distribution.access_token
+      end
+    end
+    
+    # Token doesn't exist or is expiring soon, refresh it
+    refresh_oauth_token(distribution)
+    distribution.access_token
+  end
+  
+  # Refresh OAuth token
+  def refresh_oauth_token(distribution)
+    return false unless distribution.client_id.present? && distribution.client_secret.present? && distribution.token_url.present?
+    
+    begin
+      uri = URI.parse(distribution.token_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+      
+      request = Net::HTTP::Post.new(uri)
+      request.content_type = 'application/x-www-form-urlencoded'
+      
+      # Construct appropriate OAuth payload based on whether we're doing initial token or refresh
+      if distribution.refresh_token.present?
+        # Use refresh token flow
+        request.set_form_data({
+          'grant_type' => 'refresh_token',
+          'refresh_token' => distribution.refresh_token,
+          'client_id' => distribution.client_id,
+          'client_secret' => distribution.client_secret
+        })
+      else
+        # Use client credentials flow
+        request.set_form_data({
+          'grant_type' => 'client_credentials',
+          'client_id' => distribution.client_id,
+          'client_secret' => distribution.client_secret
+        })
+      end
+      
+      response = http.request(request)
+      
+      if response.code.to_i == 200
+        # Parse response to get token
+        token_data = JSON.parse(response.body)
+        
+        # Update distribution with new token info
+        distribution.update(
+          access_token: token_data['access_token'],
+          refresh_token: token_data['refresh_token'] || distribution.refresh_token,
+          token_expires_at: Time.current + token_data['expires_in'].to_i.seconds
+        )
+        
+        return true
+      else
+        Rails.logger.error("OAuth token refresh failed: #{response.body}")
+        return false
+      end
+    rescue => e
+      Rails.logger.error("OAuth token refresh error: #{e.message}")
+      return false
+    end
+  end
+  
+  # Generate a JWT token
+  def generate_jwt(distribution)
+    # JWT implementation would go here
+    # This is a placeholder - in a real application, you would implement JWT generation
+    # based on your specific requirements
+    
+    # Example:
+    # payload = {
+    #   iss: distribution.client_id,
+    #   exp: Time.now.to_i + 3600,
+    #   iat: Time.now.to_i
+    # }
+    # JWT.encode(payload, distribution.client_secret, 'HS256')
+    
+    # For now, return nil
+    nil
   end
 
   def set_request_payload(request, distribution, payload)
@@ -333,11 +491,11 @@ class LeadDistributionService
     end
   end
 
-  def record_api_request(distribution, payload, response, error = nil)
+  def record_api_request(distribution, payload, response, error = nil, endpoint_url = nil)
     api_request = distribution.api_requests.new(
       requestable: distribution,
       lead: @lead,
-      endpoint_url: distribution.endpoint_url,
+      endpoint_url: endpoint_url || distribution.endpoint_url,
       request_method: distribution.request_method.to_sym,
       request_payload: payload
     )

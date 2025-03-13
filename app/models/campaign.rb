@@ -14,6 +14,12 @@ class Campaign < ApplicationRecord
   has_many :distribution_filters, -> { where(type: 'DistributionFilter') }, class_name: 'DistributionFilter', dependent: :destroy, foreign_key: 'campaign_id'
   has_many :bid_requests, dependent: :destroy
   has_many :bid_analytic_snapshots, dependent: :nullify
+  has_many :form_builders, dependent: :destroy
+  
+  # Define enrichment processors attribute with default value
+  def enrichment_processors
+    []
+  end
   
   # Constants for campaign types and distribution methods
   CAMPAIGN_TYPES = ['ping_post', 'direct', 'calls'].freeze
@@ -82,18 +88,55 @@ class Campaign < ApplicationRecord
   
   # Find eligible distributions for bidding with given anonymized data
   def eligible_distributions_for_bidding(anonymized_data)
-    return [] unless distribution_method.in?(['highest_bid', 'weighted_random', 'waterfall'])
+    Rails.logger.info("Campaign#eligible_distributions_for_bidding called for campaign #{id}")
+    
+    unless distribution_method.in?(['highest_bid', 'weighted_random', 'waterfall'])
+      Rails.logger.warn("Campaign #{id} has distribution_method '#{distribution_method}' not compatible with bidding")
+      return []
+    end
     
     # Apply filters to determine eligible distributions
+    Rails.logger.info("Campaign #{id} getting filtered eligible distributions")
     eligible = eligible_distributions(anonymized_data)
+    Rails.logger.info("Campaign #{id} has #{eligible.count} distributions after filtering")
     
     # Further limit to distributions set up for bidding
-    eligible.select { |dist| dist.respond_to?(:bidding_enabled?) && dist.bidding_enabled? }
+    bidding_enabled = eligible.select { |dist| dist.respond_to?(:bidding_enabled?) && dist.bidding_enabled? }
+    Rails.logger.info("Campaign #{id} has #{bidding_enabled.count} distributions with bidding enabled")
+    
+    # Log which distributions are not bidding enabled for debugging
+    if bidding_enabled.count < eligible.count
+      eligible.each do |dist|
+        unless dist.respond_to?(:bidding_enabled?) && dist.bidding_enabled?
+          if !dist.respond_to?(:bidding_enabled?)
+            Rails.logger.warn("Distribution #{dist.id} doesn't respond to bidding_enabled?")
+          elsif !dist.bidding_enabled?
+            Rails.logger.warn("Distribution #{dist.id} has bidding disabled (base_bid_amount: #{dist.base_bid_amount})")
+          end
+        end
+      end
+    end
+    
+    bidding_enabled
   end
   
   # Get all eligible entities (sources and distributions) for given lead data
   def eligible_entities(lead_data)
     FilterService.evaluate_filters(lead_data, self)
+  end
+  
+  # Check if campaign is ready for form building
+  def ready_for_form_builder?
+    # Campaign must have fields
+    return false if campaign_fields.empty?
+    
+    # Campaign must have at least one required field
+    #return false unless campaign_fields.where(required: true).exists?
+    
+    # Campaign should be in draft, active or paused status (not archived)
+    return false if archived?
+    
+    true
   end
   
   private

@@ -67,8 +67,19 @@ class BidRequest < ApplicationRecord
   end
   
   # Mark as expired if time has passed
+  # Returns true if the request was expired during this check
   def check_expiration!
-    update(status: :expired) if expires_at <= Time.current && status == 'active'
+    if expires_at <= Time.current && status.in?(['active', 'pending'])
+      update(status: :expired)
+      Rails.logger.info("BidRequest ##{id} marked as expired (was: #{status_was}, expired at: #{expires_at})")
+      return true
+    end
+    false
+  end
+  
+  # Check if request is technically expired by time but not yet marked as expired
+  def technically_expired?
+    expires_at <= Time.current && status.in?(['active', 'pending'])
   end
   
   # Get field values from lead if present
@@ -141,6 +152,12 @@ class BidRequest < ApplicationRecord
   end
   
   def set_expiration
-    self.expires_at ||= 5.minutes.from_now
+    # If campaign has bid_timeout_seconds set, use that; otherwise use 2 minutes as default
+    # This ensures we have a reasonable default even if campaign config is missing
+    if campaign && campaign.bid_timeout_seconds.present?
+      self.expires_at ||= Time.current + campaign.bid_timeout_seconds.seconds
+    else
+      self.expires_at ||= 2.minutes.from_now
+    end
   end
 end

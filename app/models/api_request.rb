@@ -23,6 +23,7 @@ class ApiRequest < ApplicationRecord
   
   store_accessor :request_payload, []
   store_accessor :response_data, []
+  store_accessor :request_headers, []
   
   scope :recent, -> { order(created_at: :desc) }
   scope :successful, -> { where("response_code >= 200 AND response_code < 300") }

@@ -4,62 +4,115 @@ export default class extends Controller {
   static targets = ["tab", "panel"]
 
   connect() {
-    // Check which tab to show based on the hash in the URL or default to first tab
-    this.showTabFromHash() || this.showTab(0)
+    // Check for tab parameter in URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const tabId = urlParams.get('tab')
+    
+    // If tab parameter exists, find corresponding tab
+    if (tabId) {
+      const tabs = this.element.querySelectorAll("[data-tabs-target='panel']")
+      let tabIndex = -1
+      
+      // Find index of tab matching the ID in URL
+      tabs.forEach((panel, index) => {
+        const panelId = this.getPanelId(panel)
+        if (panelId === tabId) {
+          tabIndex = index
+        }
+      })
+      
+      // If found, activate corresponding tab button
+      if (tabIndex >= 0 && tabIndex < this.tabTargets.length) {
+        this.activate(this.tabTargets[tabIndex])
+        return
+      }
+    }
+    
+    // Otherwise make sure at least one tab is active
+    if (!this.activeTab) {
+      this.activate(this.tabTargets[0])
+    }
   }
 
-  change(event) {
+  get activeTab() {
+    return this.tabTargets.find(tab => 
+      tab.classList.contains("border-indigo-500") && 
+      tab.classList.contains("text-indigo-600")
+    )
+  }
+  
+  // Method to select a tab by its name/ID
+  selectTabByName(event) {
     event.preventDefault()
+    const tabName = event.currentTarget.dataset.tab
     
-    // Get the index of the tab that was clicked
-    const clickedTab = event.currentTarget
-    const index = this.tabTargets.indexOf(clickedTab)
+    if (!tabName) return
     
-    if (index !== -1) {
-      this.showTab(index)
-      
-      // Update the URL hash without scrolling
-      const hash = clickedTab.getAttribute('href')
-      if (hash) {
-        history.replaceState(null, null, hash)
+    // Get all tabs and panels
+    const tabs = this.tabTargets
+    const panels = this.panelTargets
+    
+    // Find the tab with matching name
+    for (let i = 0; i < tabs.length; i++) {
+      const tabId = this.getPanelId(panels[i])
+      if (tabId === tabName) {
+        this.activate(tabs[i])
+        return
       }
     }
   }
 
-  showTabFromHash() {
-    if (window.location.hash) {
-      const tabWithHash = this.tabTargets.find(tab => 
-        tab.getAttribute('href') === window.location.hash
-      )
-      
-      if (tabWithHash) {
-        const index = this.tabTargets.indexOf(tabWithHash)
-        this.showTab(index)
-        return true
-      }
-    }
-    return false
+  select(event) {
+    event.preventDefault()
+    this.activate(event.currentTarget)
   }
 
-  showTab(index) {
-    this.tabTargets.forEach((tab, i) => {
-      // Update the tab styles
-      if (i === index) {
-        tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'dark:hover:text-gray-300')
-        tab.classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400')
-      } else {
-        tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'dark:hover:text-gray-300')
-        tab.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400')
+  // Get the ID associated with a panel element
+  getPanelId(panel) {
+    // Find the index in parent element that might provide IDs for URL updates
+    const parentElement = panel.closest('[data-tabs-panels]')
+    if (parentElement && parentElement.dataset.tabsPanels) {
+      const ids = parentElement.dataset.tabsPanels.split(',')
+      const index = parseInt(panel.dataset.tabIndex)
+      if (index >= 0 && index < ids.length) {
+        return ids[index]
       }
+    }
+    return panel.dataset.id || panel.dataset.tabIndex
+  }
+
+  activate(tab) {
+    // Deactivate all tabs
+    this.tabTargets.forEach(t => {
+      t.classList.remove("border-indigo-500", "text-indigo-600", "dark:text-indigo-400")
+      t.classList.add("border-transparent", "text-gray-500", "hover:text-gray-700", "hover:border-gray-300", "dark:text-gray-400", "dark:hover:text-gray-200", "dark:hover:border-gray-600")
     })
 
-    this.panelTargets.forEach((panel, i) => {
-      // Show/hide the panel
-      if (i === index) {
-        panel.classList.remove('hidden')
-      } else {
-        panel.classList.add('hidden')
-      }
+    // Activate the selected tab
+    tab.classList.remove("border-transparent", "text-gray-500", "hover:text-gray-700", "hover:border-gray-300", "dark:text-gray-400", "dark:hover:text-gray-200", "dark:hover:border-gray-600")
+    tab.classList.add("border-indigo-500", "text-indigo-600", "dark:text-indigo-400")
+
+    // Get the tab index
+    const index = parseInt(tab.dataset.tabIndex)
+    
+    // Hide all panels
+    this.panelTargets.forEach(panel => {
+      panel.classList.add("hidden")
     })
+
+    // Show the panel with matching index
+    if (index >= 0 && index < this.panelTargets.length) {
+      this.panelTargets[index].classList.remove("hidden")
+      
+      // Update URL with tab ID if history API is available
+      if (history.pushState) {
+        const panelId = this.getPanelId(this.panelTargets[index])
+        if (panelId) {
+          const url = new URL(window.location)
+          url.searchParams.set("tab", panelId)
+          history.pushState({}, "", url)
+        }
+      }
+    }
   }
 }

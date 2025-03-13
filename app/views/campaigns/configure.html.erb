@@ -313,7 +313,7 @@
                             </svg>
                           <% end %>
 
-                          <%= link_to campaign_validation_rule_path(@campaign, rule, toggle_active: true),
+                          <%= link_to toggle_active_campaign_validation_rule_path(@campaign, rule),
                                       data: { turbo_method: :patch },
                                       class: "text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400" do %>
                             <% if rule.active? %>

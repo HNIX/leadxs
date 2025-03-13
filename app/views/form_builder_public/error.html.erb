@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submission Error</title>
+  <meta name="description" content="Form submission error">
+  
+  <style>
+    :root {
+      --color-primary: <%= @theme["color_primary"] %>;
+      --color-secondary: <%= @theme["color_secondary"] %>;
+      --color-background: <%= @theme["color_background"] %>;
+      --color-text: <%= @theme["color_text"] %>;
+      --color-error: <%= @theme["color_error"] %>;
+      --font-family: <%= @theme["font_family"] %>;
+      --border-radius: <%= @theme["border_radius"] %>;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      margin: 0;
+      padding: 1rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    .error-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: white;
+      text-align: center;
+    }
+    
+    .error-icon {
+      width: 60px;
+      height: 60px;
+      background-color: var(--color-error);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .error-icon svg {
+      width: 30px;
+      height: 30px;
+      color: white;
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: var(--color-error);
+      font-size: 1.5rem;
+    }
+    
+    p {
+      margin-bottom: 1.5rem;
+    }
+    
+    .error-message {
+      background-color: rgba(var(--color-error-rgb), 0.1);
+      border-left: 4px solid var(--color-error);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+      border-radius: 4px;
+    }
+    
+    .btn {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.625rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.875rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: var(--color-secondary);
+    }
+    
+    /* Add support for dark mode based on system preference */
+    @media (prefers-color-scheme: dark) {
+      body.auto-dark {
+        background-color: #1f2937;
+        color: #f3f4f6;
+      }
+      
+      body.auto-dark .error-container {
+        background-color: #111827;
+      }
+      
+      body.auto-dark .error-message {
+        background-color: rgba(239, 68, 68, 0.1);
+      }
+    }
+    
+    <%= @theme["custom_css"] %>
+  </style>
+</head>
+<body class="auto-dark">
+  <div class="error-container">
+    <div class="error-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    
+    <h1>Submission Error</h1>
+    <p>There was an error processing your form submission.</p>
+    
+    <% if @error_message.present? %>
+      <div class="error-message">
+        <%= @error_message %>
+      </div>
+    <% end %>
+    
+    <a href="javascript:history.back()" class="btn">Go Back</a>
+  </div>
+  
+  <script>
+    // If the form is in an iframe, notify the parent frame of height changes
+    if (window.parent && window.parent !== window) {
+      const height = document.body.scrollHeight;
+      window.parent.postMessage({
+        type: 'swaped-form-resize',
+        height: height
+      }, '*');
+    }
+  </script>
+</body>
+</html>

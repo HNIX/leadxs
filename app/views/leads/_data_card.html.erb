@@ -1,0 +1,19 @@
+<%# Renders a data card with consistent styling
+  Usage: render "leads/data_card", title: "Card Title" do %>
+    <%# Card content goes here %>
+<% #end %>
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden <%= local_assigns[:class] %>">
+  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+    <h2 class="text-lg font-medium dark:text-white"><%= title %></h2>
+    <% if local_assigns[:actions].present? %>
+      <div class="flex space-x-2">
+        <%= actions %>
+      </div>
+    <% end %>
+  </div>
+  
+  <div class="p-6">
+    <%= yield %>
+  </div>
+</div>

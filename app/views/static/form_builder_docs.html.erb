@@ -1,0 +1,387 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">Form Builder Documentation</h1>
+  
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Overview</h2>
+    
+    <p class="text-gray-700 dark:text-gray-300 mb-4">
+      The Form Builder allows you to create customized, embeddable forms for your campaigns. These forms can be embedded on your sources' websites to collect leads directly, without requiring them to implement complex API integrations.
+    </p>
+    
+    <p class="text-gray-700 dark:text-gray-300 mb-4">
+      Forms inherit validation rules and field structures from your campaign configuration, ensuring data quality and consistency. Each form submission is automatically processed through your campaign's workflow, including validation, filtering, and distribution.
+    </p>
+    
+    <div class="flex items-center bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg border border-primary-100 dark:border-primary-800 mt-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="text-primary-700 dark:text-primary-300">
+        To use Form Builder, your campaign must have required fields defined and be in active, draft, or paused status.
+      </span>
+    </div>
+  </div>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Getting Started</h2>
+        
+        <div class="border-l-4 border-primary-500 pl-4 py-2 mb-6">
+          <h3 class="text-lg font-medium mb-2">Step 1: Create a Form</h3>
+          <p class="text-gray-700 dark:text-gray-300">
+            Navigate to a campaign's detail page and click "Manage Form Builders" or select "Create Form" from the actions dropdown. Provide a name for your form and select its initial status.
+          </p>
+        </div>
+        
+        <div class="border-l-4 border-primary-500 pl-4 py-2 mb-6">
+          <h3 class="text-lg font-medium mb-2">Step 2: Customize Your Form</h3>
+          <p class="text-gray-700 dark:text-gray-300">
+            After creating the form, you'll be taken to the form builder interface. Here you can:
+          </p>
+          <ul class="list-disc ml-6 mt-2 text-gray-700 dark:text-gray-300">
+            <li>Add new form elements by clicking "Add Element" or using the drag-and-drop interface</li>
+            <li>Rearrange elements by dragging them to new positions</li>
+            <li>Edit elements' properties by clicking on them</li>
+            <li>Preview your form to see how it will appear to users</li>
+          </ul>
+        </div>
+        
+        <div class="border-l-4 border-primary-500 pl-4 py-2 mb-6">
+          <h3 class="text-lg font-medium mb-2">Step 3: Configure Form Settings</h3>
+          <p class="text-gray-700 dark:text-gray-300">
+            Use the "Edit Settings" button to access the form configuration options:
+          </p>
+          <ul class="list-disc ml-6 mt-2 text-gray-700 dark:text-gray-300">
+            <li>Form layout and behavior settings</li>
+            <li>Theme customization (colors, fonts, spacing)</li>
+            <li>Tracking and analytics options</li>
+          </ul>
+        </div>
+        
+        <div class="border-l-4 border-primary-500 pl-4 py-2 mb-6">
+          <h3 class="text-lg font-medium mb-2">Step 4: Activate and Share</h3>
+          <p class="text-gray-700 dark:text-gray-300">
+            Once your form is ready, set its status to "Active" and use the "Embed Codes" option to get the code snippets needed to embed the form on websites.
+          </p>
+        </div>
+        
+        <div class="border-l-4 border-primary-500 pl-4 py-2">
+          <h3 class="text-lg font-medium mb-2">Step 5: Monitor Submissions</h3>
+          <p class="text-gray-700 dark:text-gray-300">
+            Track form submissions and performance through the Form Submissions tab and the analytics dashboard.
+          </p>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Form Element Types</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div>
+            <h3 class="text-lg font-medium mb-2">Input Elements</h3>
+            <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Text</span>
+                <span>Single line text input</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Textarea</span>
+                <span>Multi-line text input</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Number</span>
+                <span>Numeric input field</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Email</span>
+                <span>Email address input with format validation</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Phone</span>
+                <span>Phone number input with format validation</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Date</span>
+                <span>Date picker input</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Select</span>
+                <span>Dropdown selection menu</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Checkbox</span>
+                <span>Single or multi checkbox selection</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Radio</span>
+                <span>Single-select radio button group</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Address</span>
+                <span>Address input with optional autocomplete</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-medium mb-2">Layout and Content Elements</h3>
+            <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Header</span>
+                <span>Section title or heading</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Paragraph</span>
+                <span>Text content blocks</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Divider</span>
+                <span>Visual separator between sections</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Image</span>
+                <span>Display images in your form</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Consent</span>
+                <span>Special checkbox for capturing consent</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Submit</span>
+                <span>Form submission button</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Multi-step</span>
+                <span>Create multi-page forms with steps</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Grid</span>
+                <span>Layout container for organizing fields</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Row</span>
+                <span>Horizontal grouping of fields</span>
+              </li>
+              <li class="flex items-center">
+                <span class="inline-block w-24 font-medium">Column</span>
+                <span>Vertical grouping within rows</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <h3 class="text-lg font-medium mb-2">Campaign Field Mapping</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
+          When adding elements, you can link them to campaign fields. This automatically:
+        </p>
+        <ul class="list-disc ml-6 mb-4 text-gray-700 dark:text-gray-300">
+          <li>Inherits validation rules from the campaign field</li>
+          <li>Maps submitted data to the correct field in your campaign</li>
+          <li>Applies proper formatting and validation during submission</li>
+          <li>For list-based fields, displays the correct options from campaign field definitions</li>
+        </ul>
+        
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-100 dark:border-yellow-800">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">Note</h4>
+              <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-200">
+                <p>
+                  If you don't link an element to a campaign field, its data won't be saved with the lead unless you add a custom field mapping in the form properties.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Advanced Features</h2>
+        
+        <h3 class="text-lg font-medium mb-2">Conditional Display Logic</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
+          When editing an element, you can set conditions that determine when the element is displayed:
+        </p>
+        <ul class="list-disc ml-6 mb-6 text-gray-700 dark:text-gray-300">
+          <li>Select another element as the trigger</li>
+          <li>Choose an operator (equals, not equals, contains, etc.)</li>
+          <li>Set the value that triggers the display condition</li>
+        </ul>
+        
+        <h3 class="text-lg font-medium mb-2">Multi-step Forms</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
+          Create forms with multiple steps to improve conversion rates:
+        </p>
+        <ul class="list-disc ml-6 mb-6 text-gray-700 dark:text-gray-300">
+          <li>Add multi-step elements to divide your form into pages</li>
+          <li>Enable progress indicators to show completion status</li>
+          <li>Each step is validated before proceeding to the next</li>
+        </ul>
+        
+        <h3 class="text-lg font-medium mb-2">Theme Customization</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
+          Customize your form's appearance to match your brand:
+        </p>
+        <ul class="list-disc ml-6 mb-6 text-gray-700 dark:text-gray-300">
+          <li>Set custom colors for primary, secondary, background, and text elements</li>
+          <li>Choose fonts and spacing options</li>
+          <li>Add your logo to the form header</li>
+          <li>Add custom CSS for advanced styling needs</li>
+        </ul>
+        
+        <h3 class="text-lg font-medium mb-2">Tracking and Analytics</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
+          Monitor form performance with built-in analytics:
+        </p>
+        <ul class="list-disc ml-6 mb-6 text-gray-700 dark:text-gray-300">
+          <li>Track views, starts, submissions, and completions</li>
+          <li>Monitor time spent on the form</li>
+          <li>Identify drop-off points where users abandon the form</li>
+          <li>View device breakdown to understand your audience</li>
+          <li>Integrate with Google Analytics or Facebook Pixel for additional insights</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="lg:col-span-1">
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8 sticky top-6">
+        <h2 class="text-xl font-semibold mb-4">Quick Reference</h2>
+        
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-md font-medium mb-2 text-primary-600 dark:text-primary-400">Embedding Options</h3>
+            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <p><strong>JavaScript Embed</strong> - Recommended for responsive embedding that adjusts to container size</p>
+              <p><strong>iframe Embed</strong> - Simple option that works in most environments</p>
+              <p><strong>Direct Link</strong> - Share as a standalone form page</p>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-md font-medium mb-2 text-primary-600 dark:text-primary-400">Field Validation</h3>
+            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <p><strong>Required Fields</strong> - Mark fields that must be filled</p>
+              <p><strong>Format Validation</strong> - Email, phone, date, etc.</p>
+              <p><strong>Min/Max Length</strong> - For text inputs</p>
+              <p><strong>Min/Max Value</strong> - For number inputs</p>
+              <p><strong>Pattern Matching</strong> - Custom regex patterns</p>
+              <p><strong>List Validation</strong> - Restricted to specific values</p>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-md font-medium mb-2 text-primary-600 dark:text-primary-400">Form Statuses</h3>
+            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <p><strong>Draft</strong> - Form is being built, not publicly accessible</p>
+              <p><strong>Active</strong> - Form is live and accepting submissions</p>
+              <p><strong>Paused</strong> - Form is temporarily not accepting submissions</p>
+              <p><strong>Archived</strong> - Form is no longer in use</p>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-md font-medium mb-2 text-primary-600 dark:text-primary-400">Compliance Features</h3>
+            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <p><strong>Consent Tracking</strong> - Records exact consent text shown to user</p>
+              <p><strong>IP Address Recording</strong> - For compliance documentation</p>
+              <p><strong>Timestamp Tracking</strong> - When consent was provided</p>
+              <p><strong>User Agent Logging</strong> - Browser and device information</p>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-md font-medium mb-2 text-primary-600 dark:text-primary-400">Best Practices</h3>
+            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+              <p>• Keep forms as short as possible to improve completion rates</p>
+              <p>• Use multi-step forms for longer form requirements</p>
+              <p>• Only mark fields as required when absolutely necessary</p>
+              <p>• Group related fields together for better user experience</p>
+              <p>• Use clear and concise labels and help text</p>
+              <p>• Test your form on mobile devices before publishing</p>
+              <p>• Use A/B testing to optimize conversion rates</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Frequently Asked Questions</h2>
+    
+    <div class="space-y-6">
+      <div>
+        <h3 class="text-lg font-medium mb-2">Can I use the same form for multiple sources?</h3>
+        <p class="text-gray-700 dark:text-gray-300">
+          Yes. When generating embed codes, you can select which source the submissions should be attributed to. This allows you to track which sources are generating leads through your forms.
+        </p>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-2">How are form submissions processed?</h3>
+        <p class="text-gray-700 dark:text-gray-300">
+          Form submissions are processed through the same workflow as API submissions. They go through validation, filtering, and distribution according to your campaign settings. Submissions create lead records and can trigger bidding if configured for your campaign.
+        </p>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-2">Can I customize the success page after form submission?</h3>
+        <p class="text-gray-700 dark:text-gray-300">
+          Yes. In the form settings, you can specify a custom redirect URL for successful submissions. This allows you to direct users to a thank you page or back to your website after they submit the form.
+        </p>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-2">How do I implement progressive disclosure in my forms?</h3>
+        <p class="text-gray-700 dark:text-gray-300">
+          Use the conditional display feature when editing form elements. You can set conditions based on other field values to show or hide elements dynamically. For example, show additional questions only if a user selects "Yes" to a qualification question.
+        </p>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-2">Can I collect compliance documentation through the form?</h3>
+        <p class="text-gray-700 dark:text-gray-300">
+          Yes. The form automatically captures compliance information including:
+        </p>
+        <ul class="list-disc ml-6 mt-2 text-gray-700 dark:text-gray-300">
+          <li>The exact consent text shown to the user</li>
+          <li>Timestamp of when consent was provided</li>
+          <li>IP address of the user</li>
+          <li>User agent (browser and device information)</li>
+        </ul>
+        <p class="text-gray-700 dark:text-gray-300 mt-2">
+          This information is stored with the submission and associated lead record, making it available for compliance reporting.
+        </p>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-2">How do I create a multi-step form?</h3>
+        <p class="text-gray-700 dark:text-gray-300">
+          First, set the form layout to "Multi-step" in the form settings. Then add form elements and organize them by adding "Multi-step" elements between groups of fields to create separate pages. You can enable a progress indicator to show users their completion status.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="flex justify-between">
+    <a href="/lead_submission_process" class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+      </svg>
+      Lead Submission Process
+    </a>
+    
+    <a href="/validation_rules_documentation" class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 flex items-center">
+      Validation Rules
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+      </svg>
+    </a>
+  </div>
+</div>

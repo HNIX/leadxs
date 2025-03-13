@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_13_210534) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -188,6 +188,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
     t.datetime "updated_at", null: false
     t.bigint "account_id", null: false
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.jsonb "request_headers"
     t.index ["account_id"], name: "index_api_requests_on_account_id"
     t.index ["requestable_type", "requestable_id", "created_at"], name: "idx_on_requestable_type_requestable_id_created_at_3b74dff40b"
     t.index ["requestable_type", "requestable_id"], name: "index_api_requests_on_requestable"
@@ -265,6 +266,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_fallback", default: false, null: false
     t.index ["account_id", "status"], name: "index_bids_on_account_id_and_status"
     t.index ["account_id"], name: "index_bids_on_account_id"
     t.index ["amount"], name: "index_bids_on_amount"
@@ -513,10 +515,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
     t.string "bid_endpoint_url"
     t.string "metadata_requirements"
     t.jsonb "custom_metadata_fields"
+    t.boolean "bid_on_error", default: false, null: false
+    t.integer "endpoint_type", default: 0, null: false
+    t.integer "authentication_method", default: 0, null: false
+    t.string "username"
+    t.string "password"
+    t.string "api_key_name", default: "X-API-Key"
+    t.string "api_key_location", default: "header"
+    t.string "client_id"
+    t.string "client_secret"
+    t.string "token_url"
+    t.string "refresh_token"
+    t.string "access_token"
+    t.datetime "token_expires_at"
+    t.string "post_endpoint_url"
     t.index ["account_id", "name"], name: "index_distributions_on_account_id_and_name", unique: true
     t.index ["account_id"], name: "index_distributions_on_account_id"
     t.index ["company_id", "name"], name: "index_distributions_on_company_id_and_name", unique: true
     t.index ["company_id"], name: "index_distributions_on_company_id"
+    t.index ["endpoint_type", "authentication_method"], name: "index_distributions_on_endpoint_type_and_authentication_method"
   end
 
   create_table "filters", force: :cascade do |t|
@@ -536,6 +553,77 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
     t.index ["campaign_field_id"], name: "index_filters_on_campaign_field_id"
     t.index ["campaign_id"], name: "index_filters_on_campaign_id"
     t.index ["type", "account_id", "campaign_id"], name: "index_filters_on_type_and_account_id_and_campaign_id"
+  end
+
+  create_table "form_builder_analytics", force: :cascade do |t|
+    t.bigint "form_builder_id", null: false
+    t.date "date", null: false
+    t.integer "views", default: 0
+    t.integer "starts", default: 0
+    t.integer "submissions", default: 0
+    t.integer "completions", default: 0
+    t.integer "total_time_on_form_seconds", default: 0
+    t.jsonb "field_dropoffs", default: {}
+    t.jsonb "device_breakdown", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "account_id", null: false
+    t.index ["account_id"], name: "index_form_builder_analytics_on_account_id"
+    t.index ["form_builder_id", "date"], name: "index_form_builder_analytics_on_form_builder_id_and_date", unique: true
+    t.index ["form_builder_id"], name: "index_form_builder_analytics_on_form_builder_id"
+  end
+
+  create_table "form_builder_elements", force: :cascade do |t|
+    t.bigint "form_builder_id", null: false
+    t.bigint "campaign_field_id"
+    t.string "element_type", null: false
+    t.integer "position", null: false
+    t.jsonb "properties", default: {}, null: false
+    t.string "parent_element_id"
+    t.integer "display_condition_element_id"
+    t.string "display_condition_operator"
+    t.string "display_condition_value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "account_id", null: false
+    t.index ["account_id"], name: "index_form_builder_elements_on_account_id"
+    t.index ["campaign_field_id"], name: "index_form_builder_elements_on_campaign_field_id"
+    t.index ["form_builder_id"], name: "index_form_builder_elements_on_form_builder_id"
+    t.index ["parent_element_id"], name: "index_form_builder_elements_on_parent_element_id"
+  end
+
+  create_table "form_builders", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.string "name", null: false
+    t.string "status", default: "draft", null: false
+    t.jsonb "form_config", default: {}, null: false
+    t.jsonb "theme_config", default: {}, null: false
+    t.jsonb "tracking_config", default: {}, null: false
+    t.string "embed_token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "account_id", null: false
+    t.index ["account_id"], name: "index_form_builders_on_account_id"
+    t.index ["campaign_id"], name: "index_form_builders_on_campaign_id"
+    t.index ["embed_token"], name: "index_form_builders_on_embed_token", unique: true
+  end
+
+  create_table "form_submissions", force: :cascade do |t|
+    t.bigint "form_builder_id", null: false
+    t.bigint "lead_id"
+    t.string "status", default: "submitted", null: false
+    t.jsonb "form_data", default: {}, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.text "consent_text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "account_id", null: false
+    t.index ["account_id"], name: "index_form_submissions_on_account_id"
+    t.index ["form_builder_id"], name: "index_form_submissions_on_form_builder_id"
+    t.index ["lead_id"], name: "index_form_submissions_on_lead_id"
+    t.index ["status"], name: "index_form_submissions_on_status"
   end
 
   create_table "headers", force: :cascade do |t|
@@ -874,9 +962,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "form_builder_id"
     t.index ["account_id"], name: "index_sources_on_account_id"
     t.index ["campaign_id"], name: "index_sources_on_campaign_id"
     t.index ["company_id"], name: "index_sources_on_company_id"
+    t.index ["form_builder_id"], name: "index_sources_on_form_builder_id"
     t.index ["name", "account_id"], name: "index_sources_on_name_and_account_id", unique: true
     t.index ["token"], name: "index_sources_on_token", unique: true
   end
@@ -1069,6 +1159,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
   add_foreign_key "filters", "accounts"
   add_foreign_key "filters", "campaign_fields"
   add_foreign_key "filters", "campaigns"
+  add_foreign_key "form_builder_analytics", "accounts"
+  add_foreign_key "form_builder_analytics", "form_builders", on_delete: :cascade
+  add_foreign_key "form_builder_elements", "accounts"
+  add_foreign_key "form_builder_elements", "campaign_fields"
+  add_foreign_key "form_builder_elements", "form_builders", on_delete: :cascade
+  add_foreign_key "form_builders", "accounts"
+  add_foreign_key "form_builders", "campaigns", on_delete: :cascade
+  add_foreign_key "form_submissions", "accounts"
+  add_foreign_key "form_submissions", "form_builders"
+  add_foreign_key "form_submissions", "leads"
   add_foreign_key "headers", "distributions"
   add_foreign_key "lead_activity_logs", "accounts"
   add_foreign_key "lead_activity_logs", "leads"
@@ -1091,6 +1191,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_034354) do
   add_foreign_key "sources", "accounts"
   add_foreign_key "sources", "campaigns"
   add_foreign_key "sources", "companies"
+  add_foreign_key "sources", "form_builders"
   add_foreign_key "standard_fields", "accounts"
   add_foreign_key "validation_rules", "accounts"
   add_foreign_key "vertical_fields", "accounts"

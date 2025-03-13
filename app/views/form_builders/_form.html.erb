@@ -1,0 +1,211 @@
+<%= form_with(model: [@campaign, form_builder], class: "space-y-6") do |form| %>
+  <% if form_builder.errors.any? %>
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">There <%= form_builder.errors.count == 1 ? 'is' : 'are' %> <%= pluralize(form_builder.errors.count, "error") %> with this form:</h3>
+          <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+            <% form_builder.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Form Details</h3>
+      <p class="mt-1 text-sm text-gray-500">Basic information about your form</p>
+    </div>
+    
+    <div class="p-6 space-y-6">
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :name, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "E.g. Insurance Quote Form" %>
+        <p class="mt-1 text-xs text-gray-500">Choose a descriptive name for your form that helps you identify it.</p>
+      </div>
+
+      <div>
+        <%= form.label :status, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :status, ::FormBuilder::STATUSES.map { |s| [s.titleize, s] }, {}, class: "mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <p class="mt-1 text-xs text-gray-500">Set to 'Active' when you want the form to be available for use</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Form Configuration</h3>
+      <p class="mt-1 text-sm text-gray-500">Control how your form behaves and is organized</p>
+    </div>
+    
+    <div class="p-6 space-y-6">
+      <div>
+        <%= form.label :form_config_layout, "Form Layout", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :form_config_layout, [["Standard (All fields at once)", "standard"], ["Multi-step (Field groups)", "multistep"], ["Compact (Minimal spacing)", "compact"]], { selected: form_builder.form_config["layout"] }, class: "mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :form_config_submit_button_text, "Submit Button Text", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :form_config_submit_button_text, value: form_builder.form_config["submit_button_text"], class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "Submit" %>
+      </div>
+
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= form.check_box :form_config_progress_indicator, { checked: form_builder.form_config["progress_indicator"], class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" }, true, false %>
+        </div>
+        <div class="ml-3 text-sm">
+          <%= form.label :form_config_progress_indicator, "Show Progress Indicator", class: "font-medium text-gray-700" %>
+          <p class="text-xs text-gray-500">For multi-step forms, show a progress bar indicating completion</p>
+        </div>
+      </div>
+
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= form.check_box :form_config_show_required_indicator, { checked: form_builder.form_config["show_required_indicator"], class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" }, true, false %>
+        </div>
+        <div class="ml-3 text-sm">
+          <%= form.label :form_config_show_required_indicator, "Show Required Field Indicators", class: "font-medium text-gray-700" %>
+          <p class="text-xs text-gray-500">Display asterisk (*) for required fields</p>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :form_config_field_label_position, "Field Label Position", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :form_config_field_label_position, [["Top", "top"], ["Left", "left"], ["Placeholder Only", "placeholder"], ["Hidden", "hidden"]], { selected: form_builder.form_config["field_label_position"] }, class: "mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+        <p class="mt-1 text-xs text-gray-500">Choose where to display form field labels</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Theme Settings</h3>
+      <p class="mt-1 text-sm text-gray-500">Customize the appearance of your form</p>
+    </div>
+    
+    <div class="p-6 space-y-6">
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div>
+          <%= form.label :theme_config_color_primary, "Primary Color", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 flex rounded-md shadow-sm">
+            <%= form.color_field :theme_config_color_primary, value: form_builder.theme_config["color_primary"], class: "h-8 w-8 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" %>
+            <%= form.text_field :theme_config_color_primary, value: form_builder.theme_config["color_primary"], class: "ml-2 flex-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "#4f46e5" %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :theme_config_color_secondary, "Secondary Color", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 flex rounded-md shadow-sm">
+            <%= form.color_field :theme_config_color_secondary, value: form_builder.theme_config["color_secondary"], class: "h-8 w-8 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" %>
+            <%= form.text_field :theme_config_color_secondary, value: form_builder.theme_config["color_secondary"], class: "ml-2 flex-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "#3b82f6" %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :theme_config_color_background, "Background Color", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 flex rounded-md shadow-sm">
+            <%= form.color_field :theme_config_color_background, value: form_builder.theme_config["color_background"], class: "h-8 w-8 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" %>
+            <%= form.text_field :theme_config_color_background, value: form_builder.theme_config["color_background"], class: "ml-2 flex-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "#ffffff" %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :theme_config_color_text, "Text Color", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 flex rounded-md shadow-sm">
+            <%= form.color_field :theme_config_color_text, value: form_builder.theme_config["color_text"], class: "h-8 w-8 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" %>
+            <%= form.text_field :theme_config_color_text, value: form_builder.theme_config["color_text"], class: "ml-2 flex-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "#333333" %>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :theme_config_font_family, "Font Family", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :theme_config_font_family, [["Inter (Default)", "Inter, system-ui, sans-serif"], ["Arial", "Arial, sans-serif"], ["Helvetica", "Helvetica, Arial, sans-serif"], ["Times New Roman", "'Times New Roman', serif"], ["Georgia", "Georgia, serif"], ["Verdana", "Verdana, sans-serif"]], { selected: form_builder.theme_config["font_family"] }, class: "mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :theme_config_border_radius, "Border Radius", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :theme_config_border_radius, [["None", "0px"], ["Small", "4px"], ["Medium (Default)", "6px"], ["Large", "8px"], ["Rounded", "12px"]], { selected: form_builder.theme_config["border_radius"] }, class: "mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :theme_config_spacing, "Spacing", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :theme_config_spacing, [["Compact", "compact"], ["Normal (Default)", "normal"], ["Spacious", "spacious"]], { selected: form_builder.theme_config["spacing"] }, class: "mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= form.label :theme_config_logo_url, "Logo URL (Optional)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.url_field :theme_config_logo_url, value: form_builder.theme_config["logo_url"], class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "https://example.com/logo.png" %>
+        <p class="mt-1 text-xs text-gray-500">Enter a URL for your logo to display at the top of the form</p>
+      </div>
+
+      <div>
+        <%= form.label :theme_config_custom_css, "Custom CSS (Advanced)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_area :theme_config_custom_css, value: form_builder.theme_config["custom_css"], rows: 4, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "/* Add custom CSS rules here */" %>
+        <p class="mt-1 text-xs text-gray-500">For advanced customization, add custom CSS rules</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Tracking & Analytics</h3>
+      <p class="mt-1 text-sm text-gray-500">Configure tracking options for your form</p>
+    </div>
+    
+    <div class="p-6 space-y-6">
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= form.check_box :tracking_config_track_time_on_form, { checked: form_builder.tracking_config["track_time_on_form"], class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" }, true, false %>
+        </div>
+        <div class="ml-3 text-sm">
+          <%= form.label :tracking_config_track_time_on_form, "Track Time on Form", class: "font-medium text-gray-700" %>
+          <p class="text-xs text-gray-500">Record how long users spend on your form</p>
+        </div>
+      </div>
+
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= form.check_box :tracking_config_track_field_dropoff, { checked: form_builder.tracking_config["track_field_dropoff"], class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" }, true, false %>
+        </div>
+        <div class="ml-3 text-sm">
+          <%= form.label :tracking_config_track_field_dropoff, "Track Field Dropoff", class: "font-medium text-gray-700" %>
+          <p class="text-xs text-gray-500">Track which fields users abandon without completing</p>
+        </div>
+      </div>
+
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= form.check_box :tracking_config_track_device_info, { checked: form_builder.tracking_config["track_device_info"], class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" }, true, false %>
+        </div>
+        <div class="ml-3 text-sm">
+          <%= form.label :tracking_config_track_device_info, "Track Device Info", class: "font-medium text-gray-700" %>
+          <p class="text-xs text-gray-500">Capture device type, screen size, and browser information</p>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :tracking_config_google_analytics_id, "Google Analytics ID (Optional)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :tracking_config_google_analytics_id, value: form_builder.tracking_config["google_analytics_id"], class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "UA-XXXXXXXX-X or G-XXXXXXXXXX" %>
+      </div>
+
+      <div>
+        <%= form.label :tracking_config_facebook_pixel_id, "Facebook Pixel ID (Optional)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :tracking_config_facebook_pixel_id, value: form_builder.tracking_config["facebook_pixel_id"], class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "XXXXXXXXXXXXXXXXXX" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end">
+    <%= link_to "Cancel", campaign_form_builders_path(@campaign), class: "btn btn-white mr-2" %>
+    <%= form.submit class: "btn btn-primary" %>
+  </div>
+<% end %>

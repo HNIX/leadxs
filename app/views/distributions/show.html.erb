@@ -64,9 +64,28 @@
         </div>
         
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Endpoint URL</dt>
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Endpoint Type</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-            <%= @distribution.endpoint_url %>
+            <%= @distribution.endpoint_type.titleize %>
+          </dd>
+        </div>
+
+        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Primary Endpoint</dt>
+          <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+            <div class="flex flex-col">
+              <div>
+                <span class="font-semibold"><%= @distribution.endpoint_type == "ping_post" ? "Ping URL:" : "Endpoint URL:" %></span>
+                <%= @distribution.endpoint_url %>
+              </div>
+              
+              <% if @distribution.endpoint_type == "ping_post" && @distribution.post_endpoint_url.present? %>
+                <div class="mt-2">
+                  <span class="font-semibold">Post URL:</span>
+                  <%= @distribution.post_endpoint_url %>
+                </div>
+              <% end %>
+            </div>
           </dd>
         </div>
         
@@ -84,18 +103,82 @@
           </dd>
         </div>
         
-        <% if @distribution.authentication_token.present? %>
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Authentication Token</dt>
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Authentication</dt>
           <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-            <div class="flex items-center">
-              <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                <%= @distribution.authentication_token %>
-              </span>
+            <div>
+              <div class="font-medium"><%= @distribution.authentication_method.titleize %></div>
+              
+              <% if @distribution.authentication_method_none? %>
+                <span class="text-gray-500 dark:text-gray-400">No authentication is used.</span>
+              
+              <% elsif @distribution.authentication_method_token? %>
+                <div class="mt-2 grid grid-cols-2 gap-4">
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">Token:</span>
+                    <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded ml-1">
+                      <%= @distribution.authentication_token || "—" %>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">Header name:</span>
+                    <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded ml-1">
+                      <%= @distribution.api_key_name || "X-API-Key" %>
+                    </span>
+                  </div>
+                </div>
+              
+              <% elsif @distribution.authentication_method_basic_auth? %>
+                <div class="mt-2 grid grid-cols-2 gap-4">
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">Username:</span>
+                    <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded ml-1">
+                      <%= @distribution.username || "—" %>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">Password:</span>
+                    <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded ml-1">
+                      <%= @distribution.password.present? ? "••••••••" : "—" %>
+                    </span>
+                  </div>
+                </div>
+              
+              <% elsif @distribution.authentication_method_oauth2? %>
+                <div class="mt-2 grid grid-cols-2 gap-4">
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">Client ID:</span>
+                    <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded ml-1">
+                      <%= @distribution.client_id.present? ? "••••••••" : "—" %>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">Token URL:</span>
+                    <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded ml-1">
+                      <%= @distribution.token_url || "—" %>
+                    </span>
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <span class="text-gray-500 dark:text-gray-400">Token Status:</span>
+                  <% if @distribution.access_token.present? && @distribution.token_expires_at.present? %>
+                    <% if @distribution.token_expires_at > Time.current %>
+                      <span class="text-green-600 dark:text-green-400">Valid until <%= @distribution.token_expires_at.strftime("%B %d, %Y at %H:%M") %></span>
+                    <% else %>
+                      <span class="text-red-600 dark:text-red-400">Expired on <%= @distribution.token_expires_at.strftime("%B %d, %Y at %H:%M") %></span>
+                    <% end %>
+                  <% else %>
+                    <span class="text-yellow-600 dark:text-yellow-400">No token obtained yet</span>
+                  <% end %>
+                </div>
+              <% elsif @distribution.authentication_method_jwt? %>
+                <div class="mt-2">
+                  <span class="text-gray-500 dark:text-gray-400">JWT authentication is configured. JWT tokens are generated dynamically.</span>
+                </div>
+              <% end %>
             </div>
           </dd>
         </div>
-        <% end %>
         
         <% if @distribution.template.present? %>
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

@@ -22,6 +22,18 @@ class CampaignField < ApplicationRecord
   # Whether this field should be shared during the bidding phase
   attribute :share_during_bidding, :boolean, default: false
   
+  # Check if this field contains PII data
+  def pii?
+    # Use explicitly set PII attribute if available
+    return pii if pii.present?
+    
+    # Otherwise infer from field type for backward compatibility
+    %w[email phone name first_name last_name address street ssn social_security 
+      credit_card date_of_birth dob drivers_license].include?(field_type) ||
+    %w[email phone name first_name last_name address street ssn social_security 
+      credit_card date_of_birth dob drivers_license].include?(name.downcase)
+  end
+  
   # Validations
   validates :name, presence: true
   validates :name, uniqueness: { scope: [:account_id, :campaign_id], message: "already exists in this campaign" }

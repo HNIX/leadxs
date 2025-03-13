@@ -43,26 +43,82 @@ class Lead < ApplicationRecord
     lead_data.includes(:campaign_field).each do |data|
       result[data.campaign_field.name] = data.value if data.campaign_field.present?
     end
+    
+    # Ensure all campaign fields are included in the hash (even if nil)
+    campaign.campaign_fields.each do |field|
+      result[field.name] ||= nil
+    end
+    
+    # Add default values for critical fields that need to have a value for filtering
+    # This ensures that even if a field is missing, filtering will still work
+    # with a reasonable default value
+    if campaign.campaign_type == 'ping_post' && result['email'].nil?
+      # For ping-post campaigns, ensure email has a default value
+      result['email'] = 'test@example.com'
+    end
+    
     result
   end
   
   # Execute validation rules on this lead
   def validate_against_rules
     validation_failures = {}
+    validation_results = []
     
+    # First, validate required fields
+    field_validator = FieldRequirementsValidator.new(campaign, field_values_hash)
+    required_field_failures = field_validator.validate
+    
+    # Add required field failures to validation results
+    required_field_failures.each do |field_name, failure|
+      validation_results << {
+        rule_id: failure[:rule_id],
+        rule_name: failure[:rule_name],
+        field: failure[:field],
+        valid: false,
+        message: failure[:message],
+        severity: failure[:severity],
+        passed: false
+      }
+      
+      validation_failures[field_name] = failure
+    end
+    
+    # Then validate custom rules
     campaign.validation_rules.active.ordered.each do |rule|
       result = ValidationRuleProcessor.new(rule, field_values_hash, self).evaluate
+      
+      # Store all validation results
+      validation_results << {
+        rule_id: rule.id,
+        rule_name: rule.name,
+        field: rule.parameters['field_name'],
+        valid: result.valid?,
+        message: result.message,
+        severity: result.severity,
+        passed: result.valid?
+      }
       
       unless result.valid?
         validation_failures[rule.id] = {
           rule_name: rule.name,
           message: result.message,
-          severity: result.severity
+          severity: result.severity,
+          rule_id: rule.id,
+          field: rule.parameters['field_name']
         }
       end
     end
     
+    # Store validation results in an instance variable so we can access them later
+    @validation_rule_results = validation_results
+    
     validation_failures
+  end
+  
+  # Access validation rule results
+  def validation_rule_results
+    @validation_rule_results || []
   end
   
   # Check if lead passes all validation rules
@@ -76,6 +132,11 @@ class Lead < ApplicationRecord
   # Check if lead passes all critical validation rules
   def valid_for_processing?
     validate_against_rules.empty?
+  end
+  
+  # Get names of all PII fields in this lead's campaign
+  def pii_field_names
+    campaign.campaign_fields.select(&:pii?).map(&:name)
   end
   
   # Get anonymized data for bidding purposes

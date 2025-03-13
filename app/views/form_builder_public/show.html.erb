@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= @form_builder.name %></title>
+  <meta name="description" content="<%= @form_builder.name %>">
+  
+  <style>
+    :root {
+      --color-primary: <%= @theme["color_primary"] %>;
+      --color-primary-rgb: <%= @theme["color_primary"].delete('#').scan(/../).map { |hex| hex.to_i(16) }.join(', ') %>;
+      --color-secondary: <%= @theme["color_secondary"] %>;
+      --color-background: <%= @theme["color_background"] %>;
+      --color-text: <%= @theme["color_text"] %>;
+      --color-error: <%= @theme["color_error"] %>;
+      --color-success: <%= @theme["color_success"] %>;
+      --font-family: <%= @theme["font_family"] %>;
+      --border-radius: <%= @theme["border_radius"] %>;
+      --spacing: <%= @theme["spacing"] == "compact" ? "0.5rem" : (@theme["spacing"] == "spacious" ? "1.5rem" : "1rem") %>;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+    
+    .form-container {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+    }
+    
+    .form-header {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-field {
+      margin-bottom: var(--spacing);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.625rem;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      font-family: var(--font-family);
+      font-size: 0.875rem;
+      box-sizing: border-box;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    }
+    
+    button[type="submit"] {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.625rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background-color 0.3s;
+    }
+    
+    button[type="submit"]:hover {
+      background-color: var(--color-secondary);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .help-text {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+    
+    .error-message {
+      font-size: 0.875rem;
+      color: var(--color-error);
+      margin-top: 0.25rem;
+    }
+    
+    .required-indicator {
+      color: var(--color-error);
+      margin-left: 0.25rem;
+    }
+    
+    .form-progress {
+      height: 4px;
+      background-color: #e5e7eb;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    
+    .form-progress-bar {
+      height: 100%;
+      background-color: var(--color-primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .checkbox-field {
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .checkbox-field input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    
+    .form-navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+    
+    .form-navigation button {
+      background-color: #f3f4f6;
+      color: var(--color-text);
+      border: 1px solid #d1d5db;
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    
+    .form-navigation button:hover {
+      background-color: #e5e7eb;
+    }
+    
+    .form-step {
+      display: none;
+    }
+    
+    .form-step.active {
+      display: block;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    /* Add support for dark mode based on system preference */
+    @media (prefers-color-scheme: dark) {
+      body.auto-dark {
+        background-color: #1f2937;
+        color: #f3f4f6;
+      }
+      
+      body.auto-dark input, 
+      body.auto-dark select, 
+      body.auto-dark textarea {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f3f4f6;
+      }
+      
+      body.auto-dark .form-navigation button {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f3f4f6;
+      }
+      
+      body.auto-dark .form-navigation button:hover {
+        background-color: #4b5563;
+      }
+      
+      body.auto-dark .help-text {
+        color: #9ca3af;
+      }
+    }
+    
+    <%= @theme["custom_css"] %>
+  </style>
+</head>
+<body class="auto-dark">
+  <div class="form-container">
+    <% if @form_builder.theme_config["logo_url"].present? %>
+      <div class="form-logo" style="text-align: center; margin-bottom: 1rem;">
+        <img src="<%= @form_builder.theme_config["logo_url"] %>" alt="Logo" style="max-width: 150px; max-height: 60px;">
+      </div>
+    <% end %>
+    
+    <div data-controller="form-public" 
+         data-form-public-form-token-value="<%= @form_builder.embed_token %>"
+         <%= @source ? "data-form-public-source-id-value=#{@source.id}" : "" %>
+         data-form-public-redirect-url-value="">
+         
+         <!-- Debug info: Source ID <%= @source ? @source.id : 'not set' %> -->
+      
+      <% if @form_builder.form_config["layout"] == "multistep" && @form_builder.form_config["progress_indicator"] %>
+        <div class="form-progress">
+          <div class="form-progress-bar" data-form-public-target="progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      <% end %>
+      
+      <div class="error-message hidden" data-form-public-target="error"></div>
+      
+      <form data-form-public-target="form" data-action="submit->form-public#submitForm">
+        <% if @form_builder.form_config["layout"] == "multistep" %>
+          <% 
+            # Group elements into steps (simple implementation - could be enhanced)
+            step_elements = []
+            current_step = []
+            
+            @elements.each do |element|
+              if element.element_type == 'multi_step' && !current_step.empty?
+                step_elements << current_step
+                current_step = []
+              else
+                current_step << element
+              end
+            end
+            
+            # Add the last step if not empty
+            step_elements << current_step if !current_step.empty?
+            
+            # If no steps were defined, put everything in one step
+            step_elements = [@elements] if step_elements.empty?
+            
+            step_elements.each_with_index do |elements, step_index|
+          %>
+            <div class="form-step <%= step_index == 0 ? 'active' : 'hidden' %>" data-form-public-target="step">
+              <%= render partial: 'form_elements', locals: { elements: elements, show_required: @form_builder.form_config["show_required_indicator"] } %>
+            </div>
+          <% end %>
+          
+          <div class="form-navigation">
+            <button type="button" class="hidden" data-form-public-target="prevButton" data-action="form-public#prevStep">Previous</button>
+            <button type="button" data-form-public-target="nextButton" data-action="form-public#nextStep">Next</button>
+            <button type="submit" class="hidden" data-form-public-target="submitButton"><%= @form_builder.form_config["submit_button_text"] || "Submit" %></button>
+          </div>
+        <% else %>
+          <%= render partial: 'form_elements', locals: { elements: @elements, show_required: @form_builder.form_config["show_required_indicator"] } %>
+        <% end %>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // If the form is in an iframe, notify the parent frame of height changes
+    function updateParentHeight() {
+      if (window.parent && window.parent !== window) {
+        const height = document.body.scrollHeight;
+        window.parent.postMessage({
+          type: 'swaped-form-resize',
+          height: height
+        }, '*');
+      }
+    }
+    
+    // Call once on load and then on any content changes
+    window.addEventListener('load', updateParentHeight);
+    window.addEventListener('resize', updateParentHeight);
+    document.addEventListener('DOMContentLoaded', updateParentHeight);
+    
+    // Call periodically to handle dynamic content
+    setInterval(updateParentHeight, 500);
+  </script>
+</body>
+</html>

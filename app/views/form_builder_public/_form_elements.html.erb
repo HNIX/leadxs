@@ -1,0 +1,161 @@
+<% elements.each do |element| %>
+  <% next if element.element_type == 'multi_step' %>
+  
+  <% if element.conditional_display? %>
+    <div class="form-field" data-condition-element="<%= element.display_condition_element_id %>" data-condition-operator="<%= element.display_condition_operator %>" data-condition-value="<%= element.display_condition_value %>" style="display: none;">
+  <% else %>
+    <div class="form-field">
+  <% end %>
+  
+  <% case element.element_type %>
+  <% when 'header' %>
+    <div class="form-header">
+      <%= element.properties['content'].html_safe %>
+    </div>
+    
+  <% when 'paragraph' %>
+    <div class="form-text">
+      <%= element.properties['content'].html_safe %>
+    </div>
+    
+  <% when 'divider' %>
+    <hr style="margin: var(--spacing) 0; border: 0; border-top: 1px solid #e5e7eb;">
+    
+  <% when 'text', 'email', 'phone', 'number' %>
+    <label for="field_<%= element.id %>">
+      <%= element.properties['label'] %>
+      <% if element.properties['required'] && show_required %>
+        <span class="required-indicator">*</span>
+      <% end %>
+    </label>
+    <input 
+      type="<%= element.element_type == 'text' ? 'text' : element.element_type %>" 
+      id="field_<%= element.id %>"
+      name="<%= element.id %>"
+      <% if element.campaign_field %>
+      data-field-name="<%= element.campaign_field.name %>"
+      <% if element.campaign_field.name == 'first_name' || element.campaign_field.name == 'last_name' %>
+      class="required-field <%= element.campaign_field.name %>"
+      <% end %>
+      <% end %>
+      placeholder="<%= element.properties['placeholder'] %>"
+      <%= "required" if element.properties['required'] %>
+      <% if element.campaign_field %>
+        <% if element.campaign_field.min_length %>
+          minlength="<%= element.campaign_field.min_length %>"
+        <% end %>
+        <% if element.campaign_field.max_length %>
+          maxlength="<%= element.campaign_field.max_length %>"
+        <% end %>
+        <% if element.campaign_field.min_value && element.campaign_field.data_type == 'number' %>
+          min="<%= element.campaign_field.min_value %>"
+        <% end %>
+        <% if element.campaign_field.max_value && element.campaign_field.data_type == 'number' %>
+          max="<%= element.campaign_field.max_value %>"
+        <% end %>
+        <% if element.campaign_field.validation_regex.present? %>
+          pattern="<%= element.campaign_field.validation_regex %>"
+        <% end %>
+      <% end %>
+    >
+    <% if element.properties['help_text'].present? %>
+      <div class="help-text"><%= element.properties['help_text'] %></div>
+    <% end %>
+    
+  <% when 'textarea' %>
+    <label for="field_<%= element.id %>">
+      <%= element.properties['label'] %>
+      <% if element.properties['required'] && show_required %>
+        <span class="required-indicator">*</span>
+      <% end %>
+    </label>
+    <textarea 
+      id="field_<%= element.id %>"
+      name="<%= element.id %>"
+      placeholder="<%= element.properties['placeholder'] %>"
+      rows="<%= element.properties['rows'] || 4 %>"
+      <%= "required" if element.properties['required'] %>
+      <% if element.campaign_field %>
+        <% if element.campaign_field.min_length %>
+          minlength="<%= element.campaign_field.min_length %>"
+        <% end %>
+        <% if element.campaign_field.max_length %>
+          maxlength="<%= element.campaign_field.max_length %>"
+        <% end %>
+      <% end %>
+    ></textarea>
+    <% if element.properties['help_text'].present? %>
+      <div class="help-text"><%= element.properties['help_text'] %></div>
+    <% end %>
+    
+  <% when 'select' %>
+    <label for="field_<%= element.id %>">
+      <%= element.properties['label'] %>
+      <% if element.properties['required'] && show_required %>
+        <span class="required-indicator">*</span>
+      <% end %>
+    </label>
+    <select 
+      id="field_<%= element.id %>"
+      name="<%= element.id %>"
+      <%= "required" if element.properties['required'] %>
+    >
+      <option value="" disabled selected><%= element.properties['placeholder'] || "Select an option" %></option>
+      <% if element.campaign_field&.list_values.present? %>
+        <% element.campaign_field.list_values.each do |list_value| %>
+          <option value="<%= list_value.value %>"><%= list_value.label.presence || list_value.value %></option>
+        <% end %>
+      <% else %>
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+      <% end %>
+    </select>
+    <% if element.properties['help_text'].present? %>
+      <div class="help-text"><%= element.properties['help_text'] %></div>
+    <% end %>
+    
+  <% when 'checkbox' %>
+    <div class="checkbox-field">
+      <input 
+        type="checkbox" 
+        id="field_<%= element.id %>"
+        name="<%= element.id %>"
+        value="yes"
+        <%= "required" if element.properties['required'] %>
+      >
+      <label for="field_<%= element.id %>">
+        <%= element.properties['label'] %>
+        <% if element.properties['required'] && show_required %>
+          <span class="required-indicator">*</span>
+        <% end %>
+      </label>
+    </div>
+    
+  <% when 'consent' %>
+    <div class="checkbox-field">
+      <input 
+        type="checkbox" 
+        id="field_<%= element.id %>"
+        name="<%= element.id %>"
+        value="consent_given"
+        <%= "required" if element.properties['required'] %>
+        data-consent
+      >
+      <label for="field_<%= element.id %>">
+        <%= element.properties['content'].html_safe %>
+        <% if element.properties['required'] && show_required %>
+          <span class="required-indicator">*</span>
+        <% end %>
+      </label>
+    </div>
+    
+  <% when 'submit' %>
+    <% unless @form_builder.form_config["layout"] == "multistep" %>
+      <div style="text-align: <%= element.properties['alignment'] || 'center' %>">
+        <button type="submit"><%= element.properties['text'] || "Submit" %></button>
+      </div>
+    <% end %>
+  <% end %>
+  </div>
+<% end %>

@@ -48,7 +48,7 @@
         Compliance
         <% end %>
       </li>
-
+      
 
       <li class="flex flex-col gap-3 px-4 py-2">
         <h3 class="font-mono text-sm/6 font-medium tracking-widest text-gray-500 dark:text-white uppercase sm:text-xs/6">Analytics & Reports</h3>
@@ -134,6 +134,10 @@
 
         <%= link_to compliance_documentation_path, class: "group flex items-center px-3 py-2 text-xs font-medium rounded-md #{current_page?(compliance_documentation_path) ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-200'}" do %>
           <span>Compliance Guide</span>
+        <% end %>
+        
+        <%= link_to form_builder_docs_path, class: "group flex items-center px-3 py-2 text-xs font-medium rounded-md #{current_page?(form_builder_docs_path) ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-200'}" do %>
+          <span>Form Builder Guide</span>
         <% end %>
       </div>
     </div>

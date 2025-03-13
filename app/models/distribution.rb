@@ -21,7 +21,7 @@ class Distribution < ApplicationRecord
     active: 0,
     paused: 1,
     archived: 2
-  }, default: :active
+  }, default: :active, prefix: true
 
   enum :request_method, {
     get: 0,
@@ -36,6 +36,31 @@ class Distribution < ApplicationRecord
     xml: 2
   }, default: :json
   
+  # Endpoint types
+  attribute :endpoint_type, :integer
+  enum :endpoint_type, {
+    post_only: 0,      # Only sends full lead data
+    ping_post: 1,      # Supports both ping and post
+    ping_only: 2       # Only supports ping/bidding
+  }, default: :post_only
+  
+  # Authentication methods
+  attribute :authentication_method, :integer
+  enum :authentication_method, {
+    none: 0,           # No authentication
+    token: 10,         # Simple API token
+    basic_auth: 20,    # Username/password basic auth
+    oauth2: 30,        # OAuth 2.0
+    jwt: 40            # JWT authentication
+  }, default: :none, prefix: true
+  
+  # Validations for authentication fields
+  validates :username, :password, presence: true, if: -> { authentication_method_basic_auth? }
+  validates :authentication_token, presence: true, if: -> { authentication_method_token? }
+  validates :client_id, :client_secret, :token_url, presence: true, if: -> { authentication_method_oauth2? }
+  validates :post_endpoint_url, presence: true, if: -> { endpoint_type == "ping_post" }
+  validates :api_key_name, presence: true, if: -> { authentication_method_token? }
+  
   # Define enum attribute with explicit string type
   attribute :metadata_requirements, :integer
   enum :metadata_requirements, {
@@ -49,7 +74,7 @@ class Distribution < ApplicationRecord
   end
 
   def active?
-    status == "active"
+    status_active?
   end
   
   # Bidding configuration
@@ -86,10 +111,30 @@ class Distribution < ApplicationRecord
     end
   end
   
+  # Attribute for fallback bidding on errors
+  attribute :bid_on_error, :boolean, default: false
+
   # Check if bidding is enabled for this distribution
   def bidding_enabled?
-    # Enable bidding if the base amount is set and the distribution is active
-    active? && base_bid_amount.present? && base_bid_amount > 0
+    result = status_active? && base_bid_amount.present? && base_bid_amount > 0
+    
+    reason = if !status_active?
+               "distribution is not active (status: #{status})"
+             elsif !base_bid_amount.present?
+               "base_bid_amount is not set"
+             elsif !(base_bid_amount > 0)
+               "base_bid_amount is not greater than 0 (value: #{base_bid_amount})"
+             else
+               "bidding is enabled"
+             end
+    
+    Rails.logger.debug("Distribution #{id} (#{name}) bidding_enabled? => #{result} (#{reason})")
+    return result
+  end
+  
+  # Check if this distribution can use fallback bidding
+  def can_use_fallback_bid?
+    bid_on_error && base_bid_amount.present? && base_bid_amount > 0
   end
   
   private

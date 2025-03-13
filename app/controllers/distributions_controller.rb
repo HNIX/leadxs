@@ -73,16 +73,16 @@ class DistributionsController < ApplicationController
   end
   
   def test_connection
-    # Placeholder for API testing functionality
-    success = test_endpoint_connection(@distribution)
+    # Test the distribution endpoint connection
+    test_result = test_endpoint_connection(@distribution)
     
     respond_to do |format|
-      if success
-        format.html { redirect_to distribution_path(@distribution), notice: "Connection test was successful." }
-        format.json { render json: { success: true, message: "Connection test was successful" } }
+      if test_result[:success]
+        format.html { redirect_to distribution_path(@distribution), notice: "Connection test was successful. Response code: #{test_result[:code]}" }
+        format.json { render json: { success: true, message: test_result[:message], code: test_result[:code], response_time: test_result[:response_time] } }
       else
-        format.html { redirect_to distribution_path(@distribution), alert: "Connection test failed." }
-        format.json { render json: { success: false, message: "Connection test failed" }, status: :unprocessable_entity }
+        format.html { redirect_to distribution_path(@distribution), alert: "Connection test failed: #{test_result[:message]}" }
+        format.json { render json: { success: false, message: test_result[:message] }, status: :unprocessable_entity }
       end
     end
   end
@@ -115,7 +115,10 @@ class DistributionsController < ApplicationController
   def distribution_params
     params.require(:distribution).permit(
       :name, :description, :company_id, :endpoint_url, :authentication_token,
-      :request_method, :request_format, :template, :status,
+      :request_method, :request_format, :template, :status, :endpoint_type,
+      :authentication_method, :username, :password, :api_key_name, :api_key_location,
+      :client_id, :client_secret, :token_url, :refresh_token, :post_endpoint_url,
+      :bid_endpoint_url, :bidding_strategy, :base_bid_amount, :min_bid_amount, :max_bid_amount,
       headers_attributes: [:id, :name, :value, :_destroy]
     )
   end
@@ -167,9 +170,117 @@ class DistributionsController < ApplicationController
   end
   
   def test_endpoint_connection(distribution)
-    # Implementation of endpoint connection testing will go here
-    # For now, we'll return a mock result
-    # In real implementation, we would try to make a request to the endpoint and check the response
-    true
+    require 'net/http'
+    require 'uri'
+    require 'json'
+    
+    begin
+      # Start timing
+      start_time = Time.now
+      
+      # Select the appropriate endpoint URL
+      endpoint_url = distribution.endpoint_url
+      
+      # Parse the URL
+      uri = URI.parse(endpoint_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+      http.read_timeout = 10 # 10 seconds timeout
+      
+      # Create a test payload with minimal data
+      test_payload = {
+        test: true,
+        timestamp: Time.now.utc.iso8601,
+        source: "LeadXS Distribution Test"
+      }
+      
+      # Create request based on method
+      request = case distribution.request_method
+                when "get"
+                  uri.query = URI.encode_www_form(test_payload) if test_payload.is_a?(Hash)
+                  Net::HTTP::Get.new(uri)
+                when "post"
+                  req = Net::HTTP::Post.new(uri)
+                  set_test_payload(req, distribution, test_payload)
+                  req
+                when "put"
+                  req = Net::HTTP::Put.new(uri)
+                  set_test_payload(req, distribution, test_payload)
+                  req
+                when "patch"
+                  req = Net::HTTP::Patch.new(uri)
+                  set_test_payload(req, distribution, test_payload)
+                  req
+                end
+      
+      # Apply authentication
+      apply_test_authentication(request, distribution)
+      
+      # Add headers
+      distribution.headers.each do |header|
+        request[header.name] = header.value
+      end
+      
+      # Send the request
+      response = http.request(request)
+      
+      # Calculate response time
+      response_time = (Time.now - start_time) * 1000 # ms
+      
+      # Check if response is success (2xx status code)
+      success = (200..299).include?(response.code.to_i)
+      
+      {
+        success: success,
+        code: response.code.to_i,
+        message: "Received HTTP #{response.code} in #{response_time.round(2)}ms",
+        response_time: response_time.round(2),
+        body: response.body.truncate(1000) # Truncate long responses
+      }
+    rescue => e
+      {
+        success: false,
+        message: "Error: #{e.message}",
+        code: nil,
+        response_time: nil
+      }
+    end
+  end
+  
+  def set_test_payload(request, distribution, payload)
+    case distribution.request_format
+    when "json"
+      request.content_type = 'application/json'
+      request.body = payload.to_json
+    when "xml"
+      request.content_type = 'application/xml'
+      xml_content = payload.map { |k, v| "<#{k}>#{v}</#{k}>" }.join
+      request.body = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>#{xml_content}</test>"
+    when "form"
+      request.content_type = 'application/x-www-form-urlencoded'
+      request.set_form_data(payload)
+    end
+  end
+  
+  def apply_test_authentication(request, distribution)
+    if distribution.authentication_method_token?
+      if distribution.api_key_location == "header"
+        request[distribution.api_key_name] = distribution.authentication_token
+      else
+        # Add to query params for GET or as part of body for other methods
+        # Implementation depends on payload structure
+      end
+    elsif distribution.authentication_method_basic_auth?
+      if distribution.username.present? && distribution.password.present?
+        request.basic_auth(distribution.username, distribution.password)
+      end
+    elsif distribution.authentication_method_oauth2?
+      if distribution.access_token.present?
+        request["Authorization"] = "Bearer #{distribution.access_token}"
+      elsif distribution.client_id.present? && distribution.client_secret.present? && distribution.token_url.present?
+        # We could try to get a token here, but for a connection test we'll just report that OAuth is configured
+        # but no token is available
+      end
+    end
   end
 end

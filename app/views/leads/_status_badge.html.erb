@@ -1,0 +1,10 @@
+<%# Renders a status badge with appropriate styling 
+  Usage: render "leads/status_badge", status: lead.status, status_type: 'lead' 
+  Optional: custom_class: "additional-classes" %>
+
+<% status_type ||= 'lead' %>
+<% custom_class ||= nil %>
+
+<span class="<%= lead_status_badge_class(status, status_type) %> <%= custom_class %>">
+  <%= status.to_s.upcase.gsub('_', ' ') %>
+</span>

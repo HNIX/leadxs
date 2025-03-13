@@ -1,0 +1,63 @@
+<%# Renders the bidding information section
+  Usage: render "leads/bidding_info", bid_request: @bid_request, bids: @bids, winning_bid: @winning_bid %>
+
+<% if bid_request.present? %>
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
+      <%= render "leads/status_badge", status: bid_request.status, status_type: 'bid' %>
+    </div>
+    
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Bids</span>
+      <span class="text-sm font-medium text-gray-900 dark:text-white"><%= bids.size %></span>
+    </div>
+    
+    <% if winning_bid.present? %>
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Winning Bid</span>
+        <div class="flex items-center">
+          <span class="px-2 py-1 mr-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+            $<%= sprintf('%.2f', winning_bid.amount) %>
+          </span>
+          <span class="text-sm text-gray-900 dark:text-white">
+            <%= link_to winning_bid.distribution.name, distribution_path(winning_bid.distribution), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+          </span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-4">
+    <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Request Details</div>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded p-3 text-sm">
+      <div class="flex items-center mb-1">
+        <span class="text-gray-500 dark:text-gray-400 w-24">ID:</span>
+        <span class="text-gray-900 dark:text-white font-mono text-xs break-all"><%= bid_request.unique_id %></span>
+      </div>
+      <div class="flex items-center mb-1">
+        <span class="text-gray-500 dark:text-gray-400 w-24">Created:</span>
+        <span class="text-gray-900 dark:text-white"><%= l(bid_request.created_at, format: :long) %></span>
+      </div>
+      <div class="flex items-center">
+        <span class="text-gray-500 dark:text-gray-400 w-24">Expires:</span>
+        <span class="text-gray-900 dark:text-white"><%= l(bid_request.expires_at, format: :long) %></span>
+      </div>
+    </div>
+  </div>
+  
+  <% if bids.any? %>
+    <div>
+      <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">All Bids</div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded p-2">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700 list-none">
+          <% bids.each do |bid| %>
+            <%= render "leads/bid_item", bid: bid, winning_bid: winning_bid %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <p class="text-sm text-gray-500 dark:text-gray-400">No bidding information available for this lead.</p>
+<% end %>

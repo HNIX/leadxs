@@ -1,0 +1,67 @@
+<%# Renders the lead activity timeline
+  Usage: render "leads/activities_timeline", lead: @lead, limit: 5 %>
+
+<% limit ||= 5 %>
+<% activities = lead.lead_activity_logs.recent_first.limit(limit) %>
+
+<% if activities.any? %>
+  <div class="flow-root">
+    <ul role="list" class="-mb-8 list-none">
+      <% activities.each_with_index do |activity, activity_idx| %>
+        <li>
+          <div class="relative pb-8">
+            <% if activity_idx != limit - 1 && activity_idx != activities.size - 1 %>
+              <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700" aria-hidden="true"></span>
+            <% end %>
+            <div class="relative flex items-start space-x-3">
+              <div class="relative">
+                <div class="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                  <div class="text-gray-500 dark:text-gray-400">
+                    <%= activity_icon(activity) %>
+                  </div>
+                </div>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div>
+                  <div class="text-sm">
+                    <span class="font-medium text-gray-900 dark:text-white"><%= activity_title(activity) %></span>
+                    <span class="ml-2"><%= content_tag :span, activity.activity_type.titleize, class: activity_badge(activity) %></span>
+                  </div>
+                  <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                    <%= time_ago_in_words(activity.created_at) %> ago
+                    <% if activity.user.present? %>
+                      by <%= activity.user.name %>
+                    <% end %>
+                  </p>
+                </div>
+                <div class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                  <p><%= activity_description(activity) %></p>
+                  
+                  <% if activity.details.present? && activity.details.except('causer_type', 'causer_id').any? %>
+                    <%= link_to "View Details", lead_activity_path(lead, activity), class: "mt-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+    
+    <% if lead.lead_activity_logs.count > limit %>
+      <div class="text-center mt-4">
+        <%= link_to "View All Activities (#{lead.lead_activity_logs.count})", lead_activities_path(lead), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600" %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-10">
+    <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No activity logs</h3>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      There are no activity logs recorded for this lead yet.
+    </p>
+  </div>
+<% end %>

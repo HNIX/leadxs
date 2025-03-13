@@ -1,0 +1,303 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Bid Request Debug</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Troubleshooting bid request #<%= @bid_request.id %></p>
+    </div>
+    <div>
+      <%= link_to "Back to Dashboard", bid_dashboard_path, class: "btn btn-white" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Bid Request Info -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Bid Request Information</h2>
+      <dl class="grid grid-cols-1 gap-2">
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">ID:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @bid_request.id %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Unique ID:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @bid_request.unique_id %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @bid_request.status.titleize %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Campaign:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @campaign.name %> (#<%= @campaign.id %>)</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @bid_request.created_at.strftime("%Y-%m-%d %H:%M:%S") %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Expires:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @bid_request.expires_at.strftime("%Y-%m-%d %H:%M:%S") %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Bids Received:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @bid_request.bids.count %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution Method:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @campaign.distribution_method.titleize %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Campaign Info -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Campaign Settings</h2>
+      <dl class="grid grid-cols-1 gap-2">
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution Method:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white <%= @campaign.distribution_method.in?(['highest_bid', 'weighted_random', 'waterfall']) ? 'text-green-600' : 'text-red-600' %>">
+            <%= @campaign.distribution_method.titleize %>
+            <% unless @campaign.distribution_method.in?(['highest_bid', 'weighted_random', 'waterfall']) %>
+              <span class="text-xs text-red-600 dark:text-red-400">(Not compatible with bidding)</span>
+            <% end %>
+          </dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Multi Distribution Strategy:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @campaign.multi_distribution_strategy.to_s.titleize %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Bid Timeout (seconds):</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @campaign.bid_timeout_seconds %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Bidding Enabled:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white <%= @campaign.use_bidding_system? ? 'text-green-600' : 'text-red-600' %>">
+            <%= @campaign.use_bidding_system? ? 'Yes' : 'No' %>
+          </dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Max Distributions:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @campaign.max_distributions %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Active Distributions:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white"><%= @all_distributions.count %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Eligible for Bidding:</dt>
+          <dd class="text-sm text-gray-900 dark:text-white <%= @eligible_distributions.any? ? 'text-green-600' : 'text-red-600' %>">
+            <%= @eligible_distributions.count %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Lead Data -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Lead Data</h2>
+      <div class="mt-3">
+        <div class="bg-gray-100 dark:bg-gray-700 rounded p-3 overflow-auto max-h-64">
+          <pre class="whitespace-pre-wrap text-xs text-gray-900 dark:text-white"><%= JSON.pretty_generate(@lead_data) %></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Distribution Eligibility -->
+  <div class="mt-8">
+    <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Distribution Eligibility</h2>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Distribution</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Base Bid Amount</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Bidding Enabled</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Filters Passed</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Endpoint</th>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Eligible</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <% @all_distributions.each do |dist| %>
+              <% eligibility = @distribution_eligibility[dist.id] %>
+              <% is_eligible = @eligible_distributions.include?(dist) %>
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 <%= is_eligible ? 'bg-green-50 dark:bg-green-900/30' : '' %>">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900 dark:text-white"><%= dist.name %></div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">ID: <%= dist.id %></div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold 
+                    <%= eligibility[:active] ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
+                    <%= eligibility[:active] ? 'Active' : 'Inactive' %>
+                  </span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <%= eligibility[:base_bid_amount].present? ? number_to_currency(eligibility[:base_bid_amount]) : 'Not Set' %>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold 
+                    <%= eligibility[:bidding_enabled] ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
+                    <%= eligibility[:bidding_enabled] ? 'Yes' : 'No' %>
+                  </span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <% if eligibility[:filters_passed] %>
+                    <span class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                      Passed
+                    </span>
+                  <% else %>
+                    <span class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      Failed
+                    </span>
+                    <div class="text-xs text-red-600 dark:text-red-400 mt-1">
+                      Failed filters: <%= eligibility[:failing_filters]&.join(', ') %>
+                    </div>
+                  <% end %>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                  <div class="truncate max-w-xs">
+                    <%= eligibility[:endpoint] || 'None' %>
+                  </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold 
+                    <%= is_eligible ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
+                    <%= is_eligible ? 'Yes' : 'No' %>
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bids Received -->
+  <div class="mt-8">
+    <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Bids Received (<%= @bid_request.bids.count %>)</h2>
+    
+    <% if @bid_request.bids.any? %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Distribution</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Created At</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">API Request</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @bid_request.bids.includes(:distribution, :api_request).order(created_at: :desc).each do |bid| %>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 <%= bid.status == 'accepted' ? 'bg-green-50 dark:bg-green-900/30' : '' %>">
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white"><%= bid.distribution&.name || 'Unknown' %></div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">ID: <%= bid.distribution_id %></div>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <%= number_to_currency(bid.amount) %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold 
+                      <%= {
+                        'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                        'accepted' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                        'rejected' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                        'expired' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                      }[bid.status] %>">
+                      <%= bid.status.titleize %>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <%= bid.created_at.strftime("%Y-%m-%d %H:%M:%S") %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <% if bid.api_request %>
+                      <%= link_to "View API Request", api_request_path(bid.api_request), class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+                    <% else %>
+                      No API Request
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
+        <p class="text-gray-500 dark:text-gray-400">No bids have been received for this request.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- API Requests -->
+  <div class="mt-8 mb-8">
+    <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Associated API Requests</h2>
+    
+    <% api_requests = ApiRequest.where(endpoint_url: ["/api/v1/bid_requests", "/api/v1/bids"]).where("request_payload LIKE ?", "%#{@bid_request.unique_id}%").order(created_at: :desc) %>
+    
+    <% if api_requests.any? %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Endpoint</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Method</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Response Code</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Created At</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% api_requests.each do |request| %>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <%= request.id %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <div class="truncate max-w-xs">
+                      <%= request.endpoint_url %>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <%= request.request_method.upcase %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold 
+                      <%= (request.response_code && (200..299).include?(request.response_code)) ? 
+                         'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                         'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
+                      <%= request.response_code || 'N/A' %>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <%= request.created_at.strftime("%Y-%m-%d %H:%M:%S") %>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <%= link_to "View Details", api_request_path(request), class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
+        <p class="text-gray-500 dark:text-gray-400">No API requests found for this bid request.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

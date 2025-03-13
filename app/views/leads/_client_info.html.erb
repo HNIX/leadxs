@@ -1,0 +1,25 @@
+<%# Renders the client information details
+  Usage: render "leads/client_info", lead: @lead %>
+
+<div class="bg-gray-50 dark:bg-gray-800 rounded p-3">
+  <div class="mb-3">
+    <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">IP Address</div>
+    <div class="font-mono text-sm text-gray-900 dark:text-white">
+      <%= lead.ip_address || "N/A" %>
+    </div>
+  </div>
+  
+  <div class="mb-3">
+    <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User Agent</div>
+    <div class="text-sm text-gray-900 dark:text-white break-words">
+      <%= lead.user_agent || "N/A" %>
+    </div>
+  </div>
+  
+  <div>
+    <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Referrer</div>
+    <div class="text-sm text-gray-900 dark:text-white break-words">
+      <%= lead.referrer || "N/A" %>
+    </div>
+  </div>
+</div>

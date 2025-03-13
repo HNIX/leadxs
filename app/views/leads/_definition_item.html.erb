@@ -1,0 +1,9 @@
+<%# Renders a single item in a definition list
+  Usage: render "leads/definition_item", term: "Label", description: value %>
+
+<div class="<%= local_assigns[:class] %>">
+  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400"><%= term %></dt>
+  <dd class="mt-1 text-sm text-gray-900 dark:text-white <%= local_assigns[:description_class] %>">
+    <%= description %>
+  </dd>
+</div>

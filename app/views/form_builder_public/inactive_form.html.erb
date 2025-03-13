@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Not Available</title>
+  <meta name="description" content="This form is no longer available">
+  
+  <style>
+    :root {
+      --color-primary: <%= @theme["color_primary"] %>;
+      --color-secondary: <%= @theme["color_secondary"] %>;
+      --color-background: <%= @theme["color_background"] %>;
+      --color-text: <%= @theme["color_text"] %>;
+      --font-family: <%= @theme["font_family"] %>;
+      --border-radius: <%= @theme["border_radius"] %>;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      margin: 0;
+      padding: 1rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    .message-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: white;
+      text-align: center;
+    }
+    
+    .message-icon {
+      width: 60px;
+      height: 60px;
+      background-color: #9ca3af;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .message-icon svg {
+      width: 30px;
+      height: 30px;
+      color: white;
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: #4b5563;
+      font-size: 1.5rem;
+    }
+    
+    p {
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Add support for dark mode based on system preference */
+    @media (prefers-color-scheme: dark) {
+      body.auto-dark {
+        background-color: #1f2937;
+        color: #f3f4f6;
+      }
+      
+      body.auto-dark .message-container {
+        background-color: #111827;
+      }
+    }
+    
+    <%= @theme["custom_css"] %>
+  </style>
+</head>
+<body class="auto-dark">
+  <div class="message-container">
+    <div class="message-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    
+    <h1>Form Not Available</h1>
+    <p>This form is currently not active or has been archived.</p>
+    <p>Please contact the form administrator for more information.</p>
+  </div>
+  
+  <script>
+    // If the form is in an iframe, notify the parent frame of height changes
+    if (window.parent && window.parent !== window) {
+      const height = document.body.scrollHeight;
+      window.parent.postMessage({
+        type: 'swaped-form-resize',
+        height: height
+      }, '*');
+    }
+  </script>
+</body>
+</html>

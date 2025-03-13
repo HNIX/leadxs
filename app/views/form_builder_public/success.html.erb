@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submission Successful</title>
+  <meta name="description" content="Form submitted successfully">
+  
+  <style>
+    :root {
+      --color-primary: <%= @theme["color_primary"] %>;
+      --color-secondary: <%= @theme["color_secondary"] %>;
+      --color-background: <%= @theme["color_background"] %>;
+      --color-text: <%= @theme["color_text"] %>;
+      --color-success: <%= @theme["color_success"] %>;
+      --font-family: <%= @theme["font_family"] %>;
+      --border-radius: <%= @theme["border_radius"] %>;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      margin: 0;
+      padding: 1rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    .success-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: white;
+      text-align: center;
+    }
+    
+    .success-icon {
+      width: 60px;
+      height: 60px;
+      background-color: var(--color-success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .success-icon svg {
+      width: 30px;
+      height: 30px;
+      color: white;
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: var(--color-success);
+      font-size: 1.5rem;
+    }
+    
+    p {
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.625rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.875rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: var(--color-secondary);
+    }
+    
+    /* Add support for dark mode based on system preference */
+    @media (prefers-color-scheme: dark) {
+      body.auto-dark {
+        background-color: #1f2937;
+        color: #f3f4f6;
+      }
+      
+      body.auto-dark .success-container {
+        background-color: #111827;
+      }
+    }
+    
+    <%= @theme["custom_css"] %>
+  </style>
+</head>
+<body class="auto-dark">
+  <div class="success-container">
+    <div class="success-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    
+    <h1>Thank You!</h1>
+    <p>Your form has been submitted successfully.</p>
+    
+    <% if params[:redirect_url].present? %>
+      <p>You will be redirected in <span id="countdown">5</span> seconds...</p>
+      
+      <script>
+        let countdown = 5;
+        const countdownElement = document.getElementById('countdown');
+        
+        const interval = setInterval(() => {
+          countdown--;
+          countdownElement.textContent = countdown;
+          
+          if (countdown <= 0) {
+            clearInterval(interval);
+            window.location.href = '<%= params[:redirect_url] %>';
+          }
+        }, 1000);
+      </script>
+    <% end %>
+  </div>
+  
+  <script>
+    // If the form is in an iframe, notify the parent frame of height changes
+    if (window.parent && window.parent !== window) {
+      const height = document.body.scrollHeight;
+      window.parent.postMessage({
+        type: 'swaped-form-resize',
+        height: height
+      }, '*');
+    }
+  </script>
+</body>
+</html>

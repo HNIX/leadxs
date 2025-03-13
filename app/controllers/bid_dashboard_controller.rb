@@ -127,6 +127,46 @@ class BidDashboardController < ApplicationController
     @campaigns = [] if @campaigns.nil?
   end
   
+  # Debug endpoint to help troubleshoot bid requests
+  def debug_bid_request
+    @bid_request = BidRequest.find(params[:id])
+    @lead_data = @bid_request.field_values_hash
+    @campaign = @bid_request.campaign
+    @all_distributions = @campaign.distributions.active
+    @eligible_distributions = @campaign.eligible_distributions_for_bidding(@lead_data)
+    
+    # Also check each distribution for why it might not be eligible
+    @distribution_eligibility = {}
+    @all_distributions.each do |dist|
+      eligibility = {
+        active: dist.active?,
+        base_bid_amount: dist.base_bid_amount,
+        bidding_enabled: dist.bidding_enabled?,
+        endpoint: dist.bid_endpoint_url || dist.endpoint_url,
+        filters_passed: true # Default
+      }
+      
+      # Check distribution filters
+      filters = DistributionFilter.where(campaign: @campaign, status: 'active')
+      if filters.any?
+        applicable_filters = filters.select { |filter| filter.applies_to?(dist) }
+        if applicable_filters.any?
+          passes_all = applicable_filters.all? { |filter| filter.passes?(@lead_data) }
+          eligibility[:filters_passed] = passes_all
+          
+          if !passes_all
+            failing_filters = applicable_filters.reject { |filter| filter.passes?(@lead_data) }
+            eligibility[:failing_filters] = failing_filters.map(&:id)
+          end
+        end
+      end
+      
+      @distribution_eligibility[dist.id] = eligibility
+    end
+    
+    render :debug_bid_request
+  end
+  
   private
   
   def set_account

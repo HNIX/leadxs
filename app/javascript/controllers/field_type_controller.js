@@ -6,9 +6,15 @@ export default class extends Controller {
   connect() {
     this.updateFieldType()
     this.updateValueAcceptance()
+    
+    // Initialize distribution form sections if they exist
+    this.toggleDistributionFields()
   }
 
   updateFieldType() {
+    // Skip if we don't have the dataType target (e.g., on distribution form)
+    if (!this.hasDataTypeTarget) return
+    
     // Get the selected data type
     const dataType = this.dataTypeTarget.value
     
@@ -27,6 +33,9 @@ export default class extends Controller {
   }
   
   updateValueAcceptance() {
+    // Skip if we don't have the valueAcceptance target (e.g., on distribution form)
+    if (!this.hasValueAcceptanceTarget) return
+    
     const valueAcceptance = this.valueAcceptanceTarget.value
     
     // Show or hide list section
@@ -44,6 +53,9 @@ export default class extends Controller {
   }
   
   hideAllSections() {
+    // Skip if we don't have these targets (e.g., on distribution form)
+    if (!this.hasTextSectionTarget || !this.hasRangeSectionTarget || !this.hasListSectionTarget) return
+    
     // Hide all type-specific sections
     this.textSectionTarget.classList.add("hidden")
     this.rangeSectionTarget.classList.add("hidden")
@@ -51,6 +63,9 @@ export default class extends Controller {
   }
   
   updateValueAcceptanceOptions(dataType) {
+    // Skip if we don't have the valueAcceptance target (e.g., on distribution form)
+    if (!this.hasValueAcceptanceTarget) return
+    
     // Enable/disable value acceptance options based on data type
     const valueAcceptanceSelect = this.valueAcceptanceTarget
     
@@ -97,5 +112,57 @@ export default class extends Controller {
     
     // Default to "Any" if previous value is no longer valid
     valueAcceptanceSelect.selectedIndex = 0
+  }
+  
+  // For distribution form
+  toggleFields() {
+    this.toggleDistributionFields()
+  }
+  
+  toggleDistributionFields() {
+    // Handle authentication method fields
+    const authMethodSelect = document.querySelector('select[data-target="auth-method"]')
+    if (authMethodSelect) {
+      const selectedAuthMethod = authMethodSelect.value
+      
+      // Hide all auth method fields
+      document.querySelectorAll('.auth-method-field').forEach(field => {
+        field.classList.add('hidden')
+      })
+      
+      // Show the selected auth method field
+      const selectedField = document.querySelector(`.${selectedAuthMethod}-field`)
+      if (selectedField) {
+        selectedField.classList.remove('hidden')
+      }
+    }
+    
+    // Handle endpoint type fields
+    const endpointTypeSelect = document.querySelector('select[data-target="endpoint-type"]')
+    if (endpointTypeSelect) {
+      const selectedEndpointType = endpointTypeSelect.value
+      
+      // Hide all endpoint type fields
+      document.querySelectorAll('.endpoint-type-field').forEach(field => {
+        field.classList.add('hidden')
+      })
+      
+      // Show endpoint type specific fields
+      if (selectedEndpointType === 'ping_post') {
+        document.querySelectorAll('.ping-post-field').forEach(field => {
+          field.classList.remove('hidden')
+        })
+      }
+      
+      // Update endpoint URL descriptions
+      document.querySelectorAll('.endpoint-type-desc').forEach(desc => {
+        desc.classList.add('hidden')
+      })
+      
+      const selectedDesc = document.querySelector(`.endpoint-type-desc.${selectedEndpointType}`)
+      if (selectedDesc) {
+        selectedDesc.classList.remove('hidden')
+      }
+    }
   }
 }

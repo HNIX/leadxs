@@ -10,5 +10,3 @@ application.register('modal', Modal)
 application.register('popover', Popover)
 application.register('toggle', Toggle)
 application.register('slideover', Slideover)
-
-// We are using our own custom tabs controller instead of the tailwindcss-stimulus-components one

@@ -11,6 +11,8 @@
 # Weights should be between 1-10. For random queue ordering, set all weights to 1.
 :queues:
   - ['critical', 10]
+  - ['bids', 8]        # High priority for bidding jobs
+  - ['fallback_processing', 7] # For safety fallback jobs
   - ['mailers', 5]
   - ['active_storage_analysis', 4]
   - ['default', 2]

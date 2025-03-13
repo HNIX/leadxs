@@ -1,0 +1,14 @@
+<h1 class="text-2xl font-bold mb-4">New Form Builder</h1>
+
+<div class="mb-4">
+  <p class="text-gray-600">
+    Create a form that sources can embed on their websites to collect leads for this campaign.
+    After creating the form, you'll be able to customize the fields and appearance.
+  </p>
+</div>
+
+<%= render "form", campaign: @campaign, form_builder: @form_builder %>
+
+<div class="mt-4">
+  <%= link_to "Back to forms", campaign_form_builders_path(@campaign), class: "text-indigo-600 hover:text-indigo-900" %>
+</div>

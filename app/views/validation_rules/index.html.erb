@@ -221,9 +221,9 @@
                     
                     <%= link_to case
                        when @vertical
-                         vertical_validation_rule_path(@vertical, rule, toggle_active: true)
+                         toggle_active_vertical_validation_rule_path(@vertical, rule)
                        when @campaign
-                         campaign_validation_rule_path(@campaign, rule, toggle_active: true)
+                         toggle_active_campaign_validation_rule_path(@campaign, rule)
                        end,
                        data: { turbo_method: :patch },
                        class: rule.active? ? "text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300" : "text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300",
@@ -350,14 +350,14 @@
                     Edit
                   <% end %>
                   
-                  <% toggle_path = case
-                     when @vertical
-                       vertical_validation_rule_path(@vertical, rule, toggle_active: true)
-                     when @campaign
-                       campaign_validation_rule_path(@campaign, rule, toggle_active: true)
-                     end %>
+                  <!-- Toggle path is now directly used in the link_to below -->
                   
-                  <%= link_to toggle_path,
+                  <%= link_to case
+                     when @vertical
+                       toggle_active_vertical_validation_rule_path(@vertical, rule)
+                     when @campaign
+                       toggle_active_campaign_validation_rule_path(@campaign, rule)
+                     end,
                       data: { turbo_method: :patch },
                       class: rule.active? ? "btn btn-sm btn-outline-yellow" : "btn btn-sm btn-outline-green" do %>
                     <% if rule.active? %>

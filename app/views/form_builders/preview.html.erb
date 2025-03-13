@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= @form_builder.name %> - Preview</title>
+  <style>
+    :root {
+      --color-primary: <%= @form_builder.theme_config["color_primary"] %>;
+      --color-secondary: <%= @form_builder.theme_config["color_secondary"] %>;
+      --color-background: <%= @form_builder.theme_config["color_background"] %>;
+      --color-text: <%= @form_builder.theme_config["color_text"] %>;
+      --color-error: <%= @form_builder.theme_config["color_error"] %>;
+      --color-success: <%= @form_builder.theme_config["color_success"] %>;
+      --font-family: <%= @form_builder.theme_config["font_family"] %>;
+      --border-radius: <%= @form_builder.theme_config["border_radius"] %>;
+      --spacing: <%= @form_builder.theme_config["spacing"] == "compact" ? "0.5rem" : (@form_builder.theme_config["spacing"] == "spacious" ? "1.5rem" : "1rem") %>;
+    }
+    
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      margin: 0;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+    
+    .form-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+    
+    .form-header {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-field {
+      margin-bottom: var(--spacing);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.625rem;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      font-family: var(--font-family);
+      font-size: 0.875rem;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    }
+    
+    button[type="submit"] {
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.625rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background-color 0.3s;
+    }
+    
+    button[type="submit"]:hover {
+      background-color: var(--color-secondary);
+    }
+    
+    .help-text {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+    
+    .required-indicator {
+      color: var(--color-error);
+      margin-left: 0.25rem;
+    }
+    
+    .form-progress {
+      height: 4px;
+      background-color: #e5e7eb;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    
+    .form-progress-bar {
+      height: 100%;
+      background-color: var(--color-primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .checkbox-field {
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .checkbox-field input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    
+    <%= @form_builder.theme_config["custom_css"] %>
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <% if @form_builder.theme_config["logo_url"].present? %>
+      <div class="form-logo" style="text-align: center; margin-bottom: 1rem;">
+        <img src="<%= @form_builder.theme_config["logo_url"] %>" alt="Logo" style="max-width: 150px; max-height: 60px;">
+      </div>
+    <% end %>
+    
+    <% if @form_builder.form_config["layout"] == "multistep" && @form_builder.form_config["progress_indicator"] %>
+      <div class="form-progress">
+        <div class="form-progress-bar" style="width: 0%"></div>
+      </div>
+    <% end %>
+    
+    <form id="preview-form">
+      <% @form_builder.elements.order(:position).each do |element| %>
+        <% case element.element_type %>
+        <% when 'header' %>
+          <div class="form-header">
+            <%= element.properties['content'].html_safe %>
+          </div>
+          
+        <% when 'paragraph' %>
+          <div class="form-field">
+            <%= element.properties['content'].html_safe %>
+          </div>
+          
+        <% when 'divider' %>
+          <hr style="margin: var(--spacing) 0; border: 0; border-top: 1px solid #e5e7eb;">
+          
+        <% when 'text', 'email', 'phone', 'number' %>
+          <div class="form-field">
+            <label>
+              <%= element.properties['label'] %>
+              <% if element.properties['required'] %>
+                <span class="required-indicator">*</span>
+              <% end %>
+            </label>
+            <input 
+              type="<%= element.element_type == 'text' ? 'text' : element.element_type %>" 
+              placeholder="<%= element.properties['placeholder'] %>"
+              <%= "required" if element.properties['required'] %>
+            >
+            <% if element.properties['help_text'].present? %>
+              <div class="help-text"><%= element.properties['help_text'] %></div>
+            <% end %>
+          </div>
+          
+        <% when 'textarea' %>
+          <div class="form-field">
+            <label>
+              <%= element.properties['label'] %>
+              <% if element.properties['required'] %>
+                <span class="required-indicator">*</span>
+              <% end %>
+            </label>
+            <textarea 
+              placeholder="<%= element.properties['placeholder'] %>"
+              rows="<%= element.properties['rows'] || 4 %>"
+              <%= "required" if element.properties['required'] %>
+            ></textarea>
+            <% if element.properties['help_text'].present? %>
+              <div class="help-text"><%= element.properties['help_text'] %></div>
+            <% end %>
+          </div>
+          
+        <% when 'select' %>
+          <div class="form-field">
+            <label>
+              <%= element.properties['label'] %>
+              <% if element.properties['required'] %>
+                <span class="required-indicator">*</span>
+              <% end %>
+            </label>
+            <select <%= "required" if element.properties['required'] %>>
+              <option value="" disabled selected><%= element.properties['placeholder'] || "Select an option" %></option>
+              <% if element.campaign_field&.list_values.present? %>
+                <% element.campaign_field.list_values.each do |list_value| %>
+                  <option value="<%= list_value.value %>"><%= list_value.label.presence || list_value.value %></option>
+                <% end %>
+              <% else %>
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+              <% end %>
+            </select>
+            <% if element.properties['help_text'].present? %>
+              <div class="help-text"><%= element.properties['help_text'] %></div>
+            <% end %>
+          </div>
+          
+        <% when 'checkbox' %>
+          <div class="form-field checkbox-field">
+            <input 
+              type="checkbox" 
+              id="checkbox_<%= element.id %>"
+              <%= "required" if element.properties['required'] %>
+            >
+            <label for="checkbox_<%= element.id %>">
+              <%= element.properties['label'] %>
+              <% if element.properties['required'] %>
+                <span class="required-indicator">*</span>
+              <% end %>
+            </label>
+          </div>
+          
+        <% when 'consent' %>
+          <div class="form-field checkbox-field">
+            <input 
+              type="checkbox" 
+              id="consent_<%= element.id %>"
+              <%= "required" if element.properties['required'] %>
+            >
+            <label for="consent_<%= element.id %>">
+              <%= element.properties['content'].html_safe %>
+              <% if element.properties['required'] %>
+                <span class="required-indicator">*</span>
+              <% end %>
+            </label>
+          </div>
+          
+        <% when 'submit' %>
+          <div class="form-field" style="text-align: <%= element.properties['alignment'] || 'center' %>">
+            <button type="submit"><%= element.properties['text'] || "Submit" %></button>
+          </div>
+        <% end %>
+      <% end %>
+    </form>
+  </div>
+  
+  <script>
+    // Disable form submission in preview
+    document.getElementById('preview-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('This is a preview. Form submission is disabled.');
+    });
+  </script>
+</body>
+</html>

@@ -49,7 +49,12 @@
           Edit
         <% end %>
         
-        <%= link_to polymorphic_path([@validatable, @validation_rule], toggle_active: true), 
+        <%= link_to case
+                  when @vertical
+                    toggle_active_vertical_validation_rule_path(@vertical, @validation_rule)
+                  when @campaign
+                    toggle_active_campaign_validation_rule_path(@campaign, @validation_rule)
+                  end,
                   data: { turbo_method: :patch },
                   class: "btn #{@validation_rule.active? ? 'btn-warning' : 'btn-success'}" do %>
           <% if @validation_rule.active? %>

@@ -1,0 +1,48 @@
+<%# 
+  Renders tabbed content container
+  
+  Usage: 
+    render "leads/tabs", tabs: [
+      { id: "overview", label: "Overview", active: true },
+      { id: "details", label: "Details" }
+    ] do |tab| 
+      case tab
+      when "overview"
+        # Overview tab content
+      when "details"
+        # Details tab content
+      end
+    end
+%>
+
+<div 
+  data-controller="tabs" 
+  class="relative bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden"
+>
+  <div class="border-b border-gray-200 dark:border-gray-700">
+    <nav class="flex space-x-8 px-6" aria-label="Tabs">
+      <% tabs.each_with_index do |tab, index| %>
+        <button 
+          data-tabs-target="tab" 
+          data-action="click->tabs#select"
+          data-tab-index="<%= index %>"
+          class="<%= tab[:active] ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600' %> whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+        >
+          <%= tab[:label] %>
+        </button>
+      <% end %>
+    </nav>
+  </div>
+
+  <div class="p-6">
+    <% tabs.each_with_index do |tab, index| %>
+      <div 
+        data-tabs-target="panel"
+        data-tab-index="<%= index %>"
+        class="<%= tab[:active] ? '' : 'hidden' %>"
+      >
+        <%= yield tab[:id] %>
+      </div>
+    <% end %>
+  </div>
+</div>

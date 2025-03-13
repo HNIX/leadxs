@@ -10,6 +10,31 @@ class ValidationRuleProcessor
   # Evaluate the validation rule against the provided data
   def evaluate
     begin
+      # Handle special patterns for required fields
+      if rule.rule_type == ValidationRule::RULE_TYPES[:condition] && 
+         rule.condition.match?(/!String\.empty\?\(field\(['"]([^'"]+)['"]\)\)/)
+        # Extract field name from expression
+        field_name = $1
+        
+        # Look up the field in the campaign to get a proper label
+        campaign_field = find_campaign_field(field_name)
+        field_label = campaign_field&.label || (field_name || "").humanize
+        
+        # This is a required field validation - check if the field has a value
+        field_value = data[field_name]
+        result = field_value.present?
+        
+        # Return result object
+        return ValidationResult.new(
+          valid: result,
+          rule_id: rule.id,
+          rule_name: "Required Field: #{field_label}",
+          message: result ? nil : "#{field_label} is required",
+          severity: rule.severity
+        )
+      end
+      
+      # Normal rule evaluation
       result = case rule.rule_type
       when ValidationRule::RULE_TYPES[:condition]
         evaluate_condition
@@ -44,13 +69,19 @@ class ValidationRuleProcessor
         valid: false,
         rule_id: rule.id,
         rule_name: rule.name,
-        message: "Internal validation error: #{e.message}",
+        message: "#{rule.error_message || 'Validation error'} (#{e.message})",
         severity: 'error'
       )
     end
   end
 
   private
+  
+  # Helper to find a campaign field by name
+  def find_campaign_field(field_name)
+    return nil unless lead&.campaign
+    lead.campaign.campaign_fields.find_by(name: field_name)
+  end
 
   # Evaluate a condition-based rule (uses Ruby DSL with field references)
   def evaluate_condition
@@ -182,8 +213,13 @@ class ValidationRuleProcessor
       # Create a clean binding
       binding_context = create_binding
       
-      # Evaluate the expression
-      binding_context.eval(expression) == true
+      # Evaluate the expression with error handling
+      begin
+        binding_context.eval(expression) == true
+      rescue => e
+        Rails.logger.error("Validation rule evaluation error: #{e.message} for expression: #{expression}")
+        false
+      end
     end
     
     private
@@ -192,38 +228,111 @@ class ValidationRuleProcessor
       # Create a clean binding with only safe operations
       clean_binding = binding
       
-      # Add helper modules if needed
-      string_module = Module.new do
-        def self.contains?(str, substr); str.to_s.include?(substr.to_s); end
-        def self.starts_with?(str, prefix); str.to_s.start_with?(prefix.to_s); end
-        def self.ends_with?(str, suffix); str.to_s.end_with?(suffix.to_s); end
-        def self.matches?(str, pattern); !!str.to_s.match(Regexp.new(pattern.to_s)); end
-        def self.empty?(str); str.nil? || str.to_s.empty?; end
-        def self.length(str); str.to_s.length; end
-      end
-      
-      number_module = Module.new do
-        def self.between?(num, min, max); (min..max).include?(num.to_f); end
-        def self.positive?(num); num.to_f > 0; end
-        def self.negative?(num); num.to_f < 0; end
-        def self.zero?(num); num.to_f == 0; end
-      end
-      
-      date_module = Module.new do
-        def self.before?(date1, date2); Date.parse(date1.to_s) < Date.parse(date2.to_s); end
-        def self.after?(date1, date2); Date.parse(date1.to_s) > Date.parse(date2.to_s); end
-        def self.between?(date, start_date, end_date)
-          d = Date.parse(date.to_s)
-          d >= Date.parse(start_date.to_s) && d <= Date.parse(end_date.to_s)
+      # Add helper methods directly to the binding
+      clean_binding.eval(<<~RUBY)
+        # String helper methods
+        def string_contains?(str, substr)
+          str.to_s.include?(substr.to_s)
         end
-        def self.today; Date.today.to_s; end
-        def self.years_ago(years); (Date.today - (years.to_i * 365)).to_s; end
-      end
-      
-      # Make modules accessible
-      clean_binding.local_variable_set(:String, string_module)
-      clean_binding.local_variable_set(:Number, number_module)
-      clean_binding.local_variable_set(:Date, date_module)
+        
+        def string_starts_with?(str, prefix)
+          str.to_s.start_with?(prefix.to_s)
+        end
+        
+        def string_ends_with?(str, suffix)
+          str.to_s.end_with?(suffix.to_s)
+        end
+        
+        def string_matches?(str, pattern)
+          !!str.to_s.match(Regexp.new(pattern.to_s))
+        end
+        
+        def string_empty?(str)
+          str.nil? || str.to_s.strip == ''
+        end
+        
+        def string_length(str)
+          str.to_s.length
+        end
+        
+        # For backward compatibility with existing rules
+        module String
+          def self.empty?(str)
+            str.nil? || str.to_s.strip == ''
+          end
+          
+          def self.contains?(str, substr)
+            str.to_s.include?(substr.to_s)
+          end
+          
+          def self.starts_with?(str, prefix)
+            str.to_s.start_with?(prefix.to_s)
+          end
+          
+          def self.ends_with?(str, suffix)
+            str.to_s.end_with?(suffix.to_s)
+          end
+          
+          def self.matches?(str, pattern)
+            !!str.to_s.match(Regexp.new(pattern.to_s))
+          end
+          
+          def self.length(str)
+            str.to_s.length
+          end
+        end
+        
+        # Number helper methods
+        def number_between?(num, min, max)
+          (min.to_f..max.to_f).include?(num.to_f)
+        end
+        
+        def number_positive?(num)
+          num.to_f > 0
+        end
+        
+        def number_negative?(num)
+          num.to_f < 0
+        end
+        
+        def number_zero?(num)
+          num.to_f == 0
+        end
+        
+        # Date helper methods
+        def date_before?(date1, date2)
+          begin
+            Date.parse(date1.to_s) < Date.parse(date2.to_s)
+          rescue
+            false
+          end
+        end
+        
+        def date_after?(date1, date2)
+          begin
+            Date.parse(date1.to_s) > Date.parse(date2.to_s)
+          rescue
+            false
+          end
+        end
+        
+        def date_between?(date, start_date, end_date)
+          begin
+            d = Date.parse(date.to_s)
+            d >= Date.parse(start_date.to_s) && d <= Date.parse(end_date.to_s)
+          rescue
+            false
+          end
+        end
+        
+        def date_today
+          Date.today.to_s
+        end
+        
+        def required_field?(field_value)
+          !(field_value.nil? || field_value.to_s.strip == '')
+        end
+      RUBY
       
       clean_binding
     end

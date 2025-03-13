@@ -11,7 +11,7 @@
       <%= link_to leads_path(status: 'error'), class: "px-3 py-1 rounded-md #{params[:status] == 'error' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}" do %>
         Errors
       <% end %>
-      <%= link_to leads_path(status: 'new'), class: "px-3 py-1 rounded-md #{params[:status] == 'new' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}" do %>
+      <%= link_to leads_path(status: 'new_lead'), class: "px-3 py-1 rounded-md #{params[:status] == 'new_lead' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}" do %>
         New
       <% end %>
     </div>
@@ -42,7 +42,7 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Items Per Page</label>
             <%= f.select :per_page, [['5 items', '5'], ['10 items', '10'], ['20 items', '20'], ['50 items', '50']], 
-                      { selected: params[:per_page] || '5' }, 
+                      { selected: params[:per_page] || '20' }, 
                       { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" } %>
           </div>
           
@@ -138,7 +138,7 @@
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                       DISTRIBUTED
                     </span>
-                  <% when "new" %>
+                  <% when "new_lead" %>
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
                       NEW
                     </span>

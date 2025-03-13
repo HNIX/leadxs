@@ -4,7 +4,7 @@ class LeadsController < ApplicationController
 
   def index
     # Start with base scope
-    leads = Lead.where(account: current_account)
+    leads = Lead.all
     
     # Apply ID search if provided
     if params[:unique_id].present?
@@ -14,7 +14,15 @@ class LeadsController < ApplicationController
     # Apply other filters if provided
     leads = leads.where(campaign_id: params[:campaign_id]) if params[:campaign_id].present?
     leads = leads.where(source_id: params[:source_id]) if params[:source_id].present?
-    leads = leads.where(status: params[:status]) if params[:status].present?
+    
+    # Handle status filters, with special handling for 'new' to match 'new_lead'
+    if params[:status].present?
+      if params[:status] == 'new'
+        leads = leads.where(status: 'new_lead')
+      else
+        leads = leads.where(status: params[:status])
+      end
+    end
     
     # Apply date range filters if provided
     if params[:created_after].present?
@@ -32,11 +40,12 @@ class LeadsController < ApplicationController
       leads = leads.order(created_at: :asc)
     else
       # Default to newest first
-      leads = leads.order(created_at: :desc)
+      # Add ID as secondary sort to ensure consistent ordering
+      leads = leads.order(created_at: :desc, id: :desc)
     end
     
     # Paginate results
-    per_page = params[:per_page].present? ? params[:per_page].to_i : 5
+    per_page = params[:per_page].present? ? params[:per_page].to_i : 20
     @pagy, @leads = pagy(leads, limit: per_page)
 
     respond_to do |format|
@@ -48,6 +57,11 @@ class LeadsController < ApplicationController
   def show
     @lead_data = @lead.lead_data.includes(:campaign_field).order("campaign_fields.position")
     @api_requests = @lead.api_requests.order(created_at: :desc)
+    
+    # Load bid request and bids information
+    @bid_request = @lead.bid_request || @lead.generated_bid_request
+    @bids = @bid_request ? @bid_request.bids.includes(:distribution).order(created_at: :desc) : []
+    @winning_bid = @bid_request&.winning_bid
     
     # We don't need to load all activities here since the view only shows the most recent 5
     # This will be handled by the lead association

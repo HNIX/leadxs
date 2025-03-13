@@ -9,8 +9,12 @@ module Api
         # Authenticate source
         @campaign = @source.campaign
         
+        # Get params and log for debugging
+        params_hash = lead_params
+        Rails.logger.info "Lead POST params: #{params_hash.inspect}"
+        
         # Create a new lead submission service
-        submission_service = LeadSubmissionService.new(@source, @campaign, lead_params)
+        submission_service = LeadSubmissionService.new(@source, @campaign, params_hash)
         result = submission_service.process!
         
         if result[:success]
@@ -22,10 +26,27 @@ module Api
             message: result[:message]
           }, status: :created
         else
+          # Add detailed debugging information
+          debug_info = {
+            success: false,
+            message: result[:message],
+            errors: result[:errors],
+            request_details: {
+              raw_parameters: params_hash,
+              parameter_types: params_hash.transform_values { |v| v.class.name },
+              required_fields: @campaign.campaign_fields.where(required: true).map { |f| f.name }
+            }
+          }
+          
+          # Log debug info
+          Rails.logger.warn "Lead submission failed: #{debug_info.to_json}"
+          
+          # Render the error response
           render json: {
             success: false,
             message: result[:message],
-            errors: result[:errors]
+            errors: result[:errors],
+            debug: debug_info[:request_details] # Include debug info in the response
           }, status: :unprocessable_entity
         end
       end
@@ -67,11 +88,31 @@ module Api
       end
       
       def lead_params
-        # Parse the params based on the campaign's field structure
-        permitted_params = params.require(:lead).permit!
-        
-        # Return as a hash
-        permitted_params.to_h
+        # Handle different request formats
+        if params[:lead].present?
+          # Standard form submission with lead params
+          permitted_params = params.require(:lead).permit!
+          return permitted_params.to_h
+        elsif request.raw_post.present?
+          # Direct JSON payload
+          begin
+            # Parse the raw request body as JSON
+            json_params = JSON.parse(request.raw_post)
+            
+            # Log what was received for debugging
+            Rails.logger.debug "Raw lead post payload: #{json_params.inspect}"
+            
+            # Return the parsed JSON
+            return json_params
+          rescue JSON::ParserError => e
+            Rails.logger.error "JSON parsing error: #{e.message}"
+            return {}
+          end
+        else
+          # No parameters found
+          Rails.logger.warn "No lead parameters found in request"
+          return {}
+        end
       end
     end
   end

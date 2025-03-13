@@ -1,0 +1,69 @@
+<%# Renders the lead overview details
+  Usage: render "leads/lead_details", lead: @lead %>
+
+<div class="mb-4">
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
+    <%= render "leads/status_badge", status: lead.status, status_type: 'lead' %>
+  </div>
+  
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</span>
+    <span class="text-sm text-gray-900 dark:text-white">
+      <%= time_ago_in_words(lead.created_at) %> ago
+    </span>
+  </div>
+  
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution Count</span>
+    <span class="text-sm font-medium text-gray-900 dark:text-white">
+      <%= lead.distribution_count %>
+    </span>
+  </div>
+</div>
+
+<div class="bg-gray-50 dark:bg-gray-800 rounded p-3 mb-4">
+  <div class="flex items-center mb-2">
+    <span class="text-gray-500 dark:text-gray-400 w-24 text-sm">ID:</span>
+    <span class="text-gray-900 dark:text-white text-sm"><%= lead.id %></span>
+  </div>
+  
+  <div class="flex mb-2">
+    <span class="text-gray-500 dark:text-gray-400 w-24 text-sm">UUID:</span>
+    <span class="text-gray-900 dark:text-white font-mono text-xs break-all"><%= lead.unique_id %></span>
+  </div>
+  
+  <div class="flex items-center mb-2">
+    <span class="text-gray-500 dark:text-gray-400 w-24 text-sm">Campaign:</span>
+    <span class="text-gray-900 dark:text-white text-sm">
+      <% if lead.campaign %>
+        <%= link_to(lead.campaign.name, campaign_path(lead.campaign), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300") %>
+      <% else %>
+        <span class="text-gray-400 dark:text-gray-500">N/A</span>
+      <% end %>
+    </span>
+  </div>
+  
+  <div class="flex items-center">
+    <span class="text-gray-500 dark:text-gray-400 w-24 text-sm">Source:</span>
+    <span class="text-gray-900 dark:text-white text-sm">
+      <% if lead.source %>
+        <%= link_to(lead.source.name, source_path(lead.source), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300") %>
+      <% else %>
+        <span class="text-gray-400 dark:text-gray-500">N/A</span>
+      <% end %>
+    </span>
+  </div>
+</div>
+
+<% if lead.first_distributed_at %>
+  <div class="bg-gray-50 dark:bg-gray-800 rounded p-3">
+    <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Distribution Info</div>
+    <div class="flex items-center">
+      <span class="text-gray-500 dark:text-gray-400 w-24 text-sm">First Sent:</span>
+      <span class="text-gray-900 dark:text-white text-sm">
+        <%= l(lead.first_distributed_at, format: :long) %>
+      </span>
+    </div>
+  </div>
+<% end %>

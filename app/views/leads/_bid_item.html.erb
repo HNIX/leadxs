@@ -1,0 +1,20 @@
+<%# Renders a single bid item in the bids list
+  Usage: render "leads/bid_item", bid: bid, winning_bid: @winning_bid %>
+
+<li class="py-3">
+  <div class="flex justify-between items-center">
+    <div>
+      <p class="text-sm font-medium text-gray-900 dark:text-white">
+        <%= link_to bid.distribution.name, distribution_path(bid.distribution), class: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+      </p>
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        <%= time_ago_in_words(bid.created_at) %> ago
+      </p>
+    </div>
+    <div>
+      <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <%= bid == winning_bid ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' %>">
+        $<%= sprintf('%.2f', bid.amount) %>
+      </span>
+    </div>
+  </div>
+</li>

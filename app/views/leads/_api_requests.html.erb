@@ -1,0 +1,77 @@
+<%# Renders the API requests summary 
+  Usage: render "leads/api_requests", api_requests: @api_requests, lead: @lead %>
+
+<% if api_requests.any? %>
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Requests</span>
+      <span class="text-sm font-medium text-gray-900 dark:text-white"><%= api_requests.count %></span>
+    </div>
+    
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Success Rate</span>
+      <div class="flex items-center">
+        <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mr-2">
+          <% success_rate = api_requests.any? ? (api_requests.select(&:successful?).count.to_f / api_requests.count * 100).round : 0 %>
+          <div class="bg-green-500 h-2.5 rounded-full" style="width: <%= success_rate %>%"></div>
+        </div>
+        <span class="text-sm <%= success_rate > 70 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400' %>">
+          <%= success_rate %>%
+        </span>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <div class="bg-gray-50 dark:bg-gray-800 rounded p-2 text-center">
+        <span class="text-xs text-gray-500 dark:text-gray-400 block">Successful</span>
+        <span class="text-lg font-medium text-green-600 dark:text-green-400"><%= api_requests.select(&:successful?).count %></span>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded p-2 text-center">
+        <span class="text-xs text-gray-500 dark:text-gray-400 block">Failed</span>
+        <span class="text-lg font-medium text-red-600 dark:text-red-400"><%= api_requests.reject(&:successful?).count %></span>
+      </div>
+    </div>
+  </div>
+  
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Recent Requests</div>
+      <%= link_to "View All", api_requests_path(lead_id: lead.id), class: "text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" %>
+    </div>
+    
+    <div class="bg-gray-50 dark:bg-gray-800 rounded p-2">
+      <% if api_requests.first(3).any? %>
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700 list-none">
+          <% api_requests.first(3).each do |api_request| %>
+            <li class="py-2">
+              <div class="flex justify-between items-center">
+                <div class="overflow-hidden">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
+                    <%= api_request.requestable_type %>
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]">
+                    <%= api_request.endpoint_url %>
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <%= time_ago_in_words(api_request.created_at) %> ago
+                  </p>
+                </div>
+                <div>
+                  <% if api_request.successful? %>
+                    <%= render "leads/status_badge", status: api_request.response_code, status_type: 'api' %>
+                  <% else %>
+                    <%= render "leads/status_badge", status: api_request.response_code || "ERROR", status_type: 'api' %>
+                  <% end %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-gray-500 dark:text-gray-400 py-3 text-center">No recent API requests available.</p>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <p class="text-sm text-gray-500 dark:text-gray-400">No API requests found for this lead.</p>
+<% end %>

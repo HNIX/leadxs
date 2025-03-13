@@ -52,6 +52,7 @@ Rails.application.routes.draw do
   # Real-time bid dashboard
   get 'bid_dashboard', to: 'bid_dashboard#index', as: :bid_dashboard
   get 'bid_dashboard/real_time', to: 'bid_dashboard#real_time', as: :real_time_bid_dashboard
+  get 'bid_dashboard/debug_bid_request/:id', to: 'bid_dashboard#debug_bid_request', as: :debug_bid_request
   
   # Campaign performance dashboard
   get 'campaign_dashboard', to: 'campaign_dashboard#index', as: :campaign_dashboard
@@ -146,6 +147,27 @@ Rails.application.routes.draw do
     resources :source_filters
     resources :distribution_filters
     
+    # Form builder for campaign
+    resources :form_builders do
+      member do
+        match :preview, via: [:get, :post]
+        get :embed_codes
+        patch :toggle_status
+      end
+      
+      resources :form_builder_elements, controller: 'form_builders/form_builder_elements' do
+        collection do
+          post :bulk_update_positions
+        end
+      end
+      
+      resources :form_submissions, only: [:index, :show, :destroy], controller: 'form_builders/form_submissions' do
+        member do
+          post :reprocess
+        end
+      end
+    end
+    
     # Sources for lead acquisition
     resources :sources, shallow: true, only: [:index, :new, :create]
   end
@@ -235,6 +257,7 @@ Rails.application.routes.draw do
     get :bid_reporting_docs
     get :lead_submission_process
     get :compliance_documentation
+    get :form_builder_docs
   end
   
   # Validation rules documentation
@@ -257,6 +280,17 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Form builder public routes
+  scope 'f', controller: :form_builder_public do
+    get ':token', to: 'form_builder_public#show', as: :form_builder_public
+    post ':token/submit', to: 'form_builder_public#submit', as: :form_builder_public_submit
+    get ':token/success', to: 'form_builder_public#success', as: :form_builder_public_success
+    get ':token/error', to: 'form_builder_public#error', as: :form_builder_public_error
+  end
+  
+  # Form builder embed JavaScript
+  get 'embed.js', to: 'form_builder_public#embed_js', as: :form_builder_embed_js
+  
   # Public marketing homepage
   root to: "static#index"
 end

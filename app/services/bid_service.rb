@@ -45,14 +45,38 @@ class BidService
     
     # Find eligible distributions
     eligible_distributions = @campaign.eligible_distributions_for_bidding(@anonymized_data)
+    Rails.logger.info("BidService found #{eligible_distributions.count} eligible distributions for bidding")
+    
+    if eligible_distributions.empty?
+      Rails.logger.warn("BidService: No eligible distributions found for campaign #{@campaign.id}")
+    else
+      # Log the distributions for debugging
+      eligible_distributions.each do |dist|
+        Rails.logger.info("BidService eligible distribution: #{dist.id} - #{dist.name} - endpoint: #{dist.bid_endpoint_url || dist.endpoint_url}")
+      end
+    end
     
     # Request bids asynchronously from each distribution
     eligible_distributions.each do |distribution|
+      Rails.logger.info("BidService queuing BidRequestJob for request #{@bid_request.id} to distribution #{distribution.id}")
       BidRequestJob.perform_later(@bid_request.id, distribution.id)
     end
     
-    # Schedule job to process the bid request after it expires
-    ProcessBidRequestJob.set(wait_until: @bid_request.expires_at + 2.seconds).perform_later(@bid_request.id)
+    # Schedule jobs to process the bid request:
+    # 1. At expiration time (+2 seconds for buffer)
+    # 2. With a safety fallback at extended expiration time (+15 seconds)
+    # This ensures we handle the request even if the first job fails or is delayed
+    
+    # Primary job scheduled just after expiration
+    ProcessBidRequestJob.set(
+      wait_until: @bid_request.expires_at + 2.seconds
+    ).perform_later(@bid_request.id)
+    
+    # Safety fallback job with a bigger buffer - will be a no-op if already completed
+    ProcessBidRequestJob.set(
+      wait_until: @bid_request.expires_at + 15.seconds,
+      queue: :fallback_processing
+    ).perform_later(@bid_request.id)
     
     @bid_request
   end

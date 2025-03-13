@@ -1,0 +1,158 @@
+<h1 class="text-2xl font-bold mb-4">Embed Form: <%= @form_builder.name %></h1>
+
+<div class="mb-4">
+  <p class="text-gray-600">
+    Use these code snippets to embed this form on your website or share with sources.
+    The form will be automatically styled to match your theme settings.
+  </p>
+</div>
+
+<div class="grid grid-cols-1 gap-6">
+  <!-- Source selection -->
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-4 sm:px-6 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">Select Source</h2>
+      <p class="text-sm text-gray-500">Choose a source to generate source-specific embed codes</p>
+    </div>
+    
+    <div class="p-6">
+      <div class="space-y-4">
+        <div>
+          <label for="source_id" class="block text-sm font-medium text-gray-700">Source (Optional)</label>
+          <select id="source_id" class="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onchange="updateEmbedCodes(this.value)">
+            <option value="">No source (generic embed)</option>
+            <% @campaign.sources.active.each do |source| %>
+              <option value="<%= source.id %>" <%= "selected" if @source && @source.id == source.id %>><%= source.name %></option>
+            <% end %>
+          </select>
+          <p class="mt-1 text-xs text-gray-500">Selecting a source will include their unique ID in the embed code for tracking</p>
+        </div>
+        
+        <div class="p-4 bg-yellow-50 rounded-md">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-yellow-800">You must create a source connection first</h3>
+              <div class="mt-2 text-sm text-yellow-700">
+                <p>
+                  To properly track submissions, you should create a source of type "form_builder" and select it here.
+                  <%= link_to "Create a new source", new_campaign_source_path(@campaign), class: "font-medium underline text-yellow-700 hover:text-yellow-600" %>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- JavaScript embed code -->
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-4 sm:px-6 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">JavaScript Embed Code</h2>
+      <p class="text-sm text-gray-500">Add this code where you want the form to appear</p>
+    </div>
+    
+    <div class="p-6">
+      <div class="space-y-4">
+        <div class="bg-gray-50 rounded-md p-4 relative">
+          <pre id="js-embed-code" class="text-sm text-gray-800 overflow-x-auto whitespace-pre-wrap"><%= @form_builder.js_embed_code(@source, request.host_with_port) %></pre>
+          <button class="absolute top-2 right-2 p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-200" onclick="copyToClipboard('js-embed-code')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-gray-500">
+          This code creates a container div and loads the form using JavaScript. It's the recommended method as it provides the best responsive experience.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- iFrame embed code -->
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-4 sm:px-6 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">iFrame Embed Code</h2>
+      <p class="text-sm text-gray-500">Alternative method for embedding the form</p>
+    </div>
+    
+    <div class="p-6">
+      <div class="space-y-4">
+        <div class="bg-gray-50 rounded-md p-4 relative">
+          <pre id="iframe-embed-code" class="text-sm text-gray-800 overflow-x-auto whitespace-pre-wrap"><%= @form_builder.iframe_embed_code(@source, request.host_with_port) %></pre>
+          <button class="absolute top-2 right-2 p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-200" onclick="copyToClipboard('iframe-embed-code')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-gray-500">
+          This iframe method is simpler but provides less flexibility. Use this if you can't use the JavaScript method.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Direct link -->
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="p-4 sm:px-6 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900">Direct Form Link</h2>
+      <p class="text-sm text-gray-500">Share this link to access the form directly</p>
+    </div>
+    
+    <div class="p-6">
+      <div class="space-y-4">
+        <div class="bg-gray-50 rounded-md p-4 flex justify-between items-center">
+          <div id="direct-link" class="text-sm text-gray-800 overflow-x-auto"><%= form_builder_public_url(@form_builder.embed_token, host: request.host_with_port, source_id: @source&.id) %></div>
+          <button class="p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-200" onclick="copyToClipboard('direct-link')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-gray-500">
+          You can share this link directly with users or use it as a button link.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-6">
+  <div class="flex space-x-2">
+    <%= link_to "Back to Form Builder", campaign_form_builder_path(@campaign, @form_builder), class: "text-indigo-600 hover:text-indigo-900" %>
+  </div>
+</div>
+
+<script>
+  function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    const text = element.textContent;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      // Show a temporary copied message
+      const originalHTML = element.innerHTML;
+      element.innerHTML = "<span class='text-green-600 font-medium'>Copied to clipboard!</span>";
+      
+      setTimeout(() => {
+        element.innerHTML = originalHTML;
+      }, 2000);
+    });
+  }
+  
+  function updateEmbedCodes(sourceId) {
+    // Reload the page with the selected source
+    const url = new URL(window.location.href);
+    if (sourceId) {
+      url.searchParams.set('source_id', sourceId);
+    } else {
+      url.searchParams.delete('source_id');
+    }
+    window.location.href = url.toString();
+  }
+</script>

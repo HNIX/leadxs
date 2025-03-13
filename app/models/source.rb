@@ -3,11 +3,12 @@ class Source < AccountRecord
   acts_as_tenant :account
   belongs_to :campaign
   belongs_to :company
+  belongs_to :form_builder, optional: true
   has_many :leads, dependent: :destroy
   
   # Constants
   STATUSES = ['active', 'paused', 'archived'].freeze
-  INTEGRATION_TYPES = ['affiliate', 'web_form'].freeze
+  INTEGRATION_TYPES = ['affiliate', 'web_form', 'form_builder'].freeze
   PAYOUT_METHODS = ['fixed', 'percentage'].freeze
   PAYOUT_STRUCTURES = ['per_lead', 'per_action', 'per_click', 'per_call', 'per_conversion'].freeze
   
@@ -39,6 +40,7 @@ class Source < AccountRecord
   scope :archived, -> { where(status: 'archived') }
   scope :affiliates, -> { where(integration_type: 'affiliate') }
   scope :web_forms, -> { where(integration_type: 'web_form') }
+  scope :form_builders, -> { where(integration_type: 'form_builder') }
   
   # Callbacks
   before_validation :generate_token, on: :create
@@ -85,6 +87,10 @@ class Source < AccountRecord
   
   def web_form?
     integration_type == 'web_form'
+  end
+  
+  def form_builder?
+    integration_type == 'form_builder'
   end
   
   def regenerate_token!

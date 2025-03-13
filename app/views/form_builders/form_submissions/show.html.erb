@@ -1,0 +1,311 @@
+<h1 class="text-2xl font-bold mb-4">Submission Details</h1>
+
+<div class="mb-6">
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="px-4 py-5 sm:px-6 flex justify-between">
+      <div>
+        <h2 class="text-lg font-medium text-gray-900">Submission #<%= @submission.id %></h2>
+        <p class="text-sm text-gray-500"><%= l @submission.created_at, format: :long %></p>
+      </div>
+      
+      <div>
+        <% status_class = case @submission.status
+                          when 'submitted'
+                            'bg-yellow-100 text-yellow-800'
+                          when 'processing'
+                            'bg-blue-100 text-blue-800'
+                          when 'completed'
+                            'bg-green-100 text-green-800'
+                          when 'rejected'
+                            'bg-red-100 text-red-800'
+                          else
+                            'bg-gray-100 text-gray-800'
+                          end
+        %>
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_class %>">
+          <%= @submission.status.titleize %>
+        </span>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <dt class="text-sm font-medium text-gray-500">Form</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @form_builder.name %></dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">IP Address</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @submission.ip_address || "—" %></dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">User Agent</dt>
+          <dd class="mt-1 text-sm text-gray-900 truncate" title="<%= @submission.user_agent %>">
+            <%= @submission.user_agent.truncate(40) || "—" %>
+          </dd>
+        </div>
+        
+        <% if @submission.lead.present? %>
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-medium text-gray-500">Lead</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <%= link_to "View Lead ##{@submission.lead.id}", lead_path(@submission.lead), class: "text-indigo-600 hover:text-indigo-900" %>
+            </dd>
+          </div>
+        <% end %>
+        
+        <% if @submission.metadata['error'].present? %>
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-medium text-gray-500">Error</dt>
+            <dd class="mt-1 text-sm text-red-600"><%= @submission.metadata['error'] %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+    
+    <!-- Form data -->
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <h3 class="text-lg font-medium text-gray-900">Form Data</h3>
+      
+      <div class="mt-4 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-300">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Field</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Value</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 bg-white">
+            <% @submission.form_data.each do |field_id, value| %>
+              <tr>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                  <% element = @form_builder.elements.find_by(id: field_id) %>
+                  <% if element&.campaign_field %>
+                    <%= element.campaign_field.label %>
+                  <% elsif element %>
+                    <%= element.properties['label'] || element.element_type.humanize %>
+                  <% else %>
+                    Field #<%= field_id %>
+                  <% end %>
+                </td>
+                <td class="whitespace-pre-wrap py-4 px-3 text-sm text-gray-500">
+                  <%= value.is_a?(Array) ? value.join(", ") : value %>
+                </td>
+              </tr>
+            <% end %>
+            
+            <% if @submission.consent_text.present? %>
+              <tr>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">Consent</td>
+                <td class="whitespace-pre-wrap py-4 px-3 text-sm text-gray-500">
+                  <%= @submission.consent_text %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Raw Form Data -->
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Raw Form Data</h3>
+        <button id="toggle-raw-data" class="text-sm text-indigo-600 hover:text-indigo-900">Show Raw Data</button>
+      </div>
+      
+      <div id="raw-form-data" class="mt-4 hidden">
+        <div class="bg-gray-50 rounded-md p-4 overflow-auto" style="max-height: 400px;">
+          <pre class="text-xs text-gray-800"><%= JSON.pretty_generate(@submission.form_data) %></pre>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Metadata -->
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Metadata</h3>
+        <button id="toggle-metadata" class="text-sm text-indigo-600 hover:text-indigo-900">Show Metadata</button>
+      </div>
+      
+      <div id="metadata-content" class="mt-4 hidden">
+        <div class="bg-gray-50 rounded-md p-4 overflow-auto" style="max-height: 400px;">
+          <pre class="text-xs text-gray-800"><%= JSON.pretty_generate(@submission.metadata) %></pre>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Debugging Information -->
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Debugging Information</h3>
+        <button id="toggle-debug" class="text-sm text-indigo-600 hover:text-indigo-900">Show Debug Info</button>
+      </div>
+      
+      <div id="debug-content" class="mt-4 hidden">
+        <div class="bg-gray-50 rounded-md p-4 mb-4">
+          <h4 class="text-md font-medium text-gray-700 mb-2">Field Mappings</h4>
+          <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-100">
+              <tr>
+                <th scope="col" class="py-2 pl-4 pr-3 text-left text-xs font-semibold text-gray-900">Element ID</th>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-semibold text-gray-900">Campaign Field</th>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-semibold text-gray-900">Required</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% @form_builder.elements.each do |element| %>
+                <% if element.campaign_field_id.present? %>
+                  <tr>
+                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-xs font-medium text-gray-900"><%= element.id %></td>
+                    <td class="whitespace-nowrap py-2 px-3 text-xs text-gray-500">
+                      <%= element.campaign_field.name %> 
+                      <span class="text-gray-400">(<%= element.campaign_field.label %>)</span>
+                    </td>
+                    <td class="whitespace-nowrap py-2 px-3 text-xs text-gray-500">
+                      <% if element.campaign_field.required? %>
+                        <span class="text-red-600">Required</span>
+                      <% else %>
+                        Optional
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if @submission.metadata['source_token'].present? %>
+          <div class="bg-gray-50 rounded-md p-4 mb-4">
+            <h4 class="text-md font-medium text-gray-700 mb-2">Authentication</h4>
+            <p class="text-xs text-gray-600">Source token (first 10 chars): <%= @submission.metadata['source_token'][0..9] %>...</p>
+            <p class="text-xs text-gray-600">Source ID: <%= @submission.metadata['source_id'] %></p>
+          </div>
+        <% end %>
+        
+        <% if @submission.status == 'error' || @submission.status == 'rejected' %>
+          <div class="bg-red-50 rounded-md p-4 mb-4">
+            <h4 class="text-md font-medium text-red-700 mb-2">Error Information</h4>
+            <% if @submission.metadata['error'].present? %>
+              <p class="text-sm text-red-600 mb-2">Error: <%= @submission.metadata['error'] %></p>
+            <% end %>
+            
+            <% if @submission.metadata['errors'].present? %>
+              <h5 class="text-sm font-medium text-red-700 mt-3 mb-1">Error Details:</h5>
+              <ul class="text-xs text-red-600 list-disc list-inside">
+                <% Array(@submission.metadata['errors']).each do |error| %>
+                  <li><%= error %></li>
+                <% end %>
+              </ul>
+            <% end %>
+            
+            <% if @submission.metadata['validation_errors'].present? %>
+              <h5 class="text-sm font-medium text-red-700 mt-3 mb-1">Validation Errors:</h5>
+              <div class="bg-red-100 rounded-md p-2 overflow-auto text-xs">
+                <% @submission.metadata['validation_errors'].each do |rule_id, failure| %>
+                  <div class="mb-2 pb-2 border-b border-red-200">
+                    <p><strong>Rule:</strong> <%= failure['rule_name'] %></p>
+                    <p><strong>Message:</strong> <%= failure['message'] %></p>
+                    <% if failure['field'].present? %>
+                      <p><strong>Field:</strong> <%= failure['field'] %></p>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+            
+            <% if @submission.metadata['processing_log'].present? %>
+              <h5 class="text-sm font-medium text-red-700 mt-3 mb-1">Processing Log:</h5>
+              <div class="bg-red-100 rounded-md p-2 overflow-auto text-xs">
+                <pre><%= JSON.pretty_generate(@submission.metadata['processing_log']) rescue @submission.metadata['processing_log'].to_s %></pre>
+              </div>
+            <% end %>
+            
+            <% if @submission.metadata['backtrace'].present? %>
+              <h5 class="text-sm font-medium text-red-700 mt-3 mb-1">Backtrace:</h5>
+              <pre class="text-xs text-red-600 overflow-auto max-h-48"><%= @submission.metadata['backtrace'].join("\n") %></pre>
+            <% end %>
+          </div>
+          
+          <div class="bg-yellow-50 rounded-md p-4">
+            <h4 class="text-md font-medium text-yellow-700 mb-2">Debugging Steps</h4>
+            <ol class="text-sm text-yellow-800 list-decimal list-inside space-y-2">
+              <li>
+                <strong>Check Form Field Mapping:</strong> Verify that all required fields from the campaign are correctly mapped in the form
+              </li>
+              <li>
+                <strong>Validation Rules:</strong> Review any validation rules that failed and ensure the form data meets these requirements
+              </li>
+              <li>
+                <strong>Required Fields:</strong> Make sure all required fields have values submitted
+              </li>
+              <li>
+                <strong>Field Formats:</strong> Verify field formats match expectations (email, phone numbers, dates, etc.)
+              </li>
+              <li>
+                <strong>API Authentication:</strong> Confirm the source token is valid and the source is active
+              </li>
+            </ol>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('turbo:load', function() {
+        function setupToggle(buttonId, contentId) {
+          const button = document.getElementById(buttonId);
+          const content = document.getElementById(contentId);
+          if (button && content) {
+            button.addEventListener('click', function() {
+              if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                button.textContent = 'Hide ' + button.textContent.replace('Show ', '');
+              } else {
+                content.classList.add('hidden');
+                button.textContent = button.textContent.replace('Hide ', 'Show ');
+              }
+            });
+          }
+        }
+        
+        setupToggle('toggle-raw-data', 'raw-form-data');
+        setupToggle('toggle-metadata', 'metadata-content');
+        setupToggle('toggle-debug', 'debug-content');
+        
+        // Auto-expand error information if there's an error
+        <% if @submission.status == 'error' || @submission.status == 'rejected' %>
+          const debugButton = document.getElementById('toggle-debug');
+          const debugContent = document.getElementById('debug-content');
+          if (debugButton && debugContent) {
+            debugContent.classList.remove('hidden');
+            debugButton.textContent = 'Hide Debug Info';
+          }
+        <% end %>
+      });
+    </script>
+  </div>
+</div>
+
+<div class="flex justify-between mt-6">
+  <%= link_to "Back to Submissions", campaign_form_builder_form_submissions_path(@campaign, @form_builder), class: "text-indigo-600 hover:text-indigo-900" %>
+  
+  <% if @submission.status == 'error' || @submission.status == 'rejected' %>
+    <div class="flex space-x-2">
+      <%= button_to "Reprocess Submission", 
+          reprocess_campaign_form_builder_form_submission_path(@campaign, @form_builder, @submission), 
+          method: :post, 
+          class: "px-4 py-2 bg-indigo-600 rounded-md text-white hover:bg-indigo-500", 
+          data: { confirm: "Are you sure you want to reprocess this submission? This will attempt to create the lead again." } %>
+      
+      <%= button_to "Delete Submission", 
+          campaign_form_builder_form_submission_path(@campaign, @form_builder, @submission), 
+          method: :delete, 
+          class: "px-4 py-2 bg-red-600 rounded-md text-white hover:bg-red-500", 
+          data: { confirm: "Are you sure you want to delete this submission?" } %>
+    </div>
+  <% end %>
+</div>
