@@ -3,19 +3,19 @@
 one:
   account: one
   user: one
-  record_type: MyString
-  record_id: 
-  action: MyString
-  purpose: MyString
-  ip_address: MyString
+  record_type: Lead
+  record_id: 1
+  action: view
+  purpose: Testing
+  ip_address: 127.0.0.1
   accessed_at: 2025-03-09 23:13:02
 
 two:
   account: two
   user: two
-  record_type: MyString
-  record_id: 
-  action: MyString
-  purpose: MyString
-  ip_address: MyString
+  record_type: Lead
+  record_id: 2
+  action: view
+  purpose: Testing
+  ip_address: 127.0.0.1
   accessed_at: 2025-03-09 23:13:02

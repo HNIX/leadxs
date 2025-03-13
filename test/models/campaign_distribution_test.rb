@@ -54,9 +54,10 @@ class CampaignDistributionTest < ActiveSupport::TestCase
 
   test "validates priority is a positive integer" do
     ActsAsTenant.with_tenant(@account) do
-      Campaign.transaction do
-        # Create a unique campaign with timestamp to avoid conflicts
-        campaign = Campaign.create!(
+      # Create a unique campaign with timestamp to avoid conflicts
+      campaign = nil
+      begin
+        campaign = Campaign.new(
           name: "Test Campaign #{Time.now.to_i}",
           account: @account,
           vertical: @campaign.vertical,
@@ -64,6 +65,7 @@ class CampaignDistributionTest < ActiveSupport::TestCase
           distribution_method: "highest_bid",
           status: "draft"
         )
+        campaign.save(validate: false)
         
         # Test negative priority (should fail)
         cd = CampaignDistribution.new(
@@ -87,7 +89,8 @@ class CampaignDistributionTest < ActiveSupport::TestCase
         cd = CampaignDistribution.new(
           campaign: campaign,
           distribution: distributions(:two), # Use a different distribution to avoid uniqueness constraint
-          priority: 0
+          priority: 0, 
+          account: @account
         )
         assert cd.valid?, cd.errors.full_messages.join(", ")
 
@@ -95,11 +98,10 @@ class CampaignDistributionTest < ActiveSupport::TestCase
         cd = CampaignDistribution.new(
           campaign: campaign,
           distribution: distributions(:one), # Use a different distribution
+          account: @account,
           priority: nil
         )
         assert cd.valid?, cd.errors.full_messages.join(", ")
-        
-        raise ActiveRecord::Rollback
       end
     end
   end

@@ -4,22 +4,22 @@ one:
   account: one
   lead: one
   user_id: 
-  consent_type: MyString
-  consent_text: MyText
-  ip_address: MyString
-  user_agent: MyString
+  consent_type: distribution
+  consent_text: I consent to sharing my data
+  ip_address: 127.0.0.1
+  user_agent: Test Agent
   consented_at: 2025-03-09 23:12:58
-  expires_at: 2025-03-09 23:12:58
-  proof_token: MyString
+  expires_at: 2026-03-09 23:12:58
+  proof_token: proof123
 
 two:
   account: two
   lead: two
   user_id: 
-  consent_type: MyString
-  consent_text: MyText
-  ip_address: MyString
-  user_agent: MyString
+  consent_type: distribution
+  consent_text: I consent to sharing my data
+  ip_address: 127.0.0.1
+  user_agent: Test Agent
   consented_at: 2025-03-09 23:12:58
-  expires_at: 2025-03-09 23:12:58
-  proof_token: MyString
+  expires_at: 2026-03-09 23:12:58
+  proof_token: proof456

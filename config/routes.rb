@@ -17,6 +17,10 @@ Rails.application.routes.draw do
   # Bid analytics and reporting
   resources :bid_reports, only: [:index, :show]
   
+  # Economics and revenue analysis reports 
+  get 'bid_economics', to: 'bid_reports#economics', as: :bid_economics_report
+  get 'bid_revenue', to: 'bid_reports#revenue', as: :bid_revenue_report
+  
   # Real-time bid dashboard
   get 'bid_dashboard', to: 'bid_dashboard#index', as: :bid_dashboard
   get 'bid_dashboard/real_time', to: 'bid_dashboard#real_time', as: :real_time_bid_dashboard
@@ -33,6 +37,12 @@ Rails.application.routes.draw do
   # Campaign and distribution specific reports
   get 'bid_reports/campaign/:id', to: 'bid_reports#campaign', as: :campaign_bid_report
   get 'bid_reports/distribution/:id', to: 'bid_reports#distribution', as: :distribution_bid_report
+  
+  # Campaign and distribution specific economics and revenue reports
+  get 'bid_economics/campaign/:id', to: 'bid_reports#campaign_economics', as: :campaign_economics_report
+  get 'bid_economics/distribution/:id', to: 'bid_reports#distribution_economics', as: :distribution_economics_report
+  get 'bid_revenue/campaign/:id', to: 'bid_reports#campaign_revenue', as: :campaign_revenue_report
+  get 'bid_revenue/distribution/:id', to: 'bid_reports#distribution_revenue', as: :distribution_revenue_report
   # Distributions (buyers/endpoints)
   resources :distributions do
     member do

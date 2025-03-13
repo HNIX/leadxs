@@ -1,0 +1,460 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="h2"><%= @title %></h1>
+  </div>
+  
+  <%= render "shared/bidding_navigation" %>
+  
+  <!-- Period Selection -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+      <h2 class="text-lg font-medium dark:text-white mb-4 md:mb-0">Time Period</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div>
+          <%= form_with url: request.path, method: :get, data: { turbo_frame: "_top" }, class: "flex items-center space-x-2" do |f| %>
+            <% if @campaign %>
+              <%= f.hidden_field :id, value: @campaign.id %>
+            <% end %>
+            <% if @distribution %>
+              <%= f.hidden_field :id, value: @distribution.id %>
+            <% end %>
+            <%= f.select :period_type, period_options, { selected: @period_type }, 
+                       class: "select pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" %>
+            <%= f.submit "Update", class: "btn btn-primary btn-sm" %>
+          <% end %>
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          <%= @date_range[:start].strftime("%b %d, %Y") %> - <%= @date_range[:end].strftime("%b %d, %Y") %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Overall Metrics -->
+  <% if @overall_metrics.present? %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-2 dark:text-white">Total Bids</h3>
+        <p class="text-3xl font-bold text-blue-600 dark:text-blue-400"><%= number_with_delimiter(@overall_metrics[:total_bids]) %></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Accepted: <%= number_with_delimiter(@overall_metrics[:accepted_bids]) %> (<%= @overall_metrics[:acceptance_rate] %>%)</p>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-2 dark:text-white">Average Bid</h3>
+        <p class="text-3xl font-bold text-blue-600 dark:text-blue-400"><%= number_to_currency(@overall_metrics[:avg_bid_amount]) %></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total Revenue: <%= number_to_currency(@overall_metrics[:total_revenue]) %></p>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-2 dark:text-white">Success Rates</h3>
+        <p class="text-3xl font-bold text-blue-600 dark:text-blue-400"><%= number_to_percentage(@success_rates[:acceptance_rate], precision: 1) %></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Conversion Rate: <%= number_to_percentage(@success_rates[:conversion_rate], precision: 1) %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Bid Amount Distribution Chart -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-4 dark:text-white">Bid Amount Distribution</h3>
+      <% if @bid_ranges.present? %>
+        <div class="w-full h-64">
+          <canvas id="bidDistributionChart"></canvas>
+        </div>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No bid data available for this period.</p>
+      <% end %>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h3 class="text-lg font-medium mb-4 dark:text-white">Response Duration</h3>
+      <% if @response_times.present? %>
+        <div class="w-full h-64">
+          <canvas id="responseTimeChart"></canvas>
+        </div>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400">No response duration data available for this period.</p>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- Success Rates Chart -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-medium mb-4 dark:text-white">Bid Outcome Analysis</h3>
+    <% if @success_rates.present? %>
+      <div class="w-full h-64">
+        <canvas id="bidOutcomeChart"></canvas>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No bid outcome data available for this period.</p>
+    <% end %>
+  </div>
+  
+  <!-- Top Performers -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+    <% if @top_distributions %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-4 dark:text-white">Top Buyers by Bid Value</h3>
+        <% if @top_distributions.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="border-b dark:border-gray-700">
+                  <th class="text-left pb-3 dark:text-gray-300">Buyer</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Avg Bid</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Total Bids</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Accept Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @top_distributions.each do |distribution| %>
+                  <tr class="border-b dark:border-gray-700">
+                    <td class="py-3 dark:text-gray-300">
+                      <% if @campaign %>
+                        <%= link_to distribution[:name], distribution_economics_report_path(distribution[:id], period_type: @period_type), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %>
+                      <% else %>
+                        <%= link_to distribution[:name], distribution_economics_report_path(distribution[:id], period_type: @period_type), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %>
+                      <% end %>
+                    </td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(distribution[:avg_amount]) %></td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(distribution[:total_bids]) %></td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_to_percentage(distribution[:acceptance_rate], precision: 1) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-gray-500 dark:text-gray-400">No buyer data available.</p>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <% if @top_campaigns %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-4 dark:text-white">Top Campaigns by Bid Volume</h3>
+        <% if @top_campaigns.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="border-b dark:border-gray-700">
+                  <th class="text-left pb-3 dark:text-gray-300">Campaign</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Total Bids</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Avg Bid</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Accept Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @top_campaigns.each do |campaign| %>
+                  <tr class="border-b dark:border-gray-700">
+                    <td class="py-3 dark:text-gray-300">
+                      <%= link_to campaign[:name], campaign_economics_report_path(campaign[:id], period_type: @period_type), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %>
+                    </td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(campaign[:total_bids]) %></td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(campaign[:avg_amount]) %></td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_to_percentage(campaign[:acceptance_rate], precision: 1) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-gray-500 dark:text-gray-400">No campaign data available.</p>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <% if @top_sources %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-4 dark:text-white">Top Sources by Bid Volume</h3>
+        <% if @top_sources.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="border-b dark:border-gray-700">
+                  <th class="text-left pb-3 dark:text-gray-300">Source</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Total Bids</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Avg Bid</th>
+                  <th class="text-right pb-3 dark:text-gray-300">Accept Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @top_sources.each do |source| %>
+                  <tr class="border-b dark:border-gray-700">
+                    <td class="py-3 dark:text-gray-300">
+                      <%= source[:name] %>
+                    </td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(source[:total_bids]) %></td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(source[:avg_amount]) %></td>
+                    <td class="py-3 text-right dark:text-gray-300"><%= number_to_percentage(source[:acceptance_rate], precision: 1) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-gray-500 dark:text-gray-400">No source data available.</p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Detailed Bid Range Analysis -->
+  <% if @bid_ranges.present? %>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium dark:text-white">Bid Amount Distribution</h3>
+      </div>
+      <div class="p-6">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Bid Range</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Count</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Percentage</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Distribution</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @bid_ranges.each do |range| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <%= range[:label] %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_with_delimiter(range[:count]) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_to_percentage(range[:percentage], precision: 1) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
+                      <div class="bg-blue-600 h-2.5 rounded-full" style="width: <%= range[:percentage] %>%"></div>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Snapshots Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-medium dark:text-white">Bidding Activity Timeline</h3>
+    </div>
+    <div class="p-0">
+      <% if @snapshots.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Period</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Bids</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Avg Amount</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Accept Rate</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Details</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @snapshots.each do |snapshot| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <%= format_snapshot_period(snapshot) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_with_delimiter(snapshot.total_bids) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_to_currency(snapshot.avg_bid_amount) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_to_percentage(snapshot.acceptance_rate, precision: 1) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <%= link_to "View", bid_report_path(snapshot), class: "text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+        </div>
+      <% else %>
+        <div class="px-6 py-4 text-gray-500 dark:text-gray-400">
+          <p>No analytics data available for this period.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('turbo:load', function() {
+    // Chart configurations
+    
+    <% if @bid_ranges.present? %>
+    // Bid Distribution Chart
+    new Chart(
+      document.getElementById('bidDistributionChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @bid_ranges.map { |r| r[:label] }.to_json %>,
+          datasets: [{
+            label: 'Number of Bids',
+            data: <%= raw @bid_ranges.map { |r| r[:count] }.to_json %>,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribution of Bid Amounts'
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @response_times.present? %>
+    // Response Time Distribution
+    // Create histogram data for response times
+    
+    // Get min and max response times
+    const minTime = <%= @response_times.min.to_f %>;
+    const maxTime = <%= @response_times.max.to_f %>;
+    
+    // Create 5 buckets for response times
+    const bucketSize = (maxTime - minTime) / 5;
+    const buckets = Array(5).fill(0);
+    const bucketLabels = [];
+    
+    // Create bucket labels - handle case where all values are the same
+    if (maxTime - minTime < 0.1) {
+      // If all values are essentially the same, create evenly spaced buckets around the value
+      const baseValue = minTime;
+      for (let i = 0; i < 5; i++) {
+        bucketLabels.push(`${Math.round(baseValue)}ms`);
+      }
+    } else {
+      // Normal case - create range buckets
+      for (let i = 0; i < 5; i++) {
+        const lowerBound = minTime + (i * bucketSize);
+        const upperBound = minTime + ((i + 1) * bucketSize);
+        bucketLabels.push(`${Math.round(lowerBound)}ms - ${Math.round(upperBound)}ms`);
+      }
+    }
+    
+    // Count response times in each bucket
+    <% @response_times.each do |time| %>
+      const time = <%= time.to_f %>;
+      const bucketIndex = Math.min(Math.floor((time - minTime) / bucketSize), 4);
+      if (bucketIndex >= 0) buckets[bucketIndex]++;
+    <% end %>
+    
+    new Chart(
+      document.getElementById('responseTimeChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: bucketLabels,
+          datasets: [{
+            label: 'Response Duration (ms)',
+            data: buckets,
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            borderColor: 'rgb(75, 192, 192)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribution of Response Duration (ms)'
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @success_rates.present? %>
+    // Bid Outcome Analysis Chart
+    new Chart(
+      document.getElementById('bidOutcomeChart').getContext('2d'),
+      {
+        type: 'pie',
+        data: {
+          labels: ['Accepted', 'Rejected', 'Expired'],
+          datasets: [{
+            data: [
+              <%= @success_rates[:acceptance_rate] %>,
+              <%= @success_rates[:rejection_rate] %>,
+              <%= @success_rates[:expiration_rate] %>
+            ],
+            backgroundColor: [
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(255, 205, 86, 0.5)'
+            ],
+            borderColor: [
+              'rgb(75, 192, 192)',
+              'rgb(255, 99, 132)',
+              'rgb(255, 205, 86)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right'
+            },
+            title: {
+              display: true,
+              text: 'Bid Outcomes'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw.toFixed(1) + '%';
+                  return `${label}: ${value}`;
+                }
+              }
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+  });
+</script>

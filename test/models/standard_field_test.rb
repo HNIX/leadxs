@@ -85,6 +85,10 @@ class StandardFieldTest < ActiveSupport::TestCase
   end
   
   test "should apply standard fields to vertical" do
+    # First clear any existing standard fields
+    @account.standard_fields.destroy_all
+    
+    # Now add just our test field
     @standard_field.save!
     
     vertical = @account.verticals.create!(
@@ -100,7 +104,9 @@ class StandardFieldTest < ActiveSupport::TestCase
     StandardField.apply_to_vertical(vertical)
     
     # Verify field was created
-    assert_equal 1, vertical.vertical_fields.count
+    assert_equal 1, vertical.vertical_fields.count, 
+      "Expected 1 vertical field but got #{vertical.vertical_fields.count}: #{vertical.vertical_fields.map(&:name).join(', ')}"
+    
     field = vertical.vertical_fields.first
     assert_equal @standard_field.name, field.name
     assert_equal @standard_field.label, field.label

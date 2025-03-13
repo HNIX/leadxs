@@ -1,0 +1,631 @@
+<div class="container px-4 mx-auto my-8">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="h2"><%= @title %></h1>
+  </div>
+  
+  <%= render "shared/bidding_navigation" %>
+  
+  <!-- Period Selection -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+      <h2 class="text-lg font-medium dark:text-white mb-4 md:mb-0">Time Period</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div>
+          <%= form_with url: request.path, method: :get, data: { turbo_frame: "_top" }, class: "flex items-center space-x-2" do |f| %>
+            <% if @campaign %>
+              <%= f.hidden_field :id, value: @campaign.id %>
+            <% end %>
+            <% if @distribution %>
+              <%= f.hidden_field :id, value: @distribution.id %>
+            <% end %>
+            <%= f.select :period_type, period_options, { selected: @period_type }, 
+                       class: "select pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" %>
+            <%= f.submit "Update", class: "btn btn-primary btn-sm" %>
+          <% end %>
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          <%= @date_range[:start].strftime("%b %d, %Y") %> - <%= @date_range[:end].strftime("%b %d, %Y") %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Overall Metrics -->
+  <% if @overall_metrics.present? %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-2 dark:text-white">Total Revenue</h3>
+        <p class="text-3xl font-bold text-green-600 dark:text-green-400"><%= number_to_currency(@overall_metrics[:total_revenue]) %></p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">From <%= number_with_delimiter(@overall_metrics[:accepted_bids]) %> accepted bids</p>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-2 dark:text-white">Revenue Per Bid</h3>
+        <p class="text-3xl font-bold text-green-600 dark:text-green-400">
+          <%= number_to_currency(@overall_metrics[:total_revenue] / [@overall_metrics[:total_bids], 1].max) %>
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Per Accepted Bid: <%= number_to_currency(@overall_metrics[:total_revenue] / [@overall_metrics[:accepted_bids], 1].max) %>
+        </p>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-2 dark:text-white">Conversion Rate</h3>
+        <p class="text-3xl font-bold text-green-600 dark:text-green-400">
+          <%= number_to_percentage(@overall_metrics[:conversion_count].to_f / [@overall_metrics[:accepted_bids], 1].max * 100, precision: 1) %>
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <%= number_with_delimiter(@overall_metrics[:conversion_count]) %> conversions
+        </p>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Revenue Time Series Chart -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-medium mb-4 dark:text-white">Revenue Over Time</h3>
+    <% if @chart_data[:labels].any? %>
+      <div class="w-full h-64">
+        <canvas id="revenueTimeChart"></canvas>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No revenue data available for this period.</p>
+    <% end %>
+  </div>
+  
+  <!-- Revenue by Day/Time of Week -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+    <h3 class="text-lg font-medium mb-4 dark:text-white">Revenue by <%= @period_type.capitalize %></h3>
+    <% if @revenue_by_time.present? %>
+      <div class="w-full h-64">
+        <canvas id="revenueByTimeChart"></canvas>
+      </div>
+      
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="border-b dark:border-gray-700">
+              <th class="text-left pb-3 dark:text-gray-300"><%= @period_type.capitalize %></th>
+              <th class="text-right pb-3 dark:text-gray-300">Revenue</th>
+              <th class="text-right pb-3 dark:text-gray-300">Accepted Bids</th>
+              <th class="text-right pb-3 dark:text-gray-300">Revenue Per Bid</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @revenue_by_time.each do |time_data| %>
+              <tr class="border-b dark:border-gray-700">
+                <td class="py-3 dark:text-gray-300"><%= time_data[:time_period] %></td>
+                <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(time_data[:total_revenue]) %></td>
+                <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(time_data[:accepted_bids]) %></td>
+                <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(time_data[:revenue_per_bid]) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-gray-500 dark:text-gray-400">No time-based revenue data available.</p>
+    <% end %>
+  </div>
+  
+  <!-- Revenue Breakdowns -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+    <!-- Revenue by Distribution/Buyer -->
+    <% if @revenue_by_distribution.present? %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-4 dark:text-white">Revenue by Buyer</h3>
+        <div class="w-full h-64">
+          <canvas id="revenueByBuyerChart"></canvas>
+        </div>
+        
+        <div class="mt-4 overflow-x-auto max-h-64">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b dark:border-gray-700">
+                <th class="text-left pb-3 dark:text-gray-300">Buyer</th>
+                <th class="text-right pb-3 dark:text-gray-300">Revenue</th>
+                <th class="text-right pb-3 dark:text-gray-300">Accepted Bids</th>
+                <th class="text-right pb-3 dark:text-gray-300">Rev/Bid</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @revenue_by_distribution.each do |distribution| %>
+                <tr class="border-b dark:border-gray-700">
+                  <td class="py-3 dark:text-gray-300">
+                    <% if @campaign %>
+                      <%= link_to distribution[:name], distribution_revenue_report_path(distribution[:id], period_type: @period_type), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %>
+                    <% else %>
+                      <%= link_to distribution[:name], distribution_revenue_report_path(distribution[:id], period_type: @period_type), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %>
+                    <% end %>
+                  </td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(distribution[:total_revenue]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(distribution[:accepted_bids]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(distribution[:revenue_per_accepted_bid]) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+    
+    <!-- Revenue by Campaign -->
+    <% if @revenue_by_campaign.present? %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-4 dark:text-white">Revenue by Campaign</h3>
+        <div class="w-full h-64">
+          <canvas id="revenueByCampaignChart"></canvas>
+        </div>
+        
+        <div class="mt-4 overflow-x-auto max-h-64">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b dark:border-gray-700">
+                <th class="text-left pb-3 dark:text-gray-300">Campaign</th>
+                <th class="text-right pb-3 dark:text-gray-300">Revenue</th>
+                <th class="text-right pb-3 dark:text-gray-300">Accepted Bids</th>
+                <th class="text-right pb-3 dark:text-gray-300">Rev/Bid</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @revenue_by_campaign.each do |campaign| %>
+                <tr class="border-b dark:border-gray-700">
+                  <td class="py-3 dark:text-gray-300">
+                    <%= link_to campaign[:name], campaign_revenue_report_path(campaign[:id], period_type: @period_type), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" %>
+                  </td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(campaign[:total_revenue]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(campaign[:accepted_bids]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(campaign[:revenue_per_accepted_bid]) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+    
+    <!-- Revenue by Source -->
+    <% if @revenue_by_source.present? %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-4 dark:text-white">Revenue by Source</h3>
+        <div class="w-full h-64">
+          <canvas id="revenueBySourceChart"></canvas>
+        </div>
+        
+        <div class="mt-4 overflow-x-auto max-h-64">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b dark:border-gray-700">
+                <th class="text-left pb-3 dark:text-gray-300">Source</th>
+                <th class="text-right pb-3 dark:text-gray-300">Revenue</th>
+                <th class="text-right pb-3 dark:text-gray-300">Accepted Bids</th>
+                <th class="text-right pb-3 dark:text-gray-300">Rev/Bid</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @revenue_by_source.each do |source| %>
+                <tr class="border-b dark:border-gray-700">
+                  <td class="py-3 dark:text-gray-300"><%= source[:name] %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(source[:total_revenue]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(source[:accepted_bids]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(source[:revenue_per_bid]) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+    
+    <!-- Revenue by Lead Characteristics -->
+    <% if @revenue_by_lead_char.present? %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium mb-4 dark:text-white">Revenue by Lead Quality</h3>
+        <div class="w-full h-64">
+          <canvas id="revenueByLeadQualityChart"></canvas>
+        </div>
+        
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b dark:border-gray-700">
+                <th class="text-left pb-3 dark:text-gray-300">Lead Quality</th>
+                <th class="text-right pb-3 dark:text-gray-300">Revenue</th>
+                <th class="text-right pb-3 dark:text-gray-300">Accepted Bids</th>
+                <th class="text-right pb-3 dark:text-gray-300">Rev/Bid</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @revenue_by_lead_char.each do |char| %>
+                <tr class="border-b dark:border-gray-700">
+                  <td class="py-3 dark:text-gray-300"><%= char[:characteristic] %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(char[:total_revenue]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_with_delimiter(char[:accepted_bids]) %></td>
+                  <td class="py-3 text-right dark:text-gray-300"><%= number_to_currency(char[:revenue_per_bid]) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Snapshots Table -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden mb-6">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-medium dark:text-white">Revenue Timeline</h3>
+    </div>
+    <div class="p-0">
+      <% if @snapshots.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Period</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Revenue</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Accepted Bids</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Revenue/Bid</th>
+                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Details</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @snapshots.each do |snapshot| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <%= format_snapshot_period(snapshot) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_to_currency(snapshot.total_revenue) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_with_delimiter(snapshot.accepted_bids) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-300">
+                    <%= number_to_currency(snapshot.accepted_bids > 0 ? snapshot.total_revenue / snapshot.accepted_bids : 0) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <%= link_to "View", bid_report_path(snapshot), class: "text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+        </div>
+      <% else %>
+        <div class="px-6 py-4 text-gray-500 dark:text-gray-400">
+          <p>No revenue data available for this period.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('turbo:load', function() {
+    // Chart configurations
+    
+    <% if @chart_data[:labels].any? %>
+    // Revenue Time Series Chart
+    new Chart(
+      document.getElementById('revenueTimeChart').getContext('2d'),
+      {
+        type: 'line',
+        data: {
+          labels: <%= raw @chart_data[:labels].to_json %>,
+          datasets: [{
+            label: 'Revenue',
+            data: <%= raw @chart_data[:total_revenue].to_json %>,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Revenue Over Time'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @revenue_by_time.present? %>
+    // Revenue by Time Period Chart
+    new Chart(
+      document.getElementById('revenueByTimeChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @revenue_by_time.map { |t| t[:time_period] }.to_json %>,
+          datasets: [{
+            label: 'Revenue',
+            data: <%= raw @revenue_by_time.map { |t| t[:total_revenue] }.to_json %>,
+            backgroundColor: 'rgba(153, 102, 255, 0.5)',
+            borderColor: 'rgb(153, 102, 255)',
+            borderWidth: 1
+          }, {
+            label: 'Revenue Per Bid',
+            data: <%= raw @revenue_by_time.map { |t| t[:revenue_per_bid] }.to_json %>,
+            backgroundColor: 'rgba(255, 159, 64, 0.5)',
+            borderColor: 'rgb(255, 159, 64)',
+            borderWidth: 1,
+            type: 'line',
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Revenue'
+              },
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Revenue Per Bid'
+              },
+              grid: {
+                drawOnChartArea: false
+              },
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Revenue by <%= @period_type.capitalize %>'
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @revenue_by_distribution.present? %>
+    // Revenue by Buyer Chart
+    new Chart(
+      document.getElementById('revenueByBuyerChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @revenue_by_distribution.take(8).map { |d| d[:name] }.to_json %>,
+          datasets: [{
+            label: 'Revenue',
+            data: <%= raw @revenue_by_distribution.take(8).map { |d| d[:total_revenue] }.to_json %>,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Top 8 Buyers by Revenue'
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @revenue_by_campaign.present? %>
+    // Revenue by Campaign Chart
+    new Chart(
+      document.getElementById('revenueByCampaignChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @revenue_by_campaign.take(8).map { |c| c[:name] }.to_json %>,
+          datasets: [{
+            label: 'Revenue',
+            data: <%= raw @revenue_by_campaign.take(8).map { |c| c[:total_revenue] }.to_json %>,
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Top 8 Campaigns by Revenue'
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @revenue_by_source.present? %>
+    // Revenue by Source Chart
+    new Chart(
+      document.getElementById('revenueBySourceChart').getContext('2d'),
+      {
+        type: 'pie',
+        data: {
+          labels: <%= raw @revenue_by_source.take(6).map { |s| s[:name] }.to_json %>,
+          datasets: [{
+            data: <%= raw @revenue_by_source.take(6).map { |s| s[:total_revenue] }.to_json %>,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(54, 162, 235, 0.5)',
+              'rgba(255, 206, 86, 0.5)',
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(153, 102, 255, 0.5)',
+              'rgba(255, 159, 64, 0.5)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right'
+            },
+            title: {
+              display: true,
+              text: 'Top 6 Sources by Revenue'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = '$' + context.raw.toLocaleString();
+                  return `${label}: ${value}`;
+                }
+              }
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+    <% if @revenue_by_lead_char.present? %>
+    // Revenue by Lead Quality Chart
+    new Chart(
+      document.getElementById('revenueByLeadQualityChart').getContext('2d'),
+      {
+        type: 'bar',
+        data: {
+          labels: <%= raw @revenue_by_lead_char.map { |c| c[:characteristic] }.to_json %>,
+          datasets: [{
+            label: 'Revenue',
+            data: <%= raw @revenue_by_lead_char.map { |c| c[:total_revenue] }.to_json %>,
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            borderColor: 'rgb(75, 192, 192)',
+            borderWidth: 1
+          }, {
+            label: 'Revenue Per Bid',
+            data: <%= raw @revenue_by_lead_char.map { |c| c[:revenue_per_bid] }.to_json %>,
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 1,
+            type: 'line',
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Revenue'
+              },
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Revenue Per Bid'
+              },
+              grid: {
+                drawOnChartArea: false
+              },
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Revenue by Lead Quality'
+            }
+          }
+        }
+      }
+    );
+    <% end %>
+    
+  });
+</script>

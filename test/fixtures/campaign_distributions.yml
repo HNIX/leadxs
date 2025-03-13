@@ -5,9 +5,11 @@ one:
   distribution: one
   active: true
   priority: 1
+  account: one
 
 two:
   campaign: two
   distribution: two
   active: true
   priority: 2
+  account: two

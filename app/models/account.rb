@@ -22,6 +22,9 @@ class Account < ApplicationRecord
   has_many :bids, dependent: :destroy
   has_many :bid_analytic_snapshots, dependent: :destroy
   has_many :standard_fields, -> { order(position: :asc) }, dependent: :destroy
+  has_many :compliance_records, dependent: :destroy
+  has_many :consent_records, dependent: :destroy
+  has_many :data_access_records, dependent: :destroy
 
   scope :personal, -> { where(personal: true) }
   scope :team, -> { where(personal: false) }

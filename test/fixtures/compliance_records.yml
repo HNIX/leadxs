@@ -2,24 +2,24 @@
 
 one:
   account: one
-  record_type: MyString
-  record_id: 
-  action: MyString
-  event_type: MyString
+  record_type: Lead
+  record_id: 1
+  action: created
+  event_type: lead_processing
   data: 
   user_id: 
-  ip_address: MyString
-  user_agent: MyString
+  ip_address: 127.0.0.1
+  user_agent: Test Agent
   occurred_at: 2025-03-09 23:12:55
 
 two:
   account: two
-  record_type: MyString
-  record_id: 
-  action: MyString
-  event_type: MyString
+  record_type: Lead
+  record_id: 2
+  action: created
+  event_type: lead_processing
   data: 
   user_id: 
-  ip_address: MyString
-  user_agent: MyString
+  ip_address: 127.0.0.1
+  user_agent: Test Agent
   occurred_at: 2025-03-09 23:12:55
