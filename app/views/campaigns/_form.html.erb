@@ -1,4 +1,4 @@
-<%= form_with(model: campaign, local: true, data: { turbo: false }) do |form| %>
+<%= form_with(model: campaign, local: true, data: { turbo: false, controller: "campaign-type" }) do |form| %>
   <div class="space-y-6">
     <% if campaign.errors.any? %>
       <div class="bg-red-50 dark:bg-red-900/50 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded relative">
@@ -30,7 +30,34 @@
 
         <div>
           <%= form.label :campaign_type, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-          <%= form.select :campaign_type, Campaign::CAMPAIGN_TYPES.map { |t| [t.titleize, t] }, { include_blank: "Select a campaign type" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+          <%= form.select :campaign_type, Campaign::CAMPAIGN_TYPES.map { |t| [t.titleize, t] }, 
+            { include_blank: "Select a campaign type" }, 
+            { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500",
+              data: { campaign_type_target: "campaignType", action: "change->campaign-type#updateCampaignType" } } %>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <span class="font-medium">Campaign types:</span> Ping-Post (2-stage with bidding), Direct (single-stage submission), Calls (phone call routing)
+          </p>
+        </div>
+        
+        <!-- Campaign Scheduling -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <%= form.label :start_date, "Start Date", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.date_field :start_date, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When this campaign begins (optional)</p>
+          </div>
+          
+          <div>
+            <%= form.label :end_date, "End Date", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.date_field :end_date, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When this campaign ends (optional)</p>
+          </div>
+        </div>
+        
+        <div>
+          <%= form.label :expected_volume, "Expected Lead Volume", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.number_field :expected_volume, min: 0, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Estimated number of leads per day (optional)</p>
         </div>
       </div>
 
@@ -42,10 +69,15 @@
 
         <div>
           <%= form.label :distribution_method, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-          <%= form.select :distribution_method, Campaign::DISTRIBUTION_METHODS.map { |d| [d.titleize, d] }, { include_blank: "Select a distribution method" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { controller: "toggle", action: "change->toggle#toggle", toggle_target: "controller" } } %>
+          <%= form.select :distribution_method, campaign.available_distribution_methods.map { |d| [d.titleize, d] }, 
+            { include_blank: "Select a distribution method" }, 
+            { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500",
+              data: { campaign_type_target: "distributionMethod", action: "change->campaign-type#updateDistributionMethod" } } %>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Available distribution methods depend on campaign type</p>
         </div>
         
-        <div id="bidding_options" data-controller="toggle" data-toggle-target="toggleable" data-toggle-active-class="block" data-toggle-inactive-class="hidden" data-toggle-show-value="<%= campaign.use_bidding_system? || false %>">
+        <!-- Bidding Options (Ping-Post) -->
+        <div data-campaign-type-target="biddingOptions" class="<%= campaign.use_bidding_system? ? '' : 'hidden' %> typeSpecific">
           <div class="py-3 px-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Bidding Configuration</h3>
@@ -62,8 +94,76 @@
               <%= form.number_field :bid_timeout_seconds, min: 5, max: 300, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
               <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Time to wait for bids before auto-selecting a winner (5-300 seconds)</p>
             </div>
+            <div class="mt-4">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notification Settings</h4>
+              
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <%= form.check_box :debug_mode, { checked: campaign.debug_mode?, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
+                  <%= form.label :debug_mode, "Enable Debug Mode", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 ml-6">Enables detailed logging for troubleshooting bid issues</p>
+                
+                <div class="flex items-center">
+                  <%= form.check_box :notify_on_bid, { checked: campaign.notify_on_bid, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
+                  <%= form.label :notify_on_bid, "Bid Notifications", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 ml-6">Get notified when bids are received</p>
+                
+                <div class="flex items-center">
+                  <%= form.check_box :notify_on_reject, { checked: campaign.notify_on_reject, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
+                  <%= form.label :notify_on_reject, "Rejection Notifications", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 ml-6">Get notified when bids are rejected</p>
+                
+                <div class="flex items-center">
+                  <%= form.check_box :notify_on_failure, { checked: campaign.notify_on_failure, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
+                  <%= form.label :notify_on_failure, "Failure Notifications", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 ml-6">Get notified when bidding fails</p>
+              </div>
+            </div>
+            
             <div class="mt-4 text-xs bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500 dark:border-blue-700 p-2 text-blue-700 dark:text-blue-300">
               <p><strong>Tip:</strong> For ping-post campaigns, the system will create anonymized bid requests and automatically select a winner after the timeout period. Longer timeouts allow more bids to come in but may delay lead processing.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Direct Post Options -->
+        <div data-campaign-type-target="directOptions" class="<%= campaign.campaign_type == 'direct' ? '' : 'hidden' %> typeSpecific">
+          <div class="py-3 px-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Direct Post Configuration</h3>
+            </div>
+            <div class="mb-4">
+              <div class="flex items-center">
+                <%= form.check_box :track_conversions, { checked: campaign.track_conversions, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
+                <%= form.label :track_conversions, "Enable Conversion Tracking", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              </div>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Track conversions from direct post buyers</p>
+            </div>
+            <div class="mt-4 text-xs bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500 dark:border-blue-700 p-2 text-blue-700 dark:text-blue-300">
+              <p><strong>Tip:</strong> Direct post campaigns send leads directly to buyers without a bidding process. Configure your distribution endpoints carefully to ensure proper delivery.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Call Campaign Options -->
+        <div data-campaign-type-target="callsOptions" class="<%= campaign.campaign_type == 'calls' ? '' : 'hidden' %> typeSpecific">
+          <div class="py-3 px-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Call Campaign Configuration</h3>
+            </div>
+            <div class="mb-4">
+              <div class="flex items-center">
+                <%= form.check_box :call_recording_enabled, { checked: campaign.call_recording_enabled, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
+                <%= form.label :call_recording_enabled, "Enable Call Recording", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              </div>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Record calls for quality assurance (requires proper disclosure)</p>
+            </div>
+            <div class="mt-4 text-xs bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500 dark:border-blue-700 p-2 text-blue-700 dark:text-blue-300">
+              <p><strong>Note:</strong> Call campaigns require phone number field configuration and additional telephony setup.</p>
             </div>
           </div>
         </div>
@@ -73,7 +173,7 @@
     <div class="pt-2 border-t border-gray-200 dark:border-gray-600">
       <div class="mb-4">
         <div class="flex items-center">
-          <%= form.check_box :distribution_schedule_enabled, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" %>
+          <%= form.check_box :distribution_schedule_enabled, { checked: campaign.distribution_schedule_enabled, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
           <%= form.label :distribution_schedule_enabled, "Enable Distribution Schedule", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
         </div>
       </div>
@@ -114,22 +214,9 @@
 
 <%= javascript_tag do %>
   document.addEventListener('turbo:load', function() {
-    // Schedule options toggle
-    const scheduleCheckbox = document.querySelector('#campaign_distribution_schedule_enabled');
-    const scheduleOptions = document.querySelector('#schedule_options');
-    
-    if (scheduleCheckbox && scheduleOptions) {
-      function toggleScheduleOptions() {
-        if (scheduleCheckbox.checked) {
-          scheduleOptions.classList.remove('hidden');
-        } else {
-          scheduleOptions.classList.add('hidden');
-        }
-      }
-      
-      toggleScheduleOptions();
-      scheduleCheckbox.addEventListener('change', toggleScheduleOptions);
-    }
+    // Since we're using Stimulus for the toggle controller now, we don't need this
+    // JavaScript. The Stimulus toggle controller handles the toggling based on
+    // the data-toggle-show-value attribute.
     
     // Bidding options toggle based on campaign type and distribution method
     const campaignTypeSelect = document.querySelector('#campaign_campaign_type');

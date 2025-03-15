@@ -101,11 +101,20 @@ export default class extends Controller {
       }
     })
     
-    // Dispatch event for other controllers to respond to section changes
-    const event = new CustomEvent("sidebar-navigation:section-changed", { 
+    // Dispatch events for other controllers to respond to section changes
+    
+    // Specific namespaced event for direct controller communication
+    const sidebarEvent = new CustomEvent("sidebar-navigation:section-changed", { 
       detail: { section: section },
       bubbles: true
     })
-    this.element.dispatchEvent(event)
+    this.element.dispatchEvent(sidebarEvent)
+    
+    // Generic event for any controller that needs to know about section changes
+    const genericEvent = new CustomEvent("section-changed", { 
+      detail: { section: section },
+      bubbles: true
+    })
+    this.element.dispatchEvent(genericEvent)
   }
 }

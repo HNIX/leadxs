@@ -229,4 +229,79 @@ class CampaignTest < ActiveSupport::TestCase
       assert_equal list_field.list_values.count, campaign_field.list_values.count
     end
   end
+  
+  test "should validate that end date is after start date" do
+    start_date = Date.today
+    end_date = start_date - 1.day
+    
+    campaign = Campaign.new(
+      account: @account,
+      vertical: @vertical,
+      name: "Test Campaign",
+      status: "draft",
+      campaign_type: "ping_post",
+      distribution_method: "highest_bid",
+      start_date: start_date,
+      end_date: end_date
+    )
+    
+    assert_not campaign.valid?
+    assert_includes campaign.errors[:end_date], "must be after the start date"
+  end
+  
+  test "should accept valid campaign dates" do
+    start_date = Date.today
+    end_date = start_date + 30.days
+    
+    campaign = Campaign.new(
+      account: @account,
+      vertical: @vertical,
+      name: "Test Campaign",
+      status: "draft",
+      campaign_type: "ping_post",
+      distribution_method: "highest_bid",
+      start_date: start_date,
+      end_date: end_date
+    )
+    
+    assert campaign.valid?
+  end
+  
+  test "should accept campaign type specific fields" do
+    # Test ping_post campaign
+    ping_post = Campaign.new(
+      account: @account,
+      vertical: @vertical,
+      name: "Ping Post Campaign",
+      status: "draft",
+      campaign_type: "ping_post",
+      distribution_method: "highest_bid",
+      bid_timeout_seconds: 10
+    )
+    assert ping_post.valid?
+    
+    # Test direct campaign
+    direct = Campaign.new(
+      account: @account,
+      vertical: @vertical,
+      name: "Direct Campaign",
+      status: "draft",
+      campaign_type: "direct",
+      distribution_method: "round_robin",
+      track_conversions: true
+    )
+    assert direct.valid?
+    
+    # Test call campaign
+    calls = Campaign.new(
+      account: @account,
+      vertical: @vertical,
+      name: "Call Campaign",
+      status: "draft",
+      campaign_type: "calls",
+      distribution_method: "round_robin",
+      call_recording_enabled: true
+    )
+    assert calls.valid?
+  end
 end

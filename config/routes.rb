@@ -54,8 +54,9 @@ Rails.application.routes.draw do
   get 'bid_dashboard/real_time', to: 'bid_dashboard#real_time', as: :real_time_bid_dashboard
   get 'bid_dashboard/debug_bid_request/:id', to: 'bid_dashboard#debug_bid_request', as: :debug_bid_request
   
-  # Campaign performance dashboard
+  # Campaign performance dashboards
   get 'campaign_dashboard', to: 'campaign_dashboard#index', as: :campaign_dashboard
+  get 'campaign_performance', to: 'campaign_performance#index', as: :campaign_performance
   
   # Performance reports
   namespace :reports do

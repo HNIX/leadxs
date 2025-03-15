@@ -3,8 +3,24 @@
   <h3 class="text-lg font-medium text-gray-900 dark:text-white">Advanced Settings</h3>
 </div>
 
+<div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-700 p-4 mb-4">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3">
+      <p class="text-sm text-blue-700 dark:text-blue-300">
+        <strong>About Advanced Settings</strong><br/>
+        These settings control how your campaign distributes leads and manages notifications. Adjusting these settings can help optimize your campaign performance and lead flow management.
+      </p>
+    </div>
+  </div>
+</div>
+
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-  <%= form_with(model: @campaign, url: campaign_path(@campaign), method: :patch, local: true, data: { turbo: false }) do |form| %>
+  <%= form_with(model: @campaign, id: "campaign-form", url: campaign_path(@campaign), method: :patch, local: true, data: { turbo: false }) do |form| %>
     <div class="space-y-6">
       <% if @campaign.errors.any? %>
         <div class="bg-red-50 dark:bg-red-900/50 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded relative">
@@ -17,101 +33,181 @@
         </div>
       <% end %>
 
-      <!-- Multi-Distribution Strategy -->
+      <!-- Multi-Distribution Strategy with Info Box -->
       <div class="border-b border-gray-200 dark:border-gray-700 pb-5">
-        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Lead Distribution Strategy</h4>
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="text-md font-medium text-gray-900 dark:text-white">Lead Distribution Strategy</h4>
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs px-2 py-1 rounded-full">
+            Affects how leads are sent to buyers
+          </div>
+        </div>
+        
+        <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg">
+          <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-1">What is a Distribution Strategy?</h5>
+          <p class="text-xs text-gray-600 dark:text-gray-400">This determines how your leads are distributed among available buyers. Your choice affects your revenue potential, lead delivery success rate, and system performance.</p>
+        </div>
+        
         <div class="mt-2 space-y-4">
           <div class="relative flex items-start">
             <div class="flex items-center h-5">
-              <%= form.radio_button :multi_distribution_strategy, "sequential", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" %>
+              <%= form.radio_button :multi_distribution_strategy, "sequential", { checked: @campaign.multi_distribution_strategy == "sequential", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" } %>
             </div>
             <div class="ml-3 text-sm">
               <%= form.label :multi_distribution_strategy_sequential, "Sequential (Try distributions in order)", class: "font-medium text-gray-700 dark:text-gray-300" %>
               <p class="text-gray-500 dark:text-gray-400">Attempts each distribution in order until one accepts the lead</p>
+              <div class="mt-1 text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-1 px-2 rounded">
+                <strong>Best for:</strong> Ensuring lead delivery with fallback options or prioritizing specific buyers
+              </div>
             </div>
           </div>
           
           <div class="relative flex items-start">
             <div class="flex items-center h-5">
-              <%= form.radio_button :multi_distribution_strategy, "parallel", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" %>
+              <%= form.radio_button :multi_distribution_strategy, "parallel", { checked: @campaign.multi_distribution_strategy == "parallel", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" } %>
             </div>
             <div class="ml-3 text-sm">
               <%= form.label :multi_distribution_strategy_parallel, "Parallel (Send to all eligible distributions)", class: "font-medium text-gray-700 dark:text-gray-300" %>
               <p class="text-gray-500 dark:text-gray-400">Sends lead data to all eligible distributions simultaneously</p>
+              <div class="mt-1 text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-1 px-2 rounded">
+                <strong>Best for:</strong> Maximizing revenue by selling to multiple buyers (subject to Maximum Distributions setting)
+              </div>
             </div>
           </div>
           
           <div class="relative flex items-start">
             <div class="flex items-center h-5">
-              <%= form.radio_button :multi_distribution_strategy, "single", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" %>
+              <%= form.radio_button :multi_distribution_strategy, "single", { checked: @campaign.multi_distribution_strategy == "single", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" } %>
             </div>
             <div class="ml-3 text-sm">
               <%= form.label :multi_distribution_strategy_single, "Single Distribution (One at a time)", class: "font-medium text-gray-700 dark:text-gray-300" %>
               <p class="text-gray-500 dark:text-gray-400">Sends each lead to only one distribution</p>
+              <div class="mt-1 text-xs bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-1 px-2 rounded">
+                <strong>Best for:</strong> Exclusive lead selling or rotating leads among buyers
+              </div>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Max Distributions Option -->
-      <div class="border-b border-gray-200 dark:border-gray-700 pb-5 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <%= form.label :max_distributions, "Maximum Distributions Per Lead", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-          <%= form.number_field :max_distributions, min: 1, max: 20, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum number of distributions that can receive a single lead</p>
-        </div>
-        
-        <div class="flex items-center">
-          <div class="p-3 bg-yellow-50 dark:bg-yellow-900/30 border-l-2 border-yellow-500 dark:border-yellow-700 text-sm text-yellow-700 dark:text-yellow-300">
-            <p><strong>Note:</strong> This setting is important when using Parallel distribution strategy and can affect your lead costs.</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Custom Settings -->
-      <div>
-        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Additional Settings</h4>
-        <div class="mt-3 space-y-5">
-          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-            <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Development Tools</h5>
-            <div class="flex items-center mb-2">
-              <div class="flex items-center h-5">
-                <%= check_box_tag "campaign[debug_mode]", "1", false, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" %>
-              </div>
-              <div class="ml-3 text-sm">
-                <%= label_tag "campaign[debug_mode]", "Enable Debug Mode", class: "font-medium text-gray-700 dark:text-gray-300" %>
+      <!-- Max Distributions Option with Enhanced Info -->
+      <div class="border-b border-gray-200 dark:border-gray-700 pb-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <label for="campaign_max_distributions" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Maximum Distributions Per Lead</label>
+              <div class="bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs px-2 py-1 rounded-full">
+                Controls multi-selling
               </div>
             </div>
-            <p class="text-xs text-gray-500 dark:text-gray-400 ml-7">Enables detailed logging for API requests and responses. Only use during development.</p>
+            <%= form.number_field :max_distributions, min: 1, max: 20, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum number of distributions that can receive a single lead (1-20)</p>
+            
+            <div class="mt-2 p-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg">
+              <h5 class="text-xs font-medium text-gray-900 dark:text-white mb-1">Understanding Maximum Distributions</h5>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                This determines how many buyers can purchase the same lead. A higher number increases revenue potential but may impact lead exclusivity. For Parallel distribution, this is the maximum number of simultaneous deliveries.
+              </p>
+              
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-2 border-yellow-500 dark:border-yellow-700 p-1 text-xs text-yellow-700 dark:text-yellow-300">
+                  <strong>Value = 1:</strong> Each lead goes to only one buyer
+                </div>
+                <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-2 border-yellow-500 dark:border-yellow-700 p-1 text-xs text-yellow-700 dark:text-yellow-300">
+                  <strong>Value > 1:</strong> Multiple buyers can receive the same lead
+                </div>
+              </div>
+            </div>
           </div>
           
+          <div class="flex items-center">
+            <div class="p-4 bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500 dark:border-blue-700 rounded-lg">
+              <h5 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">Distribution Strategy Matrix</h5>
+              <div class="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+                <p><strong>Sequential + Max = 1:</strong> First eligible buyer gets the lead</p>
+                <p><strong>Sequential + Max > 1:</strong> Lead is offered to multiple buyers in order</p>
+                <p><strong>Parallel + Max > 1:</strong> Multiple buyers get the lead simultaneously</p>
+                <p><strong>Single + Any Max:</strong> Each lead goes to exactly one buyer</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Development & Notification Tools with Enhanced Info -->
+      <div>
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="text-md font-medium text-gray-900 dark:text-white">Additional Settings</h4>
+          <div class="bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs px-2 py-1 rounded-full">
+            Monitoring & notifications
+          </div>
+        </div>
+        
+        <div class="mt-3 space-y-5">
+          <!-- Debug Mode Section -->
           <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-            <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Notifications</h5>
-            <div class="flex flex-col space-y-3">
-              <div class="flex items-center">
-                <div class="flex items-center h-5">
-                  <%= check_box_tag "campaign[notify_on_bid]", "1", false, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" %>
+            <div class="flex justify-between items-start mb-2">
+              <h5 class="text-sm font-medium text-gray-900 dark:text-white">Development Tools</h5>
+              <div class="bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs px-2 py-0.5 rounded-full">
+                For troubleshooting
+              </div>
+            </div>
+            
+            <div class="flex items-center mb-2">
+              <div class="flex items-center h-5">
+                <%= form.check_box :debug_mode, { checked: @campaign[:debug_mode], class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
+              </div>
+              <div class="ml-3 text-sm">
+                <%= form.label :debug_mode, "Enable Debug Mode", class: "font-medium text-gray-700 dark:text-gray-300" %>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 ml-7 mb-2">Enables detailed logging for API requests and responses. Only use during development.</p>
+            
+            <div class="ml-7 p-2 bg-yellow-50 dark:bg-yellow-900/30 border-l-2 border-yellow-500 dark:border-yellow-700 text-xs text-yellow-700 dark:text-yellow-300">
+              <strong>Note:</strong> Debug mode may slow down performance and generate large log files. Enable only when diagnosing issues, and disable for production use.
+            </div>
+          </div>
+          
+          <!-- Notifications Section -->
+          <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+            <div class="flex justify-between items-start mb-3">
+              <h5 class="text-sm font-medium text-gray-900 dark:text-white">Notifications</h5>
+              <div class="bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs px-2 py-0.5 rounded-full">
+                Alert preferences
+              </div>
+            </div>
+            
+            <div class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg mb-4 text-xs text-blue-700 dark:text-blue-300">
+              <p>Notifications are sent via email to campaign administrators and can be configured to alert you about important events.</p>
+            </div>
+            
+            <div class="flex flex-col space-y-4">
+              <div class="flex items-start">
+                <div class="flex items-center h-5 mt-1">
+                  <%= form.check_box :notify_on_bid, { checked: @campaign.notify_on_bid, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
                 </div>
-                <div class="ml-3 text-sm">
-                  <%= label_tag "campaign[notify_on_bid]", "Notify on High Bids", class: "font-medium text-gray-700 dark:text-gray-300" %>
+                <div class="ml-3">
+                  <%= form.label :notify_on_bid, "Notify on High Bids", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Receive alerts when bids exceed 150% of your average bid amount, helping identify valuable lead types or potential pricing issues.</p>
                 </div>
               </div>
               
-              <div class="flex items-center">
-                <div class="flex items-center h-5">
-                  <%= check_box_tag "campaign[notify_on_reject]", "1", false, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" %>
+              <div class="flex items-start">
+                <div class="flex items-center h-5 mt-1">
+                  <%= form.check_box :notify_on_reject, { checked: @campaign.notify_on_reject, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
                 </div>
-                <div class="ml-3 text-sm">
-                  <%= label_tag "campaign[notify_on_reject]", "Notify on Rejected Leads", class: "font-medium text-gray-700 dark:text-gray-300" %>
+                <div class="ml-3">
+                  <%= form.label :notify_on_reject, "Notify on Rejected Leads", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Get alerts when your leads are rejected by buyers at an unusual rate (>30% in an hour). Helps identify potential data quality or mapping issues.</p>
                 </div>
               </div>
               
-              <div class="flex items-center">
-                <div class="flex items-center h-5">
-                  <%= check_box_tag "campaign[notify_on_failure]", "1", false, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" %>
+              <div class="flex items-start">
+                <div class="flex items-center h-5 mt-1">
+                  <%= form.check_box :notify_on_failure, { checked: @campaign.notify_on_failure, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" } %>
                 </div>
-                <div class="ml-3 text-sm">
-                  <%= label_tag "campaign[notify_on_failure]", "Notify on High Failure Rate", class: "font-medium text-gray-700 dark:text-gray-300" %>
+                <div class="ml-3">
+                  <%= form.label :notify_on_failure, "Notify on High Failure Rate", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Receive alerts when lead delivery failures exceed 25%. This could indicate API issues, network problems, or buyer endpoint failures.</p>
                 </div>
               </div>
             </div>
@@ -119,6 +215,9 @@
         </div>
       </div>
 
+    </div>
+    <div class="mt-6 flex justify-end space-x-3">
+      <%= form.submit class: "btn btn-primary" %>
     </div>
   <% end %>
 </div>

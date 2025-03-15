@@ -114,7 +114,7 @@ class StandardField < ApplicationRecord
           standard_values = standard_field.list_values.pluck(:list_value)
           
           # Delete any list values that no longer exist in standard field
-          # vertical_field.list_values.where.not(list_value: standard_values).destroy_all
+          vertical_field.list_values.where.not(list_value: standard_values).destroy_all
           
           # Add any new list values from standard field
           standard_field.list_values.each do |list_value|

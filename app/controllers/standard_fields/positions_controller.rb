@@ -7,7 +7,8 @@ module StandardFields
         current_account.standard_fields.find(id).update(position: index + 1)
       end
       
-      head :ok
+      @standard_fields = current_account.standard_fields.order(position: :asc)
+      render "standard_fields/positions"
     end
   end
 end

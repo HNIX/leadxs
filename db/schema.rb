@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_14_211316) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_15_060523) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -361,6 +361,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_14_211316) do
     t.decimal "minimum_bid_amount", precision: 10, scale: 2
     t.string "multi_distribution_strategy", default: "sequential"
     t.integer "max_distributions", default: 1
+    t.date "start_date"
+    t.date "end_date"
+    t.integer "expected_volume"
+    t.boolean "track_conversions", default: false
+    t.boolean "call_recording_enabled", default: false
+    t.boolean "debug_mode", default: false
+    t.boolean "notify_on_bid", default: false
+    t.boolean "notify_on_reject", default: false
+    t.boolean "notify_on_failure", default: false
     t.index ["account_id"], name: "index_campaigns_on_account_id"
     t.index ["multi_distribution_strategy"], name: "index_campaigns_on_multi_distribution_strategy"
     t.index ["vertical_id"], name: "index_campaigns_on_vertical_id"

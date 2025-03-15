@@ -11,4 +11,47 @@
   <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg p-6">
     <%= render "form", vertical: @vertical %>
   </div>
+
+  <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Standard Fields</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Standard fields help ensure consistency across verticals. You can add missing fields or update existing ones.</p>
+      </div>
+      <div class="flex space-x-3">
+        <%= button_to apply_standard_fields_vertical_path(@vertical), class: "btn btn-outline", method: :post, data: { turbo_confirm: "This will add any missing standard fields to this vertical. Continue?" } do %>
+          <span class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Add Missing Fields
+          </span>
+        <% end %>
+        <%= button_to sync_standard_fields_vertical_path(@vertical), class: "btn btn-outline", method: :post, data: { turbo_confirm: "This will update existing fields to match your standard field definitions. Continue?" } do %>
+          <span class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+            Sync Existing Fields
+          </span>
+        <% end %>
+      </div>
+    </div>
+    <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 mt-2">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-blue-700 dark:text-blue-200">
+            <strong>Add Missing Fields</strong> will add any standard fields that don't exist in this vertical.
+            <br />
+            <strong>Sync Existing Fields</strong> will update existing fields to match the current standard field definitions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

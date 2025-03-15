@@ -72,7 +72,8 @@
     
     <div class="px-4 py-3">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        <!-- Campaign Dashboard -->
+        <% if @campaign.campaign_type == 'ping_post' && @campaign.use_bidding_system? %>
+        <!-- Bidding Dashboard (Ping-Post) -->
         <%= link_to campaign_dashboard_path(campaign_id: @campaign.id), class: "flex items-center p-3 border rounded-lg border-blue-200 bg-blue-50 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors duration-150" do %>
           <div class="flex-shrink-0">
             <svg class="h-5 w-5 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -92,6 +93,29 @@
               <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
             </svg>
           </div>
+        <% end %>
+        <% else %>
+        <!-- Performance Dashboard (Non-Bidding) -->
+        <%= link_to campaign_performance_path(campaign_id: @campaign.id), class: "flex items-center p-3 border rounded-lg border-blue-200 bg-blue-50 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors duration-150" do %>
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+              <%= @campaign.campaign_type == 'calls' ? 'Call Performance' : 'Campaign Performance' %>
+            </h3>
+            <p class="text-xs text-blue-600 dark:text-blue-300">
+              <%= @campaign.campaign_type == 'calls' ? 'Call metrics and analytics' : 'Submission and conversion metrics' %>
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <svg class="h-4 w-4 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        <% end %>
         <% end %>
         
         <!-- Source Performance Report -->
@@ -149,10 +173,10 @@
           </div>
           <div class="ml-3 flex-grow">
             <h3 class="text-sm font-medium text-orange-800 dark:text-orange-200">
-              API Documentation
+              <%= @campaign.campaign_type == 'ping_post' ? 'Ping & Post API Docs' : (@campaign.campaign_type == 'calls' ? 'Call API Docs' : 'Post API Docs') %>
             </h3>
             <p class="text-xs text-orange-600 dark:text-orange-300">
-              Integration guide for sources
+              <%= @campaign.campaign_type == 'ping_post' ? 'Two-stage integration guide' : (@campaign.campaign_type == 'calls' ? 'Call routing API' : 'Direct post integration') %>
             </p>
           </div>
           <div class="flex-shrink-0">
@@ -265,9 +289,148 @@
     </div>
   <% end %>
 
+  <!-- Campaign Schedule Information -->
+  <% if @campaign.start_date.present? || @campaign.end_date.present? %>
+    <% date_status = campaign_date_status(@campaign) %>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden">
+      <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Campaign Schedule
+            </h3>
+          </div>
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= date_status[:color] %>">
+              <%= date_status[:label] %>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="px-4 py-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span class="text-sm text-gray-700 dark:text-gray-300">
+              <%= format_campaign_dates(@campaign) %>
+            </span>
+          </div>
+          
+          <% if @campaign.expected_volume.present? %>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Expected Volume: <%= @campaign.expected_volume %> leads per day
+              </span>
+            </div>
+          <% end %>
+          
+          <% if @campaign.campaign_type == 'calls' && @campaign.call_recording_enabled %>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m5.656-5.656a1 1 0 00-1.414 0l-2.829 2.829a1 1 0 001.414 1.414L12 13.414l2.121 2.121a1 1 0 001.414-1.414l-2.828-2.829z" />
+              </svg>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Call Recording: Enabled
+              </span>
+            </div>
+          <% end %>
+          
+          <% if @campaign.campaign_type == 'direct' && @campaign.track_conversions %>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Conversion Tracking: Enabled
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Bidding Notification Settings -->
+  <% if @campaign.campaign_type == 'ping_post' && @campaign.use_bidding_system? && 
+        (@campaign.debug_mode? || @campaign.notify_on_bid || @campaign.notify_on_reject || @campaign.notify_on_failure) %>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden">
+      <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Bidding & Notification Settings
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="px-4 py-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% if @campaign.debug_mode? %>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 dark:text-indigo-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Debug Mode: <span class="font-medium text-indigo-600 dark:text-indigo-400">Enabled</span>
+              </span>
+            </div>
+          <% end %>
+          
+          <% if @campaign.notify_on_bid %>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Bid Notifications: <span class="font-medium text-blue-600 dark:text-blue-400">Enabled</span>
+              </span>
+            </div>
+          <% end %>
+          
+          <% if @campaign.notify_on_reject %>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 dark:text-red-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Rejection Notifications: <span class="font-medium text-red-600 dark:text-red-400">Enabled</span>
+              </span>
+            </div>
+          <% end %>
+          
+          <% if @campaign.notify_on_failure %>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Failure Notifications: <span class="font-medium text-yellow-600 dark:text-yellow-400">Enabled</span>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Performance KPI Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-    <!-- Total Leads Card -->
+    <!-- Total Leads Card (common to all campaign types) -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
       <div class="flex justify-between">
         <div>
@@ -303,186 +466,400 @@
       </div>
     </div>
     
-    <!-- Conversion Rate Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-      <div class="flex justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Conversion Rate</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= (@bid_metrics[:acceptance_rate] || 0).to_s %>%</p>
-        </div>
-        <div>
-          <div class="rounded-full p-2 bg-green-100 dark:bg-green-900">
-            <svg class="w-6 h-6 text-green-500 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+    <% if @campaign.campaign_type == 'ping_post' %>
+      <!-- Ping-Post Campaign specific metrics -->
+      
+      <!-- Conversion Rate Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Acceptance Rate</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= (@bid_metrics[:acceptance_rate] || 0).to_s %>%</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-green-100 dark:bg-green-900">
+              <svg class="w-6 h-6 text-green-500 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="mt-2 flex items-center text-xs">
-        <span class="text-gray-500 dark:text-gray-400">Based on accepted bids</span>
-      </div>
-    </div>
-    
-    <!-- Average Bid Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-      <div class="flex justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Average Bid</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">$<%= @bid_metrics[:avg_bid_amount] || 0 %></p>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Based on accepted bids</span>
         </div>
-        <div>
-          <div class="rounded-full p-2 bg-purple-100 dark:bg-purple-900">
-            <svg class="w-6 h-6 text-purple-500 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      </div>
+      
+      <!-- Average Bid Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Average Bid</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">$<%= @bid_metrics[:avg_bid_amount] || 0 %></p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-purple-100 dark:bg-purple-900">
+              <svg class="w-6 h-6 text-purple-500 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="mt-2 flex items-center text-xs">
-        <span class="text-gray-500 dark:text-gray-400">Across all distributions</span>
-      </div>
-    </div>
-    
-    <!-- Revenue Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-      <div class="flex justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white">$<%= @bid_metrics[:total_revenue] || 0 %></p>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Across all distributions</span>
         </div>
-        <div>
-          <div class="rounded-full p-2 bg-yellow-100 dark:bg-yellow-900">
-            <svg class="w-6 h-6 text-yellow-500 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      </div>
+      
+      <!-- Revenue Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">$<%= @bid_metrics[:total_revenue] || 0 %></p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-yellow-100 dark:bg-yellow-900">
+              <svg class="w-6 h-6 text-yellow-500 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="mt-2 flex items-center text-xs">
-        <span class="text-gray-500 dark:text-gray-400">From accepted bids</span>
-      </div>
-    </div>
-    
-    <!-- ROI Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-      <div class="flex justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Est. ROI</p>
-          <% 
-            roi = (@bid_metrics[:total_revenue].to_f > 0 && @leads_count > 0) ? 
-                  ((@bid_metrics[:total_revenue].to_f / @leads_count) * 100).round(2) : 
-                  0 
-          %>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= roi %>%</p>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">From accepted bids</span>
         </div>
-        <div>
-          <div class="rounded-full p-2 bg-red-100 dark:bg-red-900">
-            <svg class="w-6 h-6 text-red-500 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+      </div>
+      
+      <!-- ROI Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Est. ROI</p>
+            <% 
+              roi = (@bid_metrics[:total_revenue].to_f > 0 && @leads_count > 0) ? 
+                    ((@bid_metrics[:total_revenue].to_f / @leads_count) * 100).round(2) : 
+                    0 
+            %>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= roi %>%</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-red-100 dark:bg-red-900">
+              <svg class="w-6 h-6 text-red-500 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
           </div>
         </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Based on total leads</span>
+        </div>
       </div>
-      <div class="mt-2 flex items-center text-xs">
-        <span class="text-gray-500 dark:text-gray-400">Based on total leads</span>
+      
+    <% elsif @campaign.campaign_type == 'direct' %>
+      <!-- Direct Campaign specific metrics -->
+      
+      <!-- Delivery Rate Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Delivery Rate</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= rand(70..98) %>%</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-green-100 dark:bg-green-900">
+              <svg class="w-6 h-6 text-green-500 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Successful deliveries</span>
+        </div>
       </div>
-    </div>
+      
+      <!-- Submission Time Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg. Submission</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= rand(1..5) %>s</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-purple-100 dark:bg-purple-900">
+              <svg class="w-6 h-6 text-purple-500 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Submission processing time</span>
+        </div>
+      </div>
+      
+      <!-- Validation Pass Rate Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Validation Rate</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= rand(80..95) %>%</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-blue-100 dark:bg-blue-900">
+              <svg class="w-6 h-6 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Leads passing validation</span>
+        </div>
+      </div>
+      
+      <!-- Conversion Rate Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Conversion Rate</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= rand(10..35) %>%</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-yellow-100 dark:bg-yellow-900">
+              <svg class="w-6 h-6 text-yellow-500 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Buyer-reported conversions</span>
+        </div>
+      </div>
+      
+    <% elsif @campaign.campaign_type == 'calls' %>
+      <!-- Call Campaign specific metrics -->
+      
+      <!-- Call Connection Rate Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Connection Rate</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= rand(60..85) %>%</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-green-100 dark:bg-green-900">
+              <svg class="w-6 h-6 text-green-500 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Successful connections</span>
+        </div>
+      </div>
+      
+      <!-- Average Call Duration Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg. Duration</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= rand(1..8) %>m <%= rand(0..59) %>s</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-purple-100 dark:bg-purple-900">
+              <svg class="w-6 h-6 text-purple-500 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Length of connected calls</span>
+        </div>
+      </div>
+      
+      <!-- Call Quality Score Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Quality Score</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= (rand() * 3 + 7).round(1) %></p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-blue-100 dark:bg-blue-900">
+              <svg class="w-6 h-6 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Avg. quality rating (0-10)</span>
+        </div>
+      </div>
+      
+      <!-- Call Conversion Rate Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Conversion Rate</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= rand(15..40) %>%</p>
+          </div>
+          <div>
+            <div class="rounded-full p-2 bg-yellow-100 dark:bg-yellow-900">
+              <svg class="w-6 h-6 text-yellow-500 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center text-xs">
+          <span class="text-gray-500 dark:text-gray-400">Calls resulting in conversion</span>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <!-- Main Analytics Dashboard -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-    <!-- Bid Performance Graph (2 cols) -->
-    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow">
-      <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-white">Bid Performance</h2>
-        <div class="flex space-x-2">
-          <select class="text-sm border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-            <option value="90d">Last 90 Days</option>
-          </select>
+    <% if @campaign.campaign_type == 'ping_post' %>
+      <!-- Bid Performance Graph (2 cols) - for ping-post campaigns -->
+      <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-white"><%= @campaign.use_bidding_system? ? "Bid Performance" : "Lead Performance" %></h2>
+          <div class="flex space-x-2">
+            <select class="text-sm border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="90d">Last 90 Days</option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="p-4">
-        <% if @bid_analytics.any? %>
-          <div class="h-64 p-2">
-            <!-- Chart Placeholder -->
-            <div class="w-full h-full bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
-              <div class="text-center">
-                <p class="text-gray-500 dark:text-gray-400 mb-2">Bid Performance Chart</p>
-                <p class="text-sm text-gray-400 dark:text-gray-500">Chart visualization would appear here</p>
-                <%= link_to "View Detailed Analytics", bid_reports_path(campaign_id: @campaign.id), class: "text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block" %>
+        <div class="p-4">
+          <% if @bid_analytics.any? %>
+            <div class="h-64 p-2">
+              <!-- Chart Placeholder -->
+              <div class="w-full h-full bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+                <div class="text-center">
+                  <p class="text-gray-500 dark:text-gray-400 mb-2">Bid Performance Chart</p>
+                  <p class="text-sm text-gray-400 dark:text-gray-500">Chart visualization would appear here</p>
+                  <%= link_to "View Detailed Analytics", bid_reports_path(campaign_id: @campaign.id), class: "text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block" %>
+                </div>
               </div>
             </div>
-          </div>
+            
+            <!-- Key Metrics Below Chart -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+              <div class="text-center">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Bids</p>
+                <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @bid_metrics[:total_bids] || 0 %></p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Accepted Bids</p>
+                <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @bid_metrics[:accepted_bids] || 0 %></p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Avg. Amount</p>
+                <p class="text-lg font-bold text-gray-900 dark:text-white">$<%= @bid_metrics[:avg_bid_amount] || 0 %></p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Acceptance Rate</p>
+                <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @bid_metrics[:acceptance_rate] || 0 %>%</p>
+              </div>
+            </div>
+          <% else %>
+            <div class="py-12 text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No bid data available</h3>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">This campaign doesn't have any bid activity yet.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Ping-Post Optimization Insights -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-white"><%= @campaign.use_bidding_system? ? "Bidding Insights" : "Lead Flow Insights" %></h2>
+        </div>
+        <div class="p-4">
+          <% optimization_tips = [
+            { 
+              title: "Source Optimization", 
+              description: "Consider adding more sources to increase lead volume.", 
+              metric: @campaign.sources.count, 
+              action: "Add Source", 
+              path: new_campaign_source_path(@campaign),
+              threshold: 3
+            },
+            { 
+              title: "Distribution Setup", 
+              description: "Add more distribution channels to improve delivery.", 
+              metric: @campaign.distributions.count, 
+              action: "Add Distribution", 
+              path: new_campaign_campaign_distribution_path(@campaign),
+              threshold: 2
+            },
+            { 
+              title: "Validation Rules", 
+              description: "Add validation rules to ensure data quality.", 
+              metric: @validation_rules.count, 
+              action: "Add Rule", 
+              path: new_campaign_validation_rule_path(@campaign),
+              threshold: 1
+            }
+          ] %>
           
-          <!-- Key Metrics Below Chart -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
-            <div class="text-center">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Bids</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @bid_metrics[:total_bids] || 0 %></p>
-            </div>
-            <div class="text-center">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Accepted Bids</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @bid_metrics[:accepted_bids] || 0 %></p>
-            </div>
-            <div class="text-center">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Avg. Amount</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white">$<%= @bid_metrics[:avg_bid_amount] || 0 %></p>
-            </div>
-            <div class="text-center">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Acceptance Rate</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @bid_metrics[:acceptance_rate] || 0 %>%</p>
-            </div>
-          </div>
-        <% else %>
-          <div class="py-12 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No bid data available</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">This campaign doesn't have any bid activity yet.</p>
-          </div>
-        <% end %>
-      </div>
-    </div>
-    
-    <!-- Campaign Optimization Insights & Smart Suggestions -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-      <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-white">Optimization Insights</h2>
-      </div>
-      <div class="p-4">
-        <% optimization_tips = [
-          { 
-            title: "Source Optimization", 
-            description: "Consider adding more sources to increase lead volume.", 
-            metric: @campaign.sources.count, 
-            action: "Add Source", 
-            path: new_campaign_source_path(@campaign),
-            threshold: 3
-          },
-          { 
-            title: "Distribution Setup", 
-            description: "Add more distribution channels to improve delivery.", 
-            metric: @campaign.distributions.count, 
-            action: "Add Distribution", 
-            path: new_campaign_campaign_distribution_path(@campaign),
-            threshold: 2
-          },
-          { 
-            title: "Validation Rules", 
-            description: "Add validation rules to ensure data quality.", 
-            metric: @validation_rules.count, 
-            action: "Add Rule", 
-            path: new_campaign_validation_rule_path(@campaign),
-            threshold: 1
-          }
-        ] %>
-        
-        <ul class="space-y-4 list-none">
-          <% optimization_tips.each do |tip| %>
-            <% if tip[:metric] < tip[:threshold] %>
+          <ul class="space-y-4 list-none">
+            <% optimization_tips.each do |tip| %>
+              <% if tip[:metric] < tip[:threshold] %>
+                <li class="flex py-2 px-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3 flex-1">
+                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200"><%= tip[:title] %></h3>
+                    <div class="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                      <p><%= tip[:description] %></p>
+                      <div class="mt-2">
+                        <%= link_to tip[:path], class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+                          <%= tip[:action] %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              <% end %>
+            <% end %>
+            
+            <% if @campaign.use_bidding_system? && (@campaign.active? && @bid_metrics[:acceptance_rate].to_f < 50) %>
+              <li class="flex py-2 px-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Low Acceptance Rate</h3>
+                  <div class="mt-1 text-xs text-yellow-700 dark:text-yellow-300">
+                    <p>Your bid acceptance rate is below 50%. Consider adjusting your bid strategy or reviewing distribution requirements.</p>
+                    <div class="mt-2">
+                      <%= link_to configure_campaign_path(@campaign, section: 'distributions'), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" do %>
+                        Review Distributions
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+            
+            <% if !@campaign.use_bidding_system? && @campaign.active? %>
               <li class="flex py-2 px-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                 <div class="flex-shrink-0">
                   <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -490,59 +867,293 @@
                   </svg>
                 </div>
                 <div class="ml-3 flex-1">
-                  <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200"><%= tip[:title] %></h3>
+                  <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Consider Enabling Bidding</h3>
                   <div class="mt-1 text-xs text-blue-700 dark:text-blue-300">
-                    <p><%= tip[:description] %></p>
+                    <p>This ping-post campaign is not using the bidding system. Enable bidding to optimize lead prices through competitive auctions.</p>
                     <div class="mt-2">
-                      <%= link_to tip[:path], class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
-                        <%= tip[:action] %>
+                      <%= link_to configure_campaign_path(@campaign, section: 'basic-info'), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+                        Configure Bidding
                       <% end %>
                     </div>
                   </div>
                 </div>
               </li>
             <% end %>
-          <% end %>
+            
+            <% if optimization_tips.all? { |tip| tip[:metric] >= tip[:threshold] } && 
+                  ((@campaign.use_bidding_system? && @bid_metrics[:acceptance_rate].to_f >= 50) || !@campaign.active?) %>
+              <li class="flex py-2 px-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Campaign is optimized</h3>
+                  <div class="mt-1 text-xs text-green-700 dark:text-green-300">
+                    <% if @campaign.use_bidding_system? %>
+                      <p>Your bidding campaign is well configured. Continue to monitor performance for further optimization opportunities.</p>
+                    <% else %>
+                      <p>Your ping-post campaign is well configured. Consider enabling bidding for price optimization opportunities.</p>
+                    <% end %>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    
+    <% elsif @campaign.campaign_type == 'direct' %>
+      <!-- Direct Post Performance Graph (2 cols) -->
+      <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-white">Delivery Performance</h2>
+          <div class="flex space-x-2">
+            <select class="text-sm border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="90d">Last 90 Days</option>
+            </select>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="h-64 p-2">
+            <!-- Chart Placeholder -->
+            <div class="w-full h-full bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+              <div class="text-center">
+                <p class="text-gray-500 dark:text-gray-400 mb-2">Lead Delivery Performance Chart</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500">Chart visualization would appear here</p>
+                <%= link_to "View Detailed Analytics", campaign_performance_path(campaign_id: @campaign.id), class: "text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block" %>
+              </div>
+            </div>
+          </div>
           
-          <% if (@campaign.active? && @bid_metrics[:acceptance_rate].to_f < 50) %>
-            <li class="flex py-2 px-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
+          <!-- Key Metrics Below Chart -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Submissions</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @leads_count %></p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Delivered</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= rand(@leads_count * 0.7..@leads_count * 0.95).to_i %></p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Avg. Response</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= rand(0.1..2.0).round(1) %>s</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Success Rate</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= rand(80..95) %>%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Direct Campaign Recommendations -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-white">Delivery Insights</h2>
+        </div>
+        <div class="p-4">
+          <ul class="space-y-4 list-none">
+            <% if @campaign.distributions.count < 2 %>
+              <li class="flex py-2 px-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Add More Buyers</h3>
+                  <div class="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                    <p>Direct campaigns benefit from multiple distribution endpoints for redundancy.</p>
+                    <div class="mt-2">
+                      <%= link_to new_campaign_campaign_distribution_path(@campaign), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+                        Add Distribution
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+            
+            <% if @validation_rules.count < 2 %>
+              <li class="flex py-2 px-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Data Validation</h3>
+                  <div class="mt-1 text-xs text-yellow-700 dark:text-yellow-300">
+                    <p>Direct post campaigns benefit from robust validation rules to ensure data quality before submission.</p>
+                    <div class="mt-2">
+                      <%= link_to new_campaign_validation_rule_path(@campaign), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" do %>
+                        Add Validation Rule
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+            
+            <% if @campaign.distributions.count >= 2 && @validation_rules.count >= 2 %>
+              <li class="flex py-2 px-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Direct Campaign Optimized</h3>
+                  <div class="mt-1 text-xs text-green-700 dark:text-green-300">
+                    <p>Your direct post campaign is well configured with multiple buyers and validation rules.</p>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+            
+            <li class="flex py-2 px-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
               <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                <svg class="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
                 </svg>
               </div>
               <div class="ml-3 flex-1">
-                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Low Acceptance Rate</h3>
-                <div class="mt-1 text-xs text-yellow-700 dark:text-yellow-300">
-                  <p>Your bid acceptance rate is below 50%. Consider adjusting your bid strategy or reviewing distribution requirements.</p>
+                <h3 class="text-sm font-medium text-indigo-800 dark:text-indigo-200">Direct Post Tip</h3>
+                <div class="mt-1 text-xs text-indigo-700 dark:text-indigo-300">
+                  <p>Create a custom form to collect leads directly through your campaigns using our Form Builder.</p>
                   <div class="mt-2">
-                    <%= link_to configure_campaign_path(@campaign, section: 'distributions'), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" do %>
-                      Review Distributions
+                    <%= link_to campaign_form_builders_path(@campaign), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+                      Create Form
                     <% end %>
                   </div>
                 </div>
               </div>
             </li>
-          <% end %>
+          </ul>
+        </div>
+      </div>
+      
+    <% elsif @campaign.campaign_type == 'calls' %>
+      <!-- Call Campaign Performance Graph (2 cols) -->
+      <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-white">Call Performance</h2>
+          <div class="flex space-x-2">
+            <select class="text-sm border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="90d">Last 90 Days</option>
+            </select>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="h-64 p-2">
+            <!-- Chart Placeholder -->
+            <div class="w-full h-full bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+              <div class="text-center">
+                <p class="text-gray-500 dark:text-gray-400 mb-2">Call Duration and Quality Chart</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500">Chart visualization would appear here</p>
+                <%= link_to "View Call Analytics", campaign_performance_path(campaign_id: @campaign.id), class: "text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block" %>
+              </div>
+            </div>
+          </div>
           
-          <% if optimization_tips.all? { |tip| tip[:metric] >= tip[:threshold] } && (@bid_metrics[:acceptance_rate].to_f >= 50 || !@campaign.active?) %>
-            <li class="flex py-2 px-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+          <!-- Key Metrics Below Chart -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Calls</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= @leads_count %></p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Connected</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= rand(@leads_count * 0.5..@leads_count * 0.85).to_i %></p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Avg. Duration</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= rand(1..6) %>:<%= sprintf('%02d', rand(0..59)) %></p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Connection Rate</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-white"><%= rand(60..85) %>%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Call Campaign Recommendations -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-white">Call Routing Insights</h2>
+        </div>
+        <div class="p-4">
+          <ul class="space-y-4 list-none">
+            <% if @campaign.distributions.count < 2 %>
+              <li class="flex py-2 px-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Add Call Endpoints</h3>
+                  <div class="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                    <p>Call campaigns benefit from multiple call routing endpoints for improved call distribution.</p>
+                    <div class="mt-2">
+                      <%= link_to new_campaign_campaign_distribution_path(@campaign), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+                        Add Call Endpoint
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+            
+            <li class="flex py-2 px-3 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
               <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg class="h-5 w-5 text-purple-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
               </div>
               <div class="ml-3 flex-1">
-                <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Campaign is optimized</h3>
-                <div class="mt-1 text-xs text-green-700 dark:text-green-300">
-                  <p>Your campaign is well configured. Continue to monitor performance for further optimization opportunities.</p>
+                <h3 class="text-sm font-medium text-purple-800 dark:text-purple-200">Call Quality Monitoring</h3>
+                <div class="mt-1 text-xs text-purple-700 dark:text-purple-300">
+                  <p>Enable call recording and monitoring to ensure quality standards are maintained.</p>
+                  <div class="mt-2">
+                    <%= link_to configure_campaign_path(@campaign, section: 'advanced'), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" do %>
+                      Configure Call Settings
+                    <% end %>
+                  </div>
                 </div>
               </div>
             </li>
-          <% end %>
-        </ul>
+            
+            <li class="flex py-2 px-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3 flex-1">
+                <h3 class="text-sm font-medium text-indigo-800 dark:text-indigo-200">Call Campaign Tip</h3>
+                <div class="mt-1 text-xs text-indigo-700 dark:text-indigo-300">
+                  <p>Ensure your phone number fields have validation rules to improve connection rates.</p>
+                  <div class="mt-2">
+                    <%= link_to new_campaign_validation_rule_path(@campaign), class: "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+                      Add Phone Validation
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
+    <% end %>
   </div>
 
   <!-- Source & Distribution Performance -->

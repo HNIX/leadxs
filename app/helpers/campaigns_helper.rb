@@ -147,4 +147,49 @@ module CampaignsHelper
       }
     ]
   end
+  
+  # Format campaign dates for display
+  def format_campaign_dates(campaign)
+    if campaign.start_date.present? && campaign.end_date.present?
+      "#{campaign.start_date.strftime('%b %d, %Y')} to #{campaign.end_date.strftime('%b %d, %Y')}"
+    elsif campaign.start_date.present?
+      "Starting #{campaign.start_date.strftime('%b %d, %Y')}"
+    elsif campaign.end_date.present?
+      "Until #{campaign.end_date.strftime('%b %d, %Y')}"
+    else
+      "No date restrictions"
+    end
+  end
+  
+  # Get campaign date status
+  def campaign_date_status(campaign)
+    today = Date.current
+    
+    if campaign.start_date.present? && campaign.end_date.present?
+      if today < campaign.start_date
+        { status: "upcoming", label: "Upcoming", color: "text-purple-600 dark:text-purple-400" }
+      elsif today > campaign.end_date
+        { status: "ended", label: "Ended", color: "text-red-600 dark:text-red-400" }
+      else
+        days_left = (campaign.end_date - today).to_i
+        { status: "active", label: "#{days_left} days left", color: "text-green-600 dark:text-green-400" }
+      end
+    elsif campaign.start_date.present?
+      if today < campaign.start_date
+        days_until = (campaign.start_date - today).to_i
+        { status: "upcoming", label: "Starts in #{days_until} days", color: "text-purple-600 dark:text-purple-400" }
+      else
+        { status: "active", label: "No end date", color: "text-green-600 dark:text-green-400" }
+      end
+    elsif campaign.end_date.present?
+      if today > campaign.end_date
+        { status: "ended", label: "Ended", color: "text-red-600 dark:text-red-400" }
+      else
+        days_left = (campaign.end_date - today).to_i
+        { status: "active", label: "#{days_left} days left", color: "text-green-600 dark:text-green-400" }
+      end
+    else
+      { status: "active", label: "No date restrictions", color: "text-gray-600 dark:text-gray-400" }
+    end
+  end
 end

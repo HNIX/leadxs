@@ -298,6 +298,15 @@ class CampaignsController < ApplicationController
       :minimum_bid_amount,
       :multi_distribution_strategy,
       :max_distributions,
+      :start_date,
+      :end_date,
+      :expected_volume,
+      :track_conversions,
+      :call_recording_enabled,
+      :debug_mode,
+      :notify_on_bid,
+      :notify_on_reject,
+      :notify_on_failure,
       distribution_schedule_days: []
     )
   end

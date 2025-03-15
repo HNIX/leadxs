@@ -175,26 +175,13 @@
                   <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", required: true %>
                   <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">A descriptive name for this campaign.</p>
                 </div>
-                
-                <div>
-                  <%= form.label :company_id, "Company", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-                  <%= form.collection_select :company_id, Company.order(:name), :id, :name, { include_blank: "Select a company" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", required: true } %>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">The company that owns this campaign.</p>
-                </div>
-              </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <%= form.label :contact_id, "Primary Contact", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-                  <%= form.collection_select :contact_id, Contact.sorted, :id, :full_name, { include_blank: "Select a contact" }, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" } %>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">The primary point of contact for this campaign.</p>
-                </div>
-                
                 <div>
                   <%= form.label :status, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
                   <%= form.select :status, Campaign::STATUSES.map { |s| [s.humanize, s] }, {}, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" } %>
                   <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Current operating status of this campaign.</p>
                 </div>
+                
               </div>
 
               <div>
@@ -245,65 +232,6 @@
                   </div>
                 </div>
               </div>
-
-              <div>
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Lead Bidding Configuration</h3>
-                
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                  <div class="mb-4">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center">
-                        <%= form.check_box :bidding_enabled, class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded" %>
-                        <%= form.label :bidding_enabled, "Enable Lead Bidding", class: "ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-                      </div>
-                      
-                      <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center" onclick="window.open('<%= lead_bidding_docs_path %>', '_blank'); return false;">
-                        <span>Learn about bidding</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline ml-1" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                          <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                        </svg>
-                      </a>
-                    </div>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 ml-6">When enabled, leads will be offered to buyers for bidding before distribution.</p>
-                  </div>
-                  
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <%= form.label :multi_distribution_strategy, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-                      <%= form.select :multi_distribution_strategy, Campaign::MULTI_DISTRIBUTION_STRATEGIES.map { |s| [s.humanize, s] }, {}, { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" } %>
-                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">How leads should be distributed when multiple buyers are available.</p>
-                    </div>
-                    
-                    <div>
-                      <%= form.label :min_bid_threshold, "Minimum Bid Threshold ($)", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-                      <div class="mt-1 relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
-                        </div>
-                        <%= form.number_field :min_bid_threshold, class: "pl-7 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", min: 0, step: 0.01 %>
-                      </div>
-                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Minimum acceptable bid for leads in this campaign.</p>
-                    </div>
-                  </div>
-                  
-                  <div class="mt-4">
-                    <div>
-                      <%= form.label :bid_timeout_seconds, "Bid Timeout (seconds)", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-                      <%= form.number_field :bid_timeout_seconds, min: 5, max: 300, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
-                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Time to wait for bids before selecting a winner (5-300 seconds)</p>
-                    </div>
-                  </div>
-                  
-                  <div class="mt-4">
-                    <div>
-                      <%= form.label :max_distributions, "Max Distributions", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-                      <%= form.number_field :max_distributions, min: 1, max: 20, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
-                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum number of distributions to attempt for each lead</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
               
               <div class="mt-6">
                 <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Distribution Schedule</h3>
@@ -348,6 +276,10 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+              <%= form.submit class: "btn btn-primary" %>
             </div>
           <% end %>
         </div>
@@ -1410,23 +1342,6 @@
       
     </div>
     
-    <!-- Sticky Action Bar (only visible for basic, advanced, and bidding sections) -->
-    <div data-controller="sticky-bar section-aware-bar" data-section-aware-bar-visible-sections-value='["basic-info", "advanced", "bidding"]' class="mt-8">
-      <div 
-        data-sticky-bar-target="bar" 
-        data-section-aware-bar-target="bar"
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg py-3 px-4 shadow-lg z-10 transition-all transform duration-300 ease-in-out hidden">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
-          <div class="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
-            Last updated: <%= @campaign.updated_at.strftime("%b %d, %Y %H:%M") %>
-          </div>
-          <div class="flex space-x-3 w-full sm:w-auto">
-            <%= link_to "Cancel", campaign_path(@campaign), class: "btn btn-white flex-1 sm:flex-none" %>
-            <button type="button" class="btn btn-primary flex-1 sm:flex-none" onclick="document.getElementById('campaign-form').submit()">Save Changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </main>
 </div>
 

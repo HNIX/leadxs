@@ -177,6 +177,23 @@
               </div>
             </div>
             
+            <% if campaign.start_date.present? || campaign.end_date.present? %>
+              <% date_status = campaign_date_status(campaign) %>
+              <div class="flex items-center mb-3 border-t border-gray-100 dark:border-gray-700 pt-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <div class="flex justify-between w-full">
+                  <span class="text-sm text-gray-600 dark:text-gray-300">
+                    <%= format_campaign_dates(campaign) %>
+                  </span>
+                  <span class="text-xs font-medium <%= date_status[:color] %>">
+                    <%= date_status[:label] %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
+            
             <div class="grid grid-cols-3 gap-2 border-t border-gray-200 dark:border-gray-700 pt-3">
               <div class="text-center">
                 <div class="text-xs text-gray-500 dark:text-gray-400">Fields</div>
