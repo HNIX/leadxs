@@ -9,6 +9,41 @@ module BidReportsHelper
     ]
   end
   
+  # Generate breadcrumbs for bid report pages
+  def bid_report_breadcrumbs(options = {})
+    content_for :breadcrumbs do
+      breadcrumbs = [
+        { title: "Home", path: root_path },
+        { title: "Bidding", path: bid_dashboard_path }
+      ]
+      
+      if options[:campaign].present?
+        breadcrumbs << { title: options[:campaign].name, path: campaign_path(options[:campaign]) }
+      end
+      
+      breadcrumbs << { title: options[:report_type].present? ? "#{options[:report_type].titleize} Report" : "Reports", path: options[:return_path] || bid_reports_path }
+      
+      if options[:detail].present?
+        breadcrumbs << { title: options[:detail], active: true }
+      end
+      
+      render partial: "shared/breadcrumbs", locals: {
+        breadcrumbs: breadcrumbs
+      }
+    end
+  end
+  
+  # Generate a title for the report that includes the campaign name if present
+  def generate_report_title(options = {})
+    base_title = options[:report_type].present? ? "#{options[:report_type].titleize} Performance" : "Bid Performance"
+    
+    if options[:campaign].present?
+      "#{base_title} for #{options[:campaign].name}"
+    else
+      base_title
+    end
+  end
+  
   # Format the snapshot period for display
   def format_snapshot_period(snapshot)
     case snapshot.period_type

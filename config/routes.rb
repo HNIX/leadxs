@@ -118,6 +118,7 @@ Rails.application.routes.draw do
     member do
       post 'sync_vertical_fields'
       get 'configure'
+      get 'api_documentation'
     end
     
     # Campaign Distributions for this campaign

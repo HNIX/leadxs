@@ -1,14 +1,19 @@
-<h1 class="text-2xl font-bold mb-4">Edit Form Configuration</h1>
+<% form_builder_edit_breadcrumbs(@campaign, @form_builder) %>
 
-<div class="mb-4">
-  <p class="text-gray-600">
-    Update the form configuration and appearance settings. 
-    To modify form fields and structure, use the form builder interface.
-  </p>
-</div>
+<% render_context_header(
+  title: "Edit Form: #{@form_builder.name}",
+  subtitle: "Update form configuration and appearance settings",
+  back_path: campaign_form_builder_path(@campaign, @form_builder),
+  back_text: "Back to Form Builder"
+) if defined?(render_context_header) %>
 
-<%= render "form", campaign: @campaign, form_builder: @form_builder %>
+<div class="container mx-auto py-6">
+  <div class="mb-4">
+    <p class="text-gray-600 dark:text-gray-300">
+      Update the form configuration and appearance settings. 
+      To modify form fields and structure, use the form builder interface.
+    </p>
+  </div>
 
-<div class="mt-4">
-  <%= link_to "Back to form", campaign_form_builder_path(@campaign, @form_builder), class: "text-indigo-600 hover:text-indigo-900" %>
+  <%= render "form", campaign: @campaign, form_builder: @form_builder %>
 </div>

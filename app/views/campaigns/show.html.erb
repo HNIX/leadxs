@@ -52,7 +52,142 @@
   ) 
 %>
 
-<div class="container mx-auto py-2">
+<div class="container mx-auto">
+  <!-- Quick Navigation Links -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden">
+    <div class="px-4 py-3 bg-blue-50 dark:bg-blue-900 border-b border-blue-100 dark:border-blue-800">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+            Quick Navigation
+          </h3>
+        </div>
+      </div>
+    </div>
+    
+    <div class="px-4 py-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <!-- Campaign Dashboard -->
+        <%= link_to campaign_dashboard_path(campaign_id: @campaign.id), class: "flex items-center p-3 border rounded-lg border-blue-200 bg-blue-50 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors duration-150" do %>
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+              Bidding Dashboard
+            </h3>
+            <p class="text-xs text-blue-600 dark:text-blue-300">
+              Real-time bidding analytics
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <svg class="h-4 w-4 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        <% end %>
+        
+        <!-- Source Performance Report -->
+        <%= link_to reports_sources_path(campaign_id: @campaign.id), class: "flex items-center p-3 border rounded-lg border-green-200 bg-green-50 hover:bg-green-100 dark:border-green-800 dark:bg-green-900/30 dark:hover:bg-green-900/50 transition-colors duration-150" do %>
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-green-500 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
+              <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
+              <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-green-800 dark:text-green-200">
+              Source Performance
+            </h3>
+            <p class="text-xs text-green-600 dark:text-green-300">
+              Source analytics report
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <svg class="h-4 w-4 text-green-500 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        <% end %>
+        
+        <!-- Buyer Performance Report -->
+        <%= link_to reports_buyers_path(campaign_id: @campaign.id), class: "flex items-center p-3 border rounded-lg border-purple-200 bg-purple-50 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 transition-colors duration-150" do %>
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-purple-500 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-purple-800 dark:text-purple-200">
+              Buyer Performance
+            </h3>
+            <p class="text-xs text-purple-600 dark:text-purple-300">
+              Buyer conversion metrics
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <svg class="h-4 w-4 text-purple-500 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        <% end %>
+        
+        <!-- API Documentation -->
+        <%= link_to api_documentation_campaign_path(@campaign), class: "flex items-center p-3 border rounded-lg border-orange-200 bg-orange-50 hover:bg-orange-100 dark:border-orange-800 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 transition-colors duration-150" do %>
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-orange-500 dark:text-orange-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-orange-800 dark:text-orange-200">
+              API Documentation
+            </h3>
+            <p class="text-xs text-orange-600 dark:text-orange-300">
+              Integration guide for sources
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <svg class="h-4 w-4 text-orange-500 dark:text-orange-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        <% end %>
+        
+        <!-- Form Builders -->
+        <%= link_to campaign_form_builders_path(@campaign), class: "flex items-center p-3 border rounded-lg border-indigo-200 bg-indigo-50 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 transition-colors duration-150" do %>
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-indigo-500 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13 7H7v6h6V7z" />
+              <path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3 flex-grow">
+            <h3 class="text-sm font-medium text-indigo-800 dark:text-indigo-200">
+              Form Builders
+            </h3>
+            <p class="text-xs text-indigo-600 dark:text-indigo-300">
+              Create web forms for lead capture
+            </p>
+          </div>
+          <div class="flex-shrink-0">
+            <svg class="h-4 w-4 text-indigo-500 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
   <% if @campaign.draft? || (@campaign.sources.count == 0 || @campaign.distributions.count == 0 || @campaign_fields.count == 0) %>
     <!-- Campaign Completion Progress Tracker -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden">

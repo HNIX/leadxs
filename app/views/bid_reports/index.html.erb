@@ -1,6 +1,15 @@
+<% 
+  # Set up breadcrumbs with campaign context if available
+  report_type = params[:report_type] || 'performance'
+  bid_report_breadcrumbs(
+    campaign: @campaign,
+    report_type: report_type
+  ) 
+%>
+
 <div class="container px-4 mx-auto my-8">
   <div class="flex items-center justify-between mb-4">
-    <h1 class="h2"><%= @title || "Bid Performance Reports" %></h1>
+    <h1 class="h2"><%= generate_report_title(campaign: @campaign, report_type: report_type) %></h1>
     <% if current_user.admin? %>
       <%= link_to bid_reports_path(period_type: @period_type, generate: true), class: "btn btn-outline flex items-center", data: { turbo_method: :get } do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

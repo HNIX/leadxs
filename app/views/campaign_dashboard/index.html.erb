@@ -1,8 +1,25 @@
+<% 
+  breadcrumbs = [
+    { title: "Home", path: root_path },
+    { title: "Bidding", path: bid_dashboard_path }
+  ]
+  
+  if @selected_campaign.present?
+    breadcrumbs << { title: @selected_campaign.name, path: campaign_path(@selected_campaign) }
+  end
+  
+  breadcrumbs << { title: "Campaign Dashboard", active: true }
+  
+  content_for :breadcrumbs do
+    render partial: "shared/breadcrumbs", locals: { breadcrumbs: breadcrumbs }
+  end
+%>
+
 <div class="container mx-auto px-4 py-8">
   <!-- Dashboard Header -->
   <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold mb-2">Campaign Performance Dashboard</h1>
+      <h1 class="text-2xl font-bold mb-2"><%= @selected_campaign ? "Dashboard for #{@selected_campaign.name}" : "Campaign Performance Dashboard" %></h1>
       <p class="text-gray-500 dark:text-gray-400">
         <%= @selected_campaign ? "Campaign: #{@selected_campaign.name}" : "All Campaigns" %>
         • <%= "#{@start_date.strftime('%b %d, %Y')} - #{@end_date.strftime('%b %d, %Y')}" %>

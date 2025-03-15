@@ -2,6 +2,7 @@ class FormBuildersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_campaign
   before_action :set_form_builder, except: [:index, :new, :create]
+  helper :form_builders
   
   def index
     @form_builders = @campaign.form_builders
@@ -22,7 +23,11 @@ class FormBuildersController < ApplicationController
   end
   
   def create
-    @form_builder = @campaign.form_builders.new(form_builder_params)
+    # Process the flat parameters into nested structure
+    processed_params = process_flat_config_params(params[:form_builder])
+    
+    # Create the form builder with processed params
+    @form_builder = @campaign.form_builders.new(processed_params)
     
     respond_to do |format|
       if @form_builder.save
@@ -42,8 +47,11 @@ class FormBuildersController < ApplicationController
   end
   
   def update
+    # Process the flat parameters into nested structure
+    processed_params = process_flat_config_params(params[:form_builder])
+    
     respond_to do |format|
-      if @form_builder.update(form_builder_params)
+      if @form_builder.update(processed_params)
         format.html { redirect_to campaign_form_builder_path(@campaign, @form_builder), notice: "Form builder was successfully updated." }
         format.json { render :show, status: :ok, location: @form_builder }
       else
@@ -126,5 +134,59 @@ class FormBuildersController < ApplicationController
         :custom_js
       ]
     )
+  end
+  
+  # Process flat config parameters like form_config_layout into nested form
+  def process_flat_config_params(form_params)
+    return params.require(:form_builder).permit(:name, :status) if form_params.blank?
+    
+    # Create a processed params hash with the basic attributes
+    processed = params.require(:form_builder).permit(:name, :status).to_h
+    
+    # Create the config hashes
+    processed[:form_config] = {}
+    processed[:theme_config] = {}
+    processed[:tracking_config] = {}
+    
+    # Get the raw parameters as strings for regex matching
+    raw_params = params[:form_builder].keys
+    
+    # Process form_config parameters
+    raw_params.grep(/^form_config_/).each do |key|
+      config_key = key.sub('form_config_', '')
+      value = params[:form_builder][key]
+      processed[:form_config][config_key] = value
+    end
+    
+    # Process theme_config parameters
+    raw_params.grep(/^theme_config_/).each do |key|
+      config_key = key.sub('theme_config_', '')
+      value = params[:form_builder][key]
+      processed[:theme_config][config_key] = value
+    end
+    
+    # Process tracking_config parameters
+    raw_params.grep(/^tracking_config_/).each do |key|
+      config_key = key.sub('tracking_config_', '')
+      value = params[:form_builder][key]
+      processed[:tracking_config][config_key] = value
+    end
+    
+    # Convert boolean strings to actual booleans
+    convert_boolean_values(processed[:form_config])
+    convert_boolean_values(processed[:tracking_config])
+    
+    processed
+  end
+  
+  # Helper to convert "true"/"false" strings to boolean values
+  def convert_boolean_values(hash)
+    hash.each do |key, value|
+      if value == "true"
+        hash[key] = true
+      elsif value == "false"
+        hash[key] = false
+      end
+    end
   end
 end

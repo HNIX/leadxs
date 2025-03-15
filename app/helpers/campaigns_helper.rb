@@ -48,6 +48,20 @@ module CampaignsHelper
     end
   end
   
+  # Generate breadcrumbs for the campaign API documentation page
+  def campaign_api_documentation_breadcrumbs(campaign)
+    content_for :breadcrumbs do
+      render partial: "shared/breadcrumbs", locals: {
+        breadcrumbs: [
+          { title: "Home", path: root_path },
+          { title: "Campaigns", path: campaigns_path },
+          { title: campaign.name, path: campaign_path(campaign) },
+          { title: "API Documentation", active: true }
+        ]
+      }
+    end
+  end
+  
   # Generate breadcrumbs for the campaign new page
   def campaign_new_breadcrumbs
     content_for :breadcrumbs do

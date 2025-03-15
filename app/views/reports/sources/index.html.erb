@@ -3,15 +3,32 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <% end %>
 
+<% 
+  breadcrumbs = [
+    { title: "Home", path: root_path },
+    { title: "Bidding", path: bid_dashboard_path }
+  ]
+  
+  if @campaign.present?
+    breadcrumbs << { title: @campaign.name, path: campaign_path(@campaign) }
+  end
+  
+  breadcrumbs << { title: "Source Performance", active: true }
+  
+  content_for :breadcrumbs do
+    render partial: "shared/breadcrumbs", locals: { breadcrumbs: breadcrumbs }
+  end
+%>
+
 <div class="container mx-auto px-4 py-8">
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 mb-4"><%= @title %></h1>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4"><%= @title %></h1>
     
     <!-- Filters Section -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
       <%= form_with url: reports_sources_path, method: :get, data: { turbo_frame: "_top" }, class: "flex flex-wrap items-end gap-4" do |f| %>
         <div>
-          <%= f.label :period_type, "Time Period", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.label :period_type, "Time Period", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
           <%= f.select :period_type, 
                       options_for_select([
                         ["Hourly", "hourly"],
@@ -20,19 +37,19 @@
                         ["Monthly", "monthly"]
                       ], @period_type),
                       {}, 
-                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
         </div>
         
         <div>
-          <%= f.label :campaign_id, "Campaign", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.label :campaign_id, "Campaign", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
           <%= f.select :campaign_id, 
                       options_from_collection_for_select(Campaign.all, :id, :name, @campaign_id),
                       { include_blank: "All Campaigns" }, 
-                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
         </div>
         
         <div>
-          <%= f.label :sort_by, "Sort By", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.label :sort_by, "Sort By", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
           <%= f.select :sort_by, 
                       options_for_select([
                         ["Volume", "volume"],
@@ -42,18 +59,18 @@
                         ["Profit Per Lead", "profit_per_lead"]
                       ], @sort_by),
                       {}, 
-                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
         </div>
         
         <div>
-          <%= f.label :sort_direction, "Direction", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.label :sort_direction, "Direction", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
           <%= f.select :sort_direction, 
                       options_for_select([
                         ["Highest First", "desc"],
                         ["Lowest First", "asc"]
                       ], @sort_direction),
                       {}, 
-                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
+                      { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" } %>
         </div>
         
         <%= f.submit "Apply Filters", class: "px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
@@ -63,68 +80,68 @@
     <!-- Top Sources Summary -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
       <!-- Top Sources by Volume -->
-      <div class="bg-white rounded-lg shadow p-4">
-        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Sources by Volume</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Top Sources by Volume</h3>
         <% if @top_sources_by_volume.present? %>
           <ul class="space-y-2">
             <% @top_sources_by_volume.each do |source| %>
               <li class="flex justify-between">
-                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
-                <span class="text-gray-700"><%= number_with_delimiter(source[:volume]) %> leads</span>
+                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300" %></span>
+                <span class="text-gray-700 dark:text-gray-300"><%= number_with_delimiter(source[:volume]) %> leads</span>
               </li>
             <% end %>
           </ul>
         <% else %>
-          <p class="text-gray-500 italic">No data available</p>
+          <p class="text-gray-500 dark:text-gray-400 italic">No data available</p>
         <% end %>
       </div>
       
       <!-- Top Sources by Acceptance Rate -->
-      <div class="bg-white rounded-lg shadow p-4">
-        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Sources by Acceptance Rate</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Top Sources by Acceptance Rate</h3>
         <% if @top_sources_by_acceptance.present? %>
           <ul class="space-y-2">
             <% @top_sources_by_acceptance.each do |source| %>
               <li class="flex justify-between">
-                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
-                <span class="text-gray-700"><%= number_to_percentage(source[:acceptance_rate], precision: 1) %></span>
+                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300" %></span>
+                <span class="text-gray-700 dark:text-gray-300"><%= number_to_percentage(source[:acceptance_rate], precision: 1) %></span>
               </li>
             <% end %>
           </ul>
         <% else %>
-          <p class="text-gray-500 italic">No data available</p>
+          <p class="text-gray-500 dark:text-gray-400 italic">No data available</p>
         <% end %>
       </div>
       
       <!-- Top Sources by Profit Per Lead -->
-      <div class="bg-white rounded-lg shadow p-4">
-        <h3 class="text-lg font-medium text-gray-900 mb-3">Top Sources by Profit Per Lead</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Top Sources by Profit Per Lead</h3>
         <% if @top_sources_by_profit.present? %>
           <ul class="space-y-2">
             <% @top_sources_by_profit.each do |source| %>
               <li class="flex justify-between">
-                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800" %></span>
-                <span class="text-gray-700"><%= number_to_currency(source[:profit_per_lead]) %></span>
+                <span class="font-medium"><%= link_to source[:name], reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300" %></span>
+                <span class="text-gray-700 dark:text-gray-300"><%= number_to_currency(source[:profit_per_lead]) %></span>
               </li>
             <% end %>
           </ul>
         <% else %>
-          <p class="text-gray-500 italic">No data available</p>
+          <p class="text-gray-500 dark:text-gray-400 italic">No data available</p>
         <% end %>
       </div>
     </div>
     
     <!-- Main Visualization Section -->
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-medium text-gray-900">Source Performance Comparison</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Source Performance Comparison</h3>
         <% if @source_metrics.present? %>
-          <div class="flex gap-2">
-            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-indigo-100 text-indigo-800 font-medium" data-chart="volume">Volume</button>
-            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="acceptance_rate">Acceptance</button>
-            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="avg_bid_amount">Bid Amount</button>
-            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="compliance_rate">Compliance</button>
-            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 hover:bg-indigo-100 hover:text-indigo-800 font-medium" data-chart="profit_per_lead">Profit</button>
+          <div class="flex flex-wrap gap-2">
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 font-medium" data-chart="volume">Volume</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-800 dark:hover:bg-indigo-900 dark:hover:text-indigo-200 font-medium" data-chart="acceptance_rate">Acceptance</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-800 dark:hover:bg-indigo-900 dark:hover:text-indigo-200 font-medium" data-chart="avg_bid_amount">Bid Amount</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-800 dark:hover:bg-indigo-900 dark:hover:text-indigo-200 font-medium" data-chart="compliance_rate">Compliance</button>
+            <button class="chart-toggle px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-indigo-100 hover:text-indigo-800 dark:hover:bg-indigo-900 dark:hover:text-indigo-200 font-medium" data-chart="profit_per_lead">Profit</button>
           </div>
         <% end %>
       </div>
@@ -134,55 +151,55 @@
           <canvas id="sourceComparisonChart"></canvas>
         <% else %>
           <div class="flex items-center justify-center h-full">
-            <p class="text-gray-500 italic">No data available for chart visualization. Add sources and generate leads to see performance metrics.</p>
+            <p class="text-gray-500 dark:text-gray-400 italic">No data available for chart visualization. Add sources and generate leads to see performance metrics.</p>
           </div>
         <% end %>
       </div>
     </div>
     
     <!-- Sources Data Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-medium text-gray-900">Source Performance Details</h3>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Source Performance Details</h3>
       </div>
       
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acceptance Rate</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Bid Amount</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance Rate</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit Per Lead</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Revenue</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Profit</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Source</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Volume</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acceptance Rate</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Avg. Bid Amount</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Compliance Rate</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Profit Per Lead</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Revenue</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Profit</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"></th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             <% if @source_metrics.present? %>
               <% @source_metrics.each do |source| %>
-                <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= source[:name] %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= source[:company_name] %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_with_delimiter(source[:volume]) %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_percentage(source[:acceptance_rate], precision: 1) %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:avg_bid_amount]) %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_percentage(source[:compliance_rate], precision: 1) %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:profit_per_lead]) %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:total_revenue]) %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(source[:total_profit]) %></td>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"><%= source[:name] %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= source[:company_name] %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= number_with_delimiter(source[:volume]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= number_to_percentage(source[:acceptance_rate], precision: 1) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= number_to_currency(source[:avg_bid_amount]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= number_to_percentage(source[:compliance_rate], precision: 1) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= number_to_currency(source[:profit_per_lead]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= number_to_currency(source[:total_revenue]) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%= number_to_currency(source[:total_profit]) %></td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <%= link_to "View Details", reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-900" %>
+                    <%= link_to "View Details", reports_source_path(source[:id]), class: "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" %>
                   </td>
                 </tr>
               <% end %>
             <% else %>
               <tr>
-                <td colspan="10" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center italic">No data available</td>
+                <td colspan="10" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center italic">No data available</td>
               </tr>
             <% end %>
           </tbody>
@@ -204,7 +221,8 @@
     // Chart data from controller
     const chartData = <%= raw @chart_data.to_json %>;
     
-    console.log("Chart data:", chartData);
+    // Check if dark mode is active
+    const isDarkMode = document.documentElement.classList.contains('dark');
     
     // Function to create/update chart
     function updateChart(dataType) {
@@ -216,11 +234,15 @@
       // Update active button state
       document.querySelectorAll('.chart-toggle').forEach(button => {
         if (button.dataset.chart === dataType) {
-          button.classList.add('bg-indigo-100', 'text-indigo-800');
-          button.classList.remove('bg-gray-100', 'text-gray-600');
+          button.classList.add(isDarkMode ? 'bg-indigo-900' : 'bg-indigo-100');
+          button.classList.add(isDarkMode ? 'text-indigo-200' : 'text-indigo-800');
+          button.classList.remove(isDarkMode ? 'bg-gray-700' : 'bg-gray-100');
+          button.classList.remove(isDarkMode ? 'text-gray-300' : 'text-gray-600');
         } else {
-          button.classList.remove('bg-indigo-100', 'text-indigo-800');
-          button.classList.add('bg-gray-100', 'text-gray-600');
+          button.classList.remove(isDarkMode ? 'bg-indigo-900' : 'bg-indigo-100');
+          button.classList.remove(isDarkMode ? 'text-indigo-200' : 'text-indigo-800');
+          button.classList.add(isDarkMode ? 'bg-gray-700' : 'bg-gray-100');
+          button.classList.add(isDarkMode ? 'text-gray-300' : 'text-gray-600');
         }
       });
       
@@ -231,8 +253,6 @@
         return;
       }
       
-      console.log("Building chart for", dataType, "with data:", chartData[dataType]);
-    
       let chartConfig = {
         type: 'bar',
         data: {
@@ -240,8 +260,8 @@
           datasets: [{
             label: getChartLabel(dataType),
             data: chartData[dataType].data,
-            backgroundColor: 'rgba(79, 70, 229, 0.6)',
-            borderColor: 'rgba(79, 70, 229, 1)',
+            backgroundColor: isDarkMode ? 'rgba(129, 140, 248, 0.6)' : 'rgba(79, 70, 229, 0.6)',
+            borderColor: isDarkMode ? 'rgba(129, 140, 248, 1)' : 'rgba(79, 70, 229, 1)',
             borderWidth: 1
           }]
         },
@@ -250,7 +270,10 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: false
+              display: false,
+              labels: {
+                color: isDarkMode ? '#e5e7eb' : '#374151' // text color for legend in dark mode
+              }
             },
             tooltip: {
               callbacks: {
@@ -258,16 +281,33 @@
                   let value = context.raw;
                   return formatValue(value, dataType);
                 }
-              }
+              },
+              backgroundColor: isDarkMode ? 'rgba(55, 65, 81, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+              titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+              bodyColor: isDarkMode ? '#e5e7eb' : '#374151',
+              borderColor: isDarkMode ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.5)',
+              borderWidth: 1
             }
           },
           scales: {
             y: {
               beginAtZero: true,
               ticks: {
+                color: isDarkMode ? '#d1d5db' : '#6b7280', // text color for y-axis in dark mode
                 callback: function(value) {
                   return formatValue(value, dataType, true);
                 }
+              },
+              grid: {
+                color: isDarkMode ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.5)'
+              }
+            },
+            x: {
+              ticks: {
+                color: isDarkMode ? '#d1d5db' : '#6b7280' // text color for x-axis in dark mode
+              },
+              grid: {
+                display: false
               }
             }
           }

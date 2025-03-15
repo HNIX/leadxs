@@ -1,6 +1,14 @@
+<% 
+  # Set up breadcrumbs with campaign context if available 
+  bid_dashboard_breadcrumbs(
+    campaign: @campaign,
+    is_real_time: true
+  ) 
+%>
+
 <div class="container mx-auto px-4 py-8">
   <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-bold">Real-Time Bid Dashboard</h1>
+    <h1 class="text-2xl font-bold"><%= generate_dashboard_title(campaign: @campaign, is_real_time: true) %></h1>
   </div>
   
   <%= render "shared/bidding_navigation" %>

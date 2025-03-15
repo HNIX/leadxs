@@ -24,7 +24,7 @@
   ],
   actions: [
     { label: "View in Campaign", path: campaign_path(@source.campaign, anchor: "sources"), icon: "document-text", style: "outline" },
-    { label: "API Docs", path: lead_bidding_docs_path, icon: "document-text", style: "outline" },
+    { label: "API Docs", path: api_documentation_campaign_path(@source.campaign), icon: "code", style: "outline" },
     { label: "Edit Source", path: edit_source_path(@source), icon: "edit", style: "primary" }
   ]
 } %>

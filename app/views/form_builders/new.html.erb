@@ -1,14 +1,19 @@
-<h1 class="text-2xl font-bold mb-4">New Form Builder</h1>
+<% form_builder_new_breadcrumbs(@campaign) %>
 
-<div class="mb-4">
-  <p class="text-gray-600">
-    Create a form that sources can embed on their websites to collect leads for this campaign.
-    After creating the form, you'll be able to customize the fields and appearance.
-  </p>
-</div>
+<% render_context_header(
+  title: "New Form Builder",
+  subtitle: "Create a custom lead capture form for this campaign",
+  back_path: campaign_form_builders_path(@campaign),
+  back_text: "Back to Form Builders"
+) if defined?(render_context_header) %>
 
-<%= render "form", campaign: @campaign, form_builder: @form_builder %>
+<div class="container mx-auto py-6">
+  <div class="mb-4">
+    <p class="text-gray-600 dark:text-gray-300">
+      Create a form that sources can embed on their websites to collect leads for this campaign.
+      After creating the form, you'll be able to customize the fields and appearance.
+    </p>
+  </div>
 
-<div class="mt-4">
-  <%= link_to "Back to forms", campaign_form_builders_path(@campaign), class: "text-indigo-600 hover:text-indigo-900" %>
+  <%= render "form", campaign: @campaign, form_builder: @form_builder %>
 </div>

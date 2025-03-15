@@ -1,6 +1,6 @@
 class CampaignsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_campaign, only: [:show, :edit, :update, :destroy, :sync_vertical_fields, :configure]
+  before_action :set_campaign, only: [:show, :edit, :update, :destroy, :sync_vertical_fields, :configure, :api_documentation]
   before_action :set_verticals, only: [:new, :create, :edit, :update, :configure]
 
   def index
@@ -182,8 +182,59 @@ class CampaignsController < ApplicationController
       redirect_to campaign_campaign_fields_path(@campaign), alert: "Cannot sync fields: this campaign does not have a vertical assigned."
     end
   end
+  
+  def api_documentation
+    @campaign_fields = @campaign.campaign_fields.ordered
+    @validation_rules = @campaign.validation_rules.ordered
+    @source_filters = @campaign.source_filters.where(type: 'SourceFilter').includes(:campaign_field)
+    
+    # Get the source token from an existing source or generate a sample
+    sample_source = @campaign.sources.first
+    @sample_source_token = sample_source&.token || 'your_source_token_here'
+    
+    # Generate sample request payload based on campaign fields
+    @sample_payload = generate_sample_payload
+    
+    # Get field requirements information
+    @required_fields = @campaign_fields.where(required: true).pluck(:name, :field_type)
+    @field_types = @campaign_fields.pluck(:name, :field_type).to_h
+  end
 
   private
+  
+  def generate_sample_payload
+    payload = {}
+    
+    @campaign_fields.each do |field|
+      # Generate appropriate sample values based on field type
+      sample_value = case field.field_type
+      when 'text'
+        field.name.include?('name') ? 'John Doe' : 'Sample Text'
+      when 'email'
+        'example@example.com'
+      when 'phone'
+        '+1234567890'
+      when 'number'
+        42
+      when 'boolean'
+        true
+      when 'date'
+        Date.today.iso8601
+      when 'datetime'
+        Time.now.iso8601
+      when 'select'
+        field.list_values.first&.value || 'Sample Option'
+      when 'multi_select'
+        [field.list_values.first&.value || 'Sample Option']
+      else
+        'Sample Value'
+      end
+      
+      payload[field.name] = sample_value
+    end
+    
+    payload
+  end
   
   def get_date_range(period_type)
     case period_type
