@@ -1,0 +1,587 @@
+<!-- Two-panel modal dialog for source creation -->
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-backdrop fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center z-50">
+    <div class="modal-container bg-white dark:bg-gray-800 w-11/12 md:max-w-5xl mx-auto rounded-lg shadow-lg overflow-hidden relative">
+      <!-- Close button -->
+      <button type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 z-10" 
+              data-action="click->turbo-modal#hideModal">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <span class="sr-only">Close</span>
+      </button>
+      
+      <!-- Modal Header with Context -->
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center space-x-3">
+          <!-- Context indicator (campaign if applicable) -->
+          <% if @campaign %>
+            <div class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium rounded px-2 py-1 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-1">
+                <path fill-rule="evenodd" d="M1 4a1 1 0 011-1h16a1 1 0 011 1v8a1 1 0 01-1 1H2a1 1 0 01-1-1V4zm12 4a3 3 0 11-6 0 3 3 0 016 0zM4 9a1 1 0 100-2 1 1 0 000 2zm13-1a1 1 0 11-2 0 1 1 0 012 0zM1.75 14.5a.75.75 0 000 1.5c4.417 0 8.693.603 12.749 1.73 1.111.309 2.251-.512 2.251-1.696v-.784a.75.75 0 00-1.5 0v.784a.272.272 0 01-.35.25A49.043 49.043 0 001.75 14.5z" clip-rule="evenodd" />
+              </svg>
+              Campaign: <%= @campaign.name %>
+            </div>
+          <% end %>
+          
+          <!-- Breadcrumb navigation -->
+          <nav class="flex" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+              <li class="inline-flex items-center">
+                <% if @campaign %>
+                  <%= link_to "Campaigns", campaigns_path, class: "text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" %>
+                <% else %>
+                  <%= link_to "Sources", sources_path, class: "text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" %>
+                <% end %>
+              </li>
+              <li>
+                <div class="flex items-center">
+                  <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                  </svg>
+                  <% if @campaign %>
+                    <%= link_to @campaign.name, campaign_path(@campaign), class: "text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300" %>
+                  <% else %>
+                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Add Source</span>
+                  <% end %>
+                </li>
+                <% if @campaign %>
+                  <li>
+                    <div class="flex items-center">
+                      <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                      </svg>
+                      <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Add Source</span>
+                    </div>
+                  </li>
+                <% end %>
+            </ol>
+          </nav>
+        </div>
+        
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+          Add New Source
+        </h2>
+        
+        <!-- Progress indicator -->
+        <div class="mt-4 pt-2">
+          <div class="flex items-center">
+            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 mr-2">Setup Progress</div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5" data-source-form-target="progressBar">
+              <div class="bg-green-500 dark:bg-green-600 h-2.5 rounded-full" style="width: 0%" data-source-form-target="progressFill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tab Navigation -->
+      <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="flex -mb-px" aria-label="Tabs">
+          <button data-source-form-target="tabButton" data-tab="basic" class="text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400 py-4 px-6 text-center border-b-2 font-medium text-sm">
+            Basic Information
+          </button>
+          <button data-source-form-target="tabButton" data-tab="api" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 border-transparent hover:border-gray-300 dark:hover:border-gray-600 py-4 px-6 text-center border-b-2 font-medium text-sm">
+            API Settings
+          </button>
+          <button data-source-form-target="tabButton" data-tab="postback" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 border-transparent hover:border-gray-300 dark:hover:border-gray-600 py-4 px-6 text-center border-b-2 font-medium text-sm">
+            Postback URLs
+          </button>
+          <button data-source-form-target="tabButton" data-tab="security" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 border-transparent hover:border-gray-300 dark:hover:border-gray-600 py-4 px-6 text-center border-b-2 font-medium text-sm">
+            Security Settings
+          </button>
+        </nav>
+      </div>
+      
+      <!-- Two-panel Content Area -->
+      <div class="flex flex-col md:flex-row h-[calc(100vh-300px)] md:h-[600px] overflow-hidden">
+        <!-- Left Panel - Form -->
+        <div class="w-full md:w-3/5 p-6 overflow-y-auto border-r border-gray-200 dark:border-gray-700">
+          <%= form_with(model: @campaign ? [@campaign, @source] : @source, 
+                        local: true, 
+                        html: { id: "source-form" },
+                        class: "space-y-6", 
+                        data: { controller: "source-form", 
+                                action: "change->source-form#updateProgress" }) do |form| %>
+            
+            <% if @source.errors.any? %>
+              <div class="alert alert-danger mb-6 dark:bg-red-900 dark:border-red-700" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="dark:text-red-300">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                
+                <div>
+                  <h4 class="dark:text-red-200">
+                    <%= I18n.t("errors.messages.not_saved", count: @source.errors.count, resource: @source.class.model_name.human.downcase) %>
+                  </h4>
+                  <ul class="dark:text-red-200">
+                    <% @source.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            <% end %>
+            
+            <!-- Tab Content Sections -->
+            
+            <!-- Basic Information Tab -->
+            <div data-source-form-target="tabContent" data-tab="basic" class="space-y-6">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Basic Information</h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                  <%= form.text_field :name, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", required: true, data: { "source-form-target": "requiredField" } %>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Unique name for this source</p>
+                </div>
+                
+                <div>
+                  <%= form.label :company_id, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                  <%= form.collection_select :company_id, 
+                                          @companies.presence || current_account.companies.active.sorted, 
+                                          :id, 
+                                          :name, 
+                                          {include_blank: "Select a company"}, 
+                                          {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200",
+                                          required: true,
+                                          data: { "source-form-target": "requiredField" }} %>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Company that owns this source</p>
+                </div>
+              </div>
+              
+              <% unless @campaign.present? %>
+                <div class="grid grid-cols-1 gap-6">
+                  <div>
+                    <%= form.label :campaign_id, "Campaign", class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.collection_select :campaign_id, 
+                                            @campaigns.presence || [], 
+                                            :id, 
+                                            :name, 
+                                            {include_blank: "Select a campaign"}, 
+                                            {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", 
+                                            required: true,
+                                            data: { "source-form-target": "requiredField" }} %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select which campaign this source belongs to</p>
+                  </div>
+                </div>
+              <% end %>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <%= form.label :integration_type, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                  <%= form.select :integration_type, 
+                                Source::INTEGRATION_TYPES.map { |type| [type.humanize, type] }, 
+                                {}, 
+                                {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200",
+                                required: true,
+                                data: { "source-form-target": "requiredField" }} %>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">How leads will be submitted</p>
+                </div>
+                
+                <div>
+                  <%= form.label :status, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                  <%= form.select :status, 
+                                Source::STATUSES.map { |status| [status.humanize, status] }, 
+                                {}, 
+                                {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200",
+                                required: true,
+                                data: { "source-form-target": "requiredField" }} %>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Current operational status</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- API Settings Tab -->
+            <div data-source-form-target="tabContent" data-tab="api" class="hidden space-y-6">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">API Configuration</h3>
+              
+              <div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg mb-4">
+                <p class="text-sm text-blue-800 dark:text-blue-200">
+                  API settings will be generated automatically when you save this source. You'll be able to view and regenerate your API token after creation.
+                </p>
+              </div>
+              
+              <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                <legend class="font-semibold text-base dark:text-gray-200">Webhook Settings</legend>
+                <div class="mt-3 space-y-4">
+                  <div>
+                    <%= form.label :webhook_url, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.url_field :webhook_url, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">URL to receive webhook notifications (optional)</p>
+                  </div>
+                  
+                  <div>
+                    <%= form.label :webhook_secret, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.text_field :webhook_secret, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Secret key for webhook signature verification (optional)</p>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            
+            <!-- Postback URLs Tab -->
+            <div data-source-form-target="tabContent" data-tab="postback" class="hidden space-y-6">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Postback Configuration</h3>
+              
+              <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                <legend class="font-semibold text-base dark:text-gray-200">Event Postbacks</legend>
+                <div class="mt-3 space-y-4">
+                  <div>
+                    <%= form.label :success_postback_url, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.url_field :success_postback_url, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">URL to notify when leads are successfully processed</p>
+                  </div>
+                  
+                  <div>
+                    <%= form.label :failure_postback_url, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.url_field :failure_postback_url, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">URL to notify when lead processing fails</p>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            
+            <!-- Security Settings Tab -->
+            <div data-source-form-target="tabContent" data-tab="security" class="hidden space-y-6">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Security Settings</h3>
+              
+              <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                <legend class="font-semibold text-base dark:text-gray-200">Access Control</legend>
+                <div class="mt-3 space-y-4">
+                  <div>
+                    <%= form.label :ip_whitelist, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.text_field :ip_whitelist, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "192.168.1.1, 10.0.0.1" %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated list of allowed IP addresses</p>
+                  </div>
+                  
+                  <div>
+                    <%= form.label :allowed_domains, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.text_field :allowed_domains, class: "form-input w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "example.com, client-domain.com" %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated list of allowed referrer domains</p>
+                  </div>
+                </div>
+              </fieldset>
+              
+              <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                <legend class="font-semibold text-base dark:text-gray-200">Payout Configuration</legend>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                  <div>
+                    <%= form.label :payout_method, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.select :payout_method, 
+                                Source::PAYOUT_METHODS.map { |method| [method.humanize, method] }, 
+                                {include_blank: "Select payout method"}, 
+                                {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", 
+                                  data: { 
+                                    "source-form-target": "payoutMethodSelect",
+                                    action: "change->source-form#toggleFields" 
+                                  }
+                                } %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Method for calculating payouts</p>
+                  </div>
+                
+                  <div>
+                    <%= form.label :payout_structure, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <%= form.select :payout_structure, Source::PAYOUT_STRUCTURES.map { |structure| [structure.humanize, structure] }, {include_blank: "Select payout structure"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When payouts are triggered</p>
+                  </div>
+                
+                  <div data-source-form-target="payoutGroup" class="<%= 'hidden' unless @source.payout_method == 'fixed' %>">
+                    <%= form.label :payout, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                      </div>
+                      <%= form.number_field :payout, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Fixed amount per lead</p>
+                  </div>
+                
+                  <div data-source-form-target="marginGroup" class="<%= 'hidden' unless @source.payout_method == 'percentage' %>">
+                    <%= form.label :margin, class: "block text-sm font-medium text-gray-700 dark:text-gray-200", title: "Percentage margin (e.g. 0.20 for 20%)" %>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">%</span>
+                      </div>
+                      <%= form.number_field :margin, step: "0.01", min: "0", max: "1", class: "form-input w-full pr-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.20" %>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter as decimal (e.g. 0.20 for 20%)</p>
+                  </div>
+                </div>
+              </fieldset>
+              
+              <fieldset class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                <legend class="font-semibold text-base dark:text-gray-200">Budget & Performance</legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+                  <div>
+                    <%= form.label :minimum_acceptable_bid, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                      </div>
+                      <%= form.number_field :minimum_acceptable_bid, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Minimum bid to accept during bidding</p>
+                  </div>
+                </div>
+              
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+                  <div>
+                    <%= form.label :daily_budget, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                      </div>
+                      <%= form.number_field :daily_budget, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum daily spending limit</p>
+                  </div>
+              
+                  <div>
+                    <%= form.label :monthly_budget, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">$</span>
+                      </div>
+                      <%= form.number_field :monthly_budget, step: "0.01", class: "form-input w-full pl-7 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", placeholder: "0.00" %>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum monthly spending limit</p>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            
+            <div class="hidden">
+              <%= form.label :notes, class: "block text-sm font-medium text-gray-700 dark:text-gray-200" %>
+              <%= form.text_area :notes, rows: 4, class: "form-textarea w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" %>
+            </div>
+            
+            <!-- Form bottom actions -->
+            <div data-source-form-target="allTabs" class="flex flex-wrap justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700 gap-2">
+              <!-- Navigation buttons -->
+              <div class="flex items-center space-x-2">
+                <button type="button" data-source-form-target="prevButton" data-action="click->source-form#prevTab" class="hidden btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  Previous
+                </button>
+                
+                <button type="button" data-source-form-target="nextButton" data-action="click->source-form#nextTab" class="btn btn-primary">
+                  Next
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+                
+                <% if @source.persisted? %>
+                  <%= link_to "Cancel", source_path(@source), class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" %>
+                <% elsif @campaign.present? %>
+                  <%= link_to "Cancel", campaign_sources_path(@campaign), class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200", data: { action: "click->turbo-modal#hideModal" } %>
+                <% else %>
+                  <%= link_to "Cancel", sources_path, class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200", data: { action: "click->turbo-modal#hideModal" } %>
+                <% end %>
+              </div>
+              
+              <div class="flex items-center gap-2">
+                <!-- Save as draft option -->
+                <%= form.hidden_field :draft, value: false, data: { "source-form-target": "draftField" } %>
+                
+                <button type="button" class="text-blue-600 dark:text-blue-400 hover:underline text-sm" data-action="click->source-form#saveDraft">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                    <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
+                  </svg>
+                  Continue Setup Later
+                </button>
+                
+                <!-- Submit button only shown on last tab -->
+                <%= form.submit "Create Source", class: "hidden btn btn-primary", data: { "source-form-target": "submitButton" } %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <!-- Right Panel - Documentation -->
+        <div class="w-full md:w-2/5 p-6 overflow-y-auto bg-gray-50 dark:bg-gray-700">
+          <!-- Context-aware documentation -->
+          <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Where will this appear?</h3>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+              <div class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-blue-500 mr-2 mt-0.5">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                </svg>
+                <div>
+                  <% if @campaign %>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">This source will be created for <strong><%= @campaign.name %></strong> campaign and will appear in:</p>
+                    <ul class="mt-2 list-disc list-inside text-sm text-gray-600 dark:text-gray-300">
+                      <li>Campaign Sources tab</li>
+                      <li>Global Sources listing</li>
+                      <li>Bid Reports for this campaign</li>
+                    </ul>
+                  <% else %>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">This source will be created for the campaign you select and will appear in:</p>
+                    <ul class="mt-2 list-disc list-inside text-sm text-gray-600 dark:text-gray-300">
+                      <li>That campaign's Sources tab</li>
+                      <li>Global Sources listing</li>
+                      <li>Bid Reports for that campaign</li>
+                    </ul>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tab-specific documentation -->
+          <div data-source-form-target="helpContent" data-tab="basic">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Basic Information Help</h3>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Source Name</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Choose a unique, descriptive name that clearly identifies this lead source. Good naming conventions include:
+              </p>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300 mb-4">
+                <li>Company name + campaign purpose (e.g. "Acme - Facebook Ads")</li>
+                <li>Platform + specific location (e.g. "LinkedIn - Jobs Page")</li>
+                <li>Publisher + location (e.g. "TechBlog - Sidebar Form")</li>
+              </ul>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Integration Type</h4>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300 mb-2">
+                <li><strong>Affiliate:</strong> Third-party sends leads via API</li>
+                <li><strong>Web Form:</strong> Embedded form on your website</li>
+                <li><strong>Form Builder:</strong> Custom form created in our builder</li>
+              </ul>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Status</h4>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300">
+                <li><strong>Active:</strong> Source is live and accepting leads</li>
+                <li><strong>Paused:</strong> Temporarily disabled but preserving settings</li>
+                <li><strong>Archived:</strong> Permanently disabled</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div data-source-form-target="helpContent" data-tab="api" class="hidden">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">API Settings Help</h3>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">API Token</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                A unique token will be generated automatically when you create the source. You'll need to share this with your affiliate or developer.
+              </p>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Webhook Settings</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Webhooks allow our system to notify your systems when events occur:
+              </p>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300">
+                <li><strong>Webhook URL:</strong> Where we'll send event notifications</li>
+                <li><strong>Webhook Secret:</strong> Used to verify the authenticity of webhooks</li>
+              </ul>
+              
+              <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900 rounded-md">
+                <p class="text-xs text-yellow-800 dark:text-yellow-200">
+                  <strong>Note:</strong> For security, API tokens should never be shared publicly or committed to source control.
+                </p>
+              </div>
+            </div>
+            
+            <!-- Code example -->
+            <div class="mt-4">
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Sample API Request</h4>
+              <div class="bg-gray-900 p-4 rounded-lg overflow-x-auto">
+                <pre class="text-green-400 text-xs"><code>POST /api/v1/leads
+Content-Type: application/json
+Authorization: Bearer YOUR_API_TOKEN
+
+{
+  "lead": {
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "johndoe@example.com",
+    "phone": "5551234567"
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+          
+          <div data-source-form-target="helpContent" data-tab="postback" class="hidden">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Postback Configuration Help</h3>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">What are Postbacks?</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Postbacks are HTTP requests sent from our system to your systems when certain events occur, allowing your applications to be notified immediately.
+              </p>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Available Postback Events</h4>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300 mb-4">
+                <li><strong>Success:</strong> Sent when a lead is successfully processed</li>
+                <li><strong>Failure:</strong> Sent when lead processing fails</li>
+              </ul>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">URL Parameters</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                You can use these macros in your postback URLs:
+              </p>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300">
+                <li><code>{lead_id}</code> - The ID of the lead</li>
+                <li><code>{status}</code> - The status of the lead (accepted/rejected)</li>
+                <li><code>{reason}</code> - If rejected, the reason why</li>
+                <li><code>{price}</code> - The accepted bid amount</li>
+              </ul>
+            </div>
+            
+            <!-- Example postback URL -->
+            <div class="mt-4">
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Example Postback URL</h4>
+              <div class="bg-gray-900 p-4 rounded-lg overflow-x-auto">
+                <pre class="text-green-400 text-xs"><code>https://your-domain.com/callback?lead_id={lead_id}&status={status}&price={price}</code></pre>
+              </div>
+            </div>
+          </div>
+          
+          <div data-source-form-target="helpContent" data-tab="security" class="hidden">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Security Settings Help</h3>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">IP Whitelist</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Restrict API access to specific IP addresses for added security. Only requests from these IPs will be processed.
+              </p>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Allowed Domains</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                For web forms, you can restrict which domains are allowed to submit data. This helps prevent form abuse.
+              </p>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Payout Configuration</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                Define how publishers are compensated:
+              </p>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300 mb-4">
+                <li><strong>Fixed:</strong> Set amount per lead regardless of bid amount</li>
+                <li><strong>Percentage:</strong> Publisher receives a percentage of the winning bid</li>
+              </ul>
+              
+              <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2">Budget Controls</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                Prevent overspending with budget limits:
+              </p>
+              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300">
+                <li><strong>Minimum Acceptable Bid:</strong> Lowest bid amount to accept</li>
+                <li><strong>Daily Budget:</strong> Maximum daily spending limit</li>
+                <li><strong>Monthly Budget:</strong> Maximum monthly spending limit</li>
+              </ul>
+            </div>
+            
+            <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded-md">
+              <p class="text-xs text-blue-800 dark:text-blue-200">
+                <strong>Recommendation:</strong> For sensitive industries, always implement both IP whitelisting and domain restrictions for maximum security.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

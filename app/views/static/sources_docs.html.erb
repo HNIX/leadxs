@@ -1,0 +1,354 @@
+<%= turbo_frame_tag "modal" do %>
+
+  <% content_for :title, "Sources Documentation" %>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+      <div class="min-w-0 flex-1">
+        <h1 class="text-3xl font-bold leading-tight text-gray-900 dark:text-white sm:text-4xl">
+          Sources Documentation
+        </h1>
+        <p class="mt-2 text-lg text-gray-500 dark:text-gray-400">
+          Learn how to create, manage, and integrate lead sources with your campaigns
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Introduction to Sources
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Sources connect your campaign to different lead providers
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <p class="text-base text-gray-700 dark:text-gray-300">
+          Sources represent the different channels and providers that send leads to your campaign. 
+          Each source has its own configuration, API token, and tracking metrics.
+        </p>
+        
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mt-6 mb-3">Key Features:</h3>
+        <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+          <li>Create multiple sources for each campaign</li>
+          <li>Track leads by source for detailed analytics</li>
+          <li>Configure different integration types (API, Web Form, Form Builder)</li>
+          <li>Set up source-specific security settings and IP whitelisting</li>
+          <li>Configure webhooks and postback URLs for real-time notifications</li>
+          <li>Set payout methods and budget controls</li>
+        </ul>
+        
+        <div class="mt-5 border-t border-gray-100 dark:border-gray-800 pt-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            <strong>Note:</strong> Sources provide a way to segment and monitor your lead generation efforts across different channels and partners.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Integration Types
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Different ways to connect lead providers to your campaign
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="space-y-8">
+            <!-- API Integration -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  API
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Allow external systems to submit leads via our REST API. This is the most flexible integration type for third-party publishers and affiliates.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Key Features:</h4>
+              <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Dedicated API token for secure authentication</li>
+                <li>IP whitelisting for enhanced security</li>
+                <li>Webhook notifications for status updates</li>
+                <li>Detailed error reporting</li>
+              </ul>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Best for: Publishers, affiliate partners, and third-party lead providers
+              </p>
+            </div>
+            
+            <!-- Web Form Integration -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Web Form
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Integrate with existing forms on your website using our JavaScript snippet. This allows you to collect leads from existing web forms without rebuilding them.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Key Features:</h4>
+              <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Simple JavaScript integration</li>
+                <li>Works with your existing forms</li>
+                <li>Domain whitelisting for security</li>
+                <li>Field mapping capabilities</li>
+              </ul>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Best for: Existing websites with forms already built
+              </p>
+            </div>
+            
+            <!-- Form Builder Integration -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Form Builder
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Create custom lead capture forms using our drag-and-drop form builder. These forms can be embedded on your website or hosted on our platform.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Key Features:</h4>
+              <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Visual form builder with drag-and-drop interface</li>
+                <li>Custom styling and branding</li>
+                <li>Multi-step forms with conditional logic</li>
+                <li>Built-in validation and compliance features</li>
+              </ul>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Best for: Quick form creation without development resources
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Security & Compliance
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Securing your lead sources and ensuring regulatory compliance
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <div class="space-y-6">
+          <!-- Security Features -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">Security Features</h3>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <li>
+                <strong>API Tokens:</strong> Unique tokens for each source that can be regenerated as needed
+              </li>
+              <li>
+                <strong>IP Whitelisting:</strong> Restrict API access to specific IP addresses
+              </li>
+              <li>
+                <strong>Domain Restrictions:</strong> Limit form submissions to specific domains
+              </li>
+              <li>
+                <strong>Webhook Signatures:</strong> Verify webhook authenticity with secret keys
+              </li>
+              <li>
+                <strong>Request Logging:</strong> Detailed logs of all API requests for auditing
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Compliance Considerations -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">Compliance Considerations</h3>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <li>
+                <strong>Consent Tracking:</strong> All sources automatically track consent records
+              </li>
+              <li>
+                <strong>Data Protection:</strong> Sensitive data is encrypted both in transit and at rest
+              </li>
+              <li>
+                <strong>Audit Trails:</strong> Complete history of lead interactions for compliance verification
+              </li>
+              <li>
+                <strong>TCPA Compliance:</strong> Built-in tools for collecting and documenting required consent
+              </li>
+            </ul>
+            
+            <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-md">
+              <p class="text-sm text-yellow-700 dark:text-yellow-300 flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span><strong>Important:</strong> Always ensure your lead collection practices comply with relevant regulations such as TCPA, GDPR, and CCPA. Our system provides tools to help with compliance, but ultimate responsibility rests with your organization.</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Payout Configuration
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Setting up payment structures for your lead sources
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
+          Configure how publishers and affiliates are compensated for the leads they provide:
+        </p>
+        
+        <div class="space-y-6">
+          <!-- Payout Methods -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Payout Methods</h3>
+            <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <!-- Fixed Payout -->
+              <div class="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+                <h4 class="font-medium text-green-800 dark:text-green-300 mb-2">
+                  Fixed Payout
+                </h4>
+                <p class="text-green-700 dark:text-green-300">
+                  Set a specific dollar amount to pay for each lead, regardless of what buyers bid.
+                </p>
+                <p class="text-sm text-green-600 dark:text-green-400 mt-2">
+                  Example: $5 per lead
+                </p>
+              </div>
+              
+              <!-- Percentage Payout -->
+              <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-2">
+                  Percentage Margin
+                </h4>
+                <p class="text-blue-700 dark:text-blue-300">
+                  Pay publishers a percentage of the winning bid amount, keeping the rest as margin.
+                </p>
+                <p class="text-sm text-blue-600 dark:text-blue-400 mt-2">
+                  Example: 80% to publisher (20% margin) on a $10 bid = $8 payout
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Payout Structures -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Payout Structures</h3>
+            <div class="mt-3">
+              <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+                <li>
+                  <strong>Per Lead:</strong> Pay for every valid lead submitted
+                </li>
+                <li>
+                  <strong>Conversion Only:</strong> Pay only when leads convert to customers
+                </li>
+                <li>
+                  <strong>Tiered:</strong> Pay different amounts based on lead quality or volume
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Budget Controls -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Budget Controls</h3>
+            <p class="text-gray-700 dark:text-gray-300 mb-3">
+              Protect your campaign budget with these controls:
+            </p>
+            <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <li>
+                <strong>Minimum Acceptable Bid:</strong> Only accept leads when buyers bid above this threshold
+              </li>
+              <li>
+                <strong>Daily Budget:</strong> Cap spending at a specified amount per day
+              </li>
+              <li>
+                <strong>Monthly Budget:</strong> Cap spending at a specified amount per month
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Best Practices
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Tips for effective source management
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <ul class="space-y-5 text-gray-700 dark:text-gray-300">
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Use descriptive names:</strong> Choose clear source names that identify the channel or partner (e.g., "Facebook Ads - Mortgage", "Affiliate Partner - John's Leads").
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Implement security measures:</strong> Always use IP whitelisting for API sources and domain restrictions for web forms.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Monitor performance:</strong> Regularly review each source's performance metrics to identify high and low performers.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Set appropriate budgets:</strong> Start with conservative daily and monthly budgets until you've validated source quality.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Use source filters:</strong> Create source-specific filters to control lead quality from individual providers.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Rotate API tokens:</strong> Periodically regenerate API tokens for enhanced security, especially when staff changes occur.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Test sources before full launch:</strong> Send test leads through each new source to verify proper integration before going live.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+<% end %>

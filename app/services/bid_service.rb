@@ -43,8 +43,18 @@ class BidService
       expires_at: Time.current + @campaign.bid_timeout_seconds.seconds
     )
     
-    # Find eligible distributions
-    eligible_distributions = @campaign.eligible_distributions_for_bidding(@anonymized_data)
+    # Find all eligible distributions regardless of type
+    all_eligible_distributions = @campaign.eligible_distributions(@anonymized_data)
+    Rails.logger.info("BidService found #{all_eligible_distributions.count} total eligible distributions")
+    
+    # Filter to get only those that support bidding (ping_post, ping_only, or post_only with bidding enabled)
+    eligible_distributions = all_eligible_distributions.select do |dist|
+      # Include distributions explicitly set up for ping/post operations
+      dist.endpoint_type.in?(["ping_post", "ping_only"]) ||
+      # Include post_only distributions that have bidding enabled
+      (dist.endpoint_type == "post_only" && dist.bidding_enabled?)
+    end
+    
     Rails.logger.info("BidService found #{eligible_distributions.count} eligible distributions for bidding")
     
     if eligible_distributions.empty?
@@ -86,18 +96,28 @@ class BidService
     return { success: false, message: "No bid request found" } unless @bid_request
     
     # Make sure the bid request has all possible bids
-    # In practice, you might want to wait for a timeout or minimum number of bids
-    
     # Check for expiration
     @bid_request.check_expiration!
     
-    # Use the LeadDistributionService to select a winner according to campaign distribution method
+    # Get all valid bids
+    valid_bids = @bid_request.bids.where(status: :pending)
+    
+    # If no valid bids, return early
+    if valid_bids.empty?
+      return {
+        success: false,
+        message: "No bids received",
+        bid_request: @bid_request
+      }
+    end
+    
+    # Use the distribution service to select a winner according to campaign distribution method
     winning_bid = select_winning_bid
     
     if winning_bid.nil?
       return {
         success: false,
-        message: "No bids received or no winner could be selected",
+        message: "No winner could be selected from #{valid_bids.count} bids",
         bid_request: @bid_request
       }
     end
@@ -109,16 +129,35 @@ class BidService
         @lead_activity_service.record_bid_selected(@lead, winning_bid, {
           selection_method: @campaign.distribution_method,
           total_bids: @bid_request.bids.count,
-          bid_request_id: @bid_request.id
+          bid_request_id: @bid_request.id,
+          winning_amount: winning_bid.amount
         })
       end
       
-      {
-        success: true,
-        bid: winning_bid,
-        distribution: winning_bid.distribution,
-        bid_request: @bid_request
-      }
+      # If we have a lead, proceed with distribution
+      if @lead
+        # Mark the bid request as completed
+        @bid_request.update(status: :completed, completed_at: Time.current)
+        
+        # Post the full lead data to the winning distribution
+        distribute_result = distribute_to_winning_bidder(winning_bid)
+        
+        return {
+          success: distribute_result[:success],
+          bid: winning_bid,
+          distribution: winning_bid.distribution,
+          bid_request: @bid_request,
+          distribution_result: distribute_result
+        }
+      else
+        # For anonymous data scenarios, just return the winning bid
+        {
+          success: true,
+          bid: winning_bid,
+          distribution: winning_bid.distribution,
+          bid_request: @bid_request
+        }
+      end
     else
       {
         success: false,
@@ -126,6 +165,30 @@ class BidService
         bid_request: @bid_request
       }
     end
+  end
+  
+  # Distribute lead to the winning bidder
+  def distribute_to_winning_bidder(winning_bid)
+    return { success: false, message: "No lead available" } unless @lead
+    
+    # Find the campaign distribution
+    campaign_distribution = @campaign.campaign_distributions.find_by(distribution: winning_bid.distribution)
+    return { success: false, message: "Campaign distribution not found" } unless campaign_distribution
+    
+    # Create a distribution service
+    distribution_service = LeadDistributionService.new(@lead)
+    
+    # Distribute to the specific distribution
+    result = distribution_service.distribute_to_specific!(campaign_distribution)
+    
+    # Update lead status based on result
+    if result[:success]
+      @lead.update(status: :distributed)
+    else
+      @lead.update(status: :error, error_message: result[:error])
+    end
+    
+    result
   end
   
   private

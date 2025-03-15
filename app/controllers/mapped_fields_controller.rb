@@ -6,6 +6,11 @@ class MappedFieldsController < ApplicationController
     @distribution = @campaign_distribution.distribution
     @campaign_fields = @campaign.campaign_fields
     @mapped_fields = @campaign_distribution.mapped_fields
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def update_mappings
@@ -54,10 +59,26 @@ class MappedFieldsController < ApplicationController
 
     respond_to do |format|
       if successful
-        format.html { redirect_to campaign_distribution_path(@campaign_distribution), notice: "Field mappings were successfully updated." }
+        # Redirect back to distribution view in turbo frame or normal view
+        campaign = @campaign_distribution.campaign
+        format.html { 
+          redirect_to campaign_distribution_path(@campaign_distribution), 
+          notice: "Field mappings were successfully updated." 
+        }
+        format.turbo_stream { 
+          redirect_to configure_campaign_path(campaign, anchor: 'distribution'),
+          notice: "Field mappings were successfully updated."
+        }
         format.json { render json: { status: "success" } }
       else
-        format.html { redirect_to campaign_distribution_mapped_fields_path(@campaign_distribution), alert: "Error updating field mappings." }
+        format.html { 
+          redirect_to campaign_distribution_mapped_fields_path(@campaign_distribution), 
+          alert: "Error updating field mappings." 
+        }
+        format.turbo_stream { 
+          redirect_to campaign_distribution_mapped_fields_path(@campaign_distribution), 
+          alert: "Error updating field mappings." 
+        }
         format.json { render json: { status: "error" }, status: :unprocessable_entity }
       end
     end

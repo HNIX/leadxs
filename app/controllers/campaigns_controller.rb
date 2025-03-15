@@ -1,11 +1,11 @@
 class CampaignsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_campaign, only: [:show, :edit, :update, :destroy, :sync_vertical_fields, :configure]
-  before_action :set_verticals, only: [:new, :create, :edit, :update]
+  before_action :set_verticals, only: [:new, :create, :edit, :update, :configure]
 
   def index
     # Start with base scope
-    campaigns = Campaign.includes(:vertical)
+    campaigns = Campaign.includes(:vertical, :campaign_fields, :sources, :distributions)
     
     # Apply search filter if provided
     if params[:name].present?
@@ -58,6 +58,9 @@ class CampaignsController < ApplicationController
     # Paginate results
     per_page = params[:per_page].present? ? params[:per_page].to_i : 10
     @pagy, @campaigns = pagy(campaigns, items: per_page)
+    
+    # Store the total count for use in the view
+    @total_campaigns_count = @pagy.count
   end
 
   def new
@@ -109,27 +112,25 @@ class CampaignsController < ApplicationController
     @section = params[:section] || 'fields'
     @subsection = params[:subsection]
     
-    # Load the appropriate data based on the selected section
+    # Load campaign fields for all sections
+    @pagy, @campaign_fields = pagy(@campaign.campaign_fields.ordered, items: 15)
+    
+    # Load calculated fields for all sections
+    @calculated_fields = @campaign.calculated_fields.ordered
+    
+    # Load validation rules for all sections
+    @validation_rules = @campaign.validation_rules.ordered
+    
+    # Load sources and distributions for all sections
+    @sources = @campaign.sources.includes(:company)
+    @distributions = @campaign.distributions.includes(:company)
+    
+    # Load filters for all sections
+    @source_filters = @campaign.source_filters.where(type: 'SourceFilter').includes(:campaign_field)
+    @distribution_filters = @campaign.distribution_filters.where(type: 'DistributionFilter').includes(:campaign_field)
+    
+    # Handle legacy URLs
     case @section
-    when 'fields'
-      @subsection ||= 'campaign_fields'
-      if @subsection == 'campaign_fields'
-        # Add pagination for campaign fields
-        @pagy, @campaign_fields = pagy(@campaign.campaign_fields.ordered, items: 15)
-      else
-        @calculated_fields = @campaign.calculated_fields.ordered
-      end
-    when 'validation_rules'
-      # Add pagination for validation rules
-      @pagy, @validation_rules = pagy(@campaign.validation_rules.ordered, items: 15)
-    when 'sources'
-      @subsection ||= 'sources_list'
-      @sources = @campaign.sources.includes(:company)
-      @source_filters = @campaign.source_filters.where(type: 'SourceFilter').includes(:campaign_field)
-    when 'distributions'
-      @subsection ||= 'distributions_list'
-      @distributions = @campaign.distributions.includes(:company)
-      @distribution_filters = @campaign.distribution_filters.where(type: 'DistributionFilter').includes(:campaign_field)
     when 'calculated_fields', 'source_filters', 'distribution_filters'
       # Redirect legacy URLs to the new consolidated sections
       new_section = case @section
@@ -242,6 +243,10 @@ class CampaignsController < ApplicationController
       :distribution_schedule_start_time, 
       :distribution_schedule_end_time,
       :vertical_id,
+      :bid_timeout_seconds,
+      :minimum_bid_amount,
+      :multi_distribution_strategy,
+      :max_distributions,
       distribution_schedule_days: []
     )
   end

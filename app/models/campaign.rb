@@ -65,6 +65,21 @@ class Campaign < ApplicationRecord
     campaign_type == 'ping_post' && distribution_method.in?(['highest_bid', 'weighted_random', 'waterfall'])
   end
   
+  # Get the appropriate distribution workflow type based on campaign settings
+  def distribution_workflow
+    if campaign_type == 'direct'
+      :direct_post
+    elsif campaign_type == 'ping_post' && use_bidding_system?
+      :ping_post_with_bidding
+    elsif campaign_type == 'ping_post' && !use_bidding_system?
+      :ping_post_without_bidding
+    elsif campaign_type == 'calls'
+      :call_routing
+    else
+      :direct_post # default fallback
+    end
+  end
+  
   # Handle days as array
   def distribution_schedule_days
     self[:distribution_schedule_days].present? ? JSON.parse(self[:distribution_schedule_days]) : []
@@ -100,19 +115,39 @@ class Campaign < ApplicationRecord
     eligible = eligible_distributions(anonymized_data)
     Rails.logger.info("Campaign #{id} has #{eligible.count} distributions after filtering")
     
-    # Further limit to distributions set up for bidding
-    bidding_enabled = eligible.select { |dist| dist.respond_to?(:bidding_enabled?) && dist.bidding_enabled? }
+    # For ping-post campaigns, we need to include:
+    # 1. ping_post distributions with bidding enabled
+    # 2. ping_only distributions with bidding enabled
+    # 3. post_only distributions with bidding enabled
+    if campaign_type == 'ping_post'
+      bidding_enabled = eligible.select do |dist|
+        # Include all types of distributions that have bidding enabled
+        dist.respond_to?(:bidding_enabled?) && dist.bidding_enabled?
+      end
+    else
+      # For other campaign types, only include distributions set up for bidding
+      bidding_enabled = eligible.select do |dist|
+        dist.respond_to?(:bidding_enabled?) && 
+        dist.bidding_enabled? && 
+        dist.endpoint_type.in?(["ping_post", "ping_only"])
+      end
+    end
+    
     Rails.logger.info("Campaign #{id} has #{bidding_enabled.count} distributions with bidding enabled")
     
     # Log which distributions are not bidding enabled for debugging
     if bidding_enabled.count < eligible.count
       eligible.each do |dist|
-        unless dist.respond_to?(:bidding_enabled?) && dist.bidding_enabled?
-          if !dist.respond_to?(:bidding_enabled?)
-            Rails.logger.warn("Distribution #{dist.id} doesn't respond to bidding_enabled?")
-          elsif !dist.bidding_enabled?
-            Rails.logger.warn("Distribution #{dist.id} has bidding disabled (base_bid_amount: #{dist.base_bid_amount})")
-          end
+        unless bidding_enabled.include?(dist)
+          reason = if !dist.respond_to?(:bidding_enabled?)
+                    "doesn't respond to bidding_enabled?"
+                  elsif !dist.bidding_enabled?
+                    "has bidding disabled (base_bid_amount: #{dist.base_bid_amount})"
+                  else
+                    "unknown reason"
+                  end
+          
+          Rails.logger.warn("Distribution #{dist.id} (#{dist.name}) excluded from bidding: #{reason}")
         end
       end
     end

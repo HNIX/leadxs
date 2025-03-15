@@ -3,27 +3,73 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="toggle"
 export default class extends Controller {
   static targets = ["toggleable", "controller", "content", "icon"]
-  static values = { show: { type: Boolean, default: false } }
+  static values = { 
+    show: { type: Boolean, default: false },
+    identifier: { type: String, default: '' }
+  }
 
   connect() {
     this.updateVisibility()
     this.updateIcon()
     
     // Check localStorage to see if this toggle was previously open
-    const storedState = localStorage.getItem(`toggle-${this.identifier}`)
+    const toggleId = this.identifierValue || this.element.id || this.identifier
+    const storedState = localStorage.getItem(`toggle-${toggleId}`)
     if (storedState === "open") {
       this.showValue = true
-      this.toggle()
+      this.updateVisibility()
+      this.updateIcon()
+    }
+    
+    // Add click outside handler for dropdowns
+    if (this.element.classList.contains('dropdown')) {
+      this.clickOutsideHandler = this.handleClickOutside.bind(this)
+      document.addEventListener('click', this.clickOutsideHandler)
+      
+      // Stop propagation for clicks inside content
+      if (this.hasContentTarget) {
+        this.contentTarget.addEventListener('click', this.preventPropagation.bind(this))
+      }
+    }
+  }
+  
+  disconnect() {
+    // Clean up event listeners
+    if (this.clickOutsideHandler) {
+      document.removeEventListener('click', this.clickOutsideHandler)
+    }
+    
+    if (this.hasContentTarget && this.element.classList.contains('dropdown')) {
+      this.contentTarget.removeEventListener('click', this.preventPropagation)
+    }
+  }
+  
+  preventPropagation(event) {
+    event.stopPropagation()
+  }
+  
+  handleClickOutside(event) {
+    // Close dropdown when clicking outside
+    if (this.showValue && !this.element.contains(event.target)) {
+      this.showValue = false
+      this.updateVisibility()
+      this.updateIcon()
     }
   }
 
-  toggle() {
+  toggle(event) {
+    // Prevent event from bubbling up to document
+    if (event) {
+      event.stopPropagation()
+    }
+    
     this.showValue = !this.showValue
     this.updateVisibility()
     this.updateIcon()
     
     // Store state in localStorage
-    localStorage.setItem(`toggle-${this.identifier}`, this.showValue ? "open" : "closed")
+    const toggleId = this.identifierValue || this.element.id || this.identifier
+    localStorage.setItem(`toggle-${toggleId}`, this.showValue ? "open" : "closed")
   }
 
   showValueChanged() {

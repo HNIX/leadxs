@@ -7,7 +7,7 @@ class Source < AccountRecord
   has_many :leads, dependent: :destroy
   
   # Constants
-  STATUSES = ['active', 'paused', 'archived'].freeze
+  STATUSES = ['active', 'paused', 'archived', 'draft'].freeze
   INTEGRATION_TYPES = ['affiliate', 'web_form', 'form_builder'].freeze
   PAYOUT_METHODS = ['fixed', 'percentage'].freeze
   PAYOUT_STRUCTURES = ['per_lead', 'per_action', 'per_click', 'per_call', 'per_conversion'].freeze
@@ -38,6 +38,7 @@ class Source < AccountRecord
   scope :active, -> { where(status: 'active') }
   scope :paused, -> { where(status: 'paused') }
   scope :archived, -> { where(status: 'archived') }
+  scope :draft, -> { where(status: 'draft') }
   scope :affiliates, -> { where(integration_type: 'affiliate') }
   scope :web_forms, -> { where(integration_type: 'web_form') }
   scope :form_builders, -> { where(integration_type: 'form_builder') }
@@ -105,9 +106,15 @@ class Source < AccountRecord
       { color: 'yellow', label: 'Paused' }
     when 'archived'
       { color: 'gray', label: 'Archived' }
+    when 'draft'
+      { color: 'blue', label: 'Draft' }
     else
       { color: 'gray', label: status.titleize }
     end
+  end
+  
+  def draft?
+    status == 'draft'
   end
   
   # Revenue and profit calculations

@@ -227,6 +227,12 @@ class BidRequestJob < ApplicationJob
       bid_request
     )
     
+    # Store the ping response data in the distribution for later use in post phase
+    if response && response[:body].present?
+      distribution.store_ping_response(response[:body])
+      Rails.logger.info("Stored ping response data for distribution #{distribution.id}")
+    end
+    
     # Create a bid if amount is valid
     if bid_amount && bid_amount > 0
       Rails.logger.info("Creating bid with valid amount: #{bid_amount}")

@@ -23,4 +23,12 @@ class StaticController < ApplicationController
     # Hotwire Native needs an empty page to route authentication and reset the app.
     # We can't head: 200 because we also need the Turbo JavaScript in <head>.
   end
+  
+  def campaign_fields_docs
+    render layout: false if turbo_frame_request?
+  end
+  
+  def calculated_fields_docs
+    render layout: false if turbo_frame_request?
+  end
 end

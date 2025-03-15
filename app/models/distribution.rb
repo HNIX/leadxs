@@ -116,20 +116,172 @@ class Distribution < ApplicationRecord
 
   # Check if bidding is enabled for this distribution
   def bidding_enabled?
-    result = status_active? && base_bid_amount.present? && base_bid_amount > 0
+    # For ping_post and ping_only distributions, we require a base_bid_amount
+    if endpoint_type.in?(["ping_post", "ping_only"])
+      result = status_active? && base_bid_amount.present? && base_bid_amount > 0
     
-    reason = if !status_active?
-               "distribution is not active (status: #{status})"
-             elsif !base_bid_amount.present?
-               "base_bid_amount is not set"
-             elsif !(base_bid_amount > 0)
-               "base_bid_amount is not greater than 0 (value: #{base_bid_amount})"
-             else
-               "bidding is enabled"
-             end
+      reason = if !status_active?
+                 "distribution is not active (status: #{status})"
+               elsif !base_bid_amount.present?
+                 "base_bid_amount is not set"
+               elsif !(base_bid_amount > 0)
+                 "base_bid_amount is not greater than 0 (value: #{base_bid_amount})"
+               else
+                 "bidding is enabled"
+               end
+    # For post_only distributions, we just need them to be active
+    # This allows post_only distributions to participate in ping-post campaigns
+    else
+      result = status_active? && (base_bid_amount.present? && base_bid_amount > 0)
+      
+      reason = if !status_active?
+                 "distribution is not active (status: #{status})"
+               elsif (!base_bid_amount.present? || !(base_bid_amount > 0))
+                 "post-only distribution without bid amount (requires manual amount)"
+               else
+                 "bidding is enabled"
+               end
+    end
     
     Rails.logger.debug("Distribution #{id} (#{name}) bidding_enabled? => #{result} (#{reason})")
     return result
+  end
+  
+  # Store ping response data for use in post phase
+  def store_ping_response(response_data)
+    self.ping_response_data = response_data
+    save
+  end
+  
+  # Get ping ID from stored response data
+  def ping_id
+    return nil unless ping_response_data.present?
+    
+    # Try to extract ping ID from stored response
+    begin
+      data = JSON.parse(ping_response_data) rescue nil
+      return nil unless data.is_a?(Hash)
+      
+      # If a custom ping_id_field is specified, use that path to extract the ID
+      if ping_id_field.present?
+        # Split the path by dots and navigate through the nested structure
+        path_parts = ping_id_field.split('.')
+        value = data
+        
+        path_parts.each do |part|
+          value = value.is_a?(Hash) ? value[part] : nil
+          break if value.nil?
+        end
+        
+        return value unless value.nil?
+      end
+      
+      # Fallback to common ping ID field names if custom field not found
+      data["ping_id"] || data["id"] || data["request_id"] || 
+      data["token"] || data["ref"] || data["reference_id"] ||
+      data.dig("data", "ping_id") || data.dig("response", "id")
+    rescue
+      nil
+    end
+  end
+  
+  # Parse and evaluate response against custom response mapping rules
+  def evaluate_response(response_data, response_code)
+    return true if (200..299).include?(response_code) && response_mapping.blank?
+    
+    begin
+      # Parse response data if it's a string (JSON)
+      response_body = response_data.is_a?(String) ? JSON.parse(response_data) : response_data
+      
+      # If no response mapping is configured, use default HTTP status code check
+      return (200..299).include?(response_code) unless response_mapping.present?
+      
+      # Check for success criteria in the response mapping
+      if response_mapping['success_criteria'].present?
+        success_criteria = response_mapping['success_criteria']
+        
+        # Check HTTP status code range if specified
+        if success_criteria['status_codes'].present?
+          status_range = success_criteria['status_codes']
+          unless status_range.any? { |range| range.split('-').map(&:to_i).then { |min, max| (min..max).include?(response_code) } }
+            return false
+          end
+        end
+        
+        # Check for field based success criteria
+        if success_criteria['fields'].present?
+          success_criteria['fields'].each do |field_config|
+            field_path = field_config['path']
+            expected_value = field_config['value']
+            operator = field_config['operator'] || 'eq'
+            
+            # Extract field value using the path
+            field_value = extract_field_value(response_body, field_path)
+            
+            # Compare based on operator
+            case operator
+            when 'eq'
+              return false unless field_value == expected_value
+            when 'neq'
+              return false unless field_value != expected_value
+            when 'contains'
+              return false unless field_value.to_s.include?(expected_value.to_s)
+            when 'regex'
+              return false unless field_value.to_s.match?(Regexp.new(expected_value.to_s))
+            end
+          end
+        end
+        
+        return true
+      end
+      
+      # Default to HTTP status code check if no specific criteria matched
+      (200..299).include?(response_code)
+    rescue => e
+      Rails.logger.error("Error evaluating response: #{e.message}")
+      # Default to HTTP status code check on error
+      (200..299).include?(response_code)
+    end
+  end
+  
+  # Extract error message from response based on mapping
+  def extract_error_message(response_data, response_code)
+    return "HTTP Error: #{response_code}" unless (200..299).include?(response_code) || response_mapping.blank?
+    
+    begin
+      # Parse response data if it's a string (JSON)
+      response_body = response_data.is_a?(String) ? JSON.parse(response_data) : response_data
+      
+      # If error fields are configured, extract the error message
+      if response_mapping['error_fields'].present?
+        response_mapping['error_fields'].each do |field_path|
+          error_message = extract_field_value(response_body, field_path)
+          return error_message if error_message.present?
+        end
+      end
+      
+      # Generic error message based on HTTP status
+      "HTTP Error: #{response_code}"
+    rescue => e
+      Rails.logger.error("Error extracting error message: #{e.message}")
+      "HTTP Error: #{response_code}"
+    end
+  end
+  
+  # Helper method to extract a value from a nested hash using a dot-notation path
+  def extract_field_value(data, path)
+    path_parts = path.split('.')
+    value = data
+    
+    path_parts.each do |part|
+      if value.is_a?(Hash) 
+        value = value[part] || value[part.to_sym]
+      else
+        return nil
+      end
+    end
+    
+    value
   end
   
   # Check if this distribution can use fallback bidding

@@ -40,6 +40,19 @@
       <main class="mb-auto dark:bg-gray-900 w-full overflow-x-hidden">
         <div class="px-4 sm:px-6 lg:px-8 max-w-full">
           <%= turbo_frame_tag "modal" %>
+          
+          <% if content_for?(:breadcrumbs) %>
+            <div class="pt-4">
+              <%= yield :breadcrumbs %>
+            </div>
+          <% end %>
+          
+          <% if content_for?(:context_header) %>
+            <div class="mt-4">
+              <%= yield :context_header %>
+            </div>
+          <% end %>
+          
           <%= yield %>
         </div>
       </main>

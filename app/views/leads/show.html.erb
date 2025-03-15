@@ -35,7 +35,7 @@
   </div>
 
   <!-- Main tabbed interface -->
-  <div data-tabs-panels="overview,details,bidding,activities,data">
+  <div class="bg-gray-100" data-tabs-panels="overview,details,bidding,activities,data">
     <%= render "leads/tabs", tabs: [
       { id: "overview", label: "Overview", active: params[:tab] == "overview" || params[:tab].blank? },
       { id: "details", label: "Lead Details", active: params[:tab] == "details" },

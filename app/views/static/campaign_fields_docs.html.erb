@@ -1,0 +1,177 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="fixed inset-0 bg-gray-700/75 bg-opacity-75 transition-opacity z-50"></div>
+
+  <%= tag.div data: { controller: "turbo-modal" }, class: "fixed inset-0 overflow-y-auto z-50" do %>
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-700 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
+        <div class="absolute top-0 right-0 p-4">
+          <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none" data-action="click->turbo-modal#close">
+            <span class="sr-only">Close</span>
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4 overflow-y-auto max-h-[80vh]">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 sm:mt-0 sm:ml-4 w-full">
+              <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Campaign Fields Documentation</h3>
+              
+              <div class="mt-4 prose prose-sm dark:prose-invert max-w-none">
+                <h2>Understanding Campaign Fields</h2>
+                <p>
+                  Campaign fields define the data structure for leads in your campaign. These fields determine what 
+                  information will be collected, how it will be validated, and how it will be processed during the lead 
+                  submission and bidding process.
+                </p>
+                
+                <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 dark:border-blue-600 p-4 my-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-blue-700 dark:text-blue-300">
+                        <strong>Note:</strong> If your campaign is based on a vertical, you can import fields from the vertical to ensure 
+                        consistent data structure and validation.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <h3 class="mt-6">Field Types and Data Types</h3>
+                <p>
+                  Each field has both a <strong>field type</strong> (UI presentation) and a <strong>data type</strong> (underlying data format):
+                </p>
+                
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="border dark:border-gray-700 rounded-md p-4">
+                    <h4 class="text-base font-medium">Common Field Types</h4>
+                    <ul class="mt-2 list-disc list-inside">
+                      <li>Text - Single-line text input</li>
+                      <li>Textarea - Multi-line text input</li>
+                      <li>Select - Dropdown selection</li>
+                      <li>Radio - Single-choice radio buttons</li>
+                      <li>Checkbox - Single or multiple checkboxes</li>
+                      <li>Date - Date picker</li>
+                      <li>Email - Specialized email input</li>
+                      <li>Phone - Specialized phone number input</li>
+                    </ul>
+                  </div>
+                  
+                  <div class="border dark:border-gray-700 rounded-md p-4">
+                    <h4 class="text-base font-medium">Data Types</h4>
+                    <ul class="mt-2 list-disc list-inside">
+                      <li>Text - Any text/string value</li>
+                      <li>Number - Numeric values only</li>
+                      <li>Date - Date values</li>
+                      <li>Boolean - True/false values</li>
+                      <li>Email - Email address format</li>
+                      <li>Phone - Phone number format</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <h3 class="mt-6">Field Properties</h3>
+                <p>
+                  Fields have several important properties that control behavior during lead submission and processing:
+                </p>
+                
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 mt-4">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Property</th>
+                      <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr>
+                      <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Required</td>
+                      <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Field must have a value in order to submit a lead</td>
+                    </tr>
+                    <tr>
+                      <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">PII</td>
+                      <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Contains Personally Identifiable Information that will be tracked for compliance</td>
+                    </tr>
+                    <tr>
+                      <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Ping Required</td>
+                      <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Field must be included in the ping (pre-qualification) phase</td>
+                    </tr>
+                    <tr>
+                      <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Post Required</td>
+                      <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Field must be included in the post (full lead submission) phase</td>
+                    </tr>
+                    <tr>
+                      <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Post Only</td>
+                      <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Field will only be included in the post phase, never in ping</td>
+                    </tr>
+                    <tr>
+                      <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Hidden</td>
+                      <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Field won't be shown in user interfaces, used for system fields</td>
+                    </tr>
+                    <tr>
+                      <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Shared during bidding</td>
+                      <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">The field's data will be shared with buyers during bidding</td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <h3 class="mt-6">Validation Settings</h3>
+                <p>
+                  Fields can be configured with various validation rules to ensure data quality:
+                </p>
+                
+                <ul class="mt-2 space-y-2">
+                  <li><strong>Minimum/Maximum Length</strong> - For text fields, enforces character length constraints</li>
+                  <li><strong>Minimum/Maximum Value</strong> - For numeric fields, enforces range constraints</li>
+                  <li><strong>Regex Pattern</strong> - Advanced validation using regular expressions</li>
+                  <li><strong>Allowed Values</strong> - For fields with a defined list of acceptable values</li>
+                </ul>
+                
+                <h3 class="mt-6">Best Practices</h3>
+                <ol class="mt-2 space-y-2 list-decimal list-inside">
+                  <li>Use descriptive field names that match industry standards for better integration with buyers</li>
+                  <li>Properly mark PII fields to ensure regulatory compliance</li>
+                  <li>Minimize required fields to improve lead conversion rates</li>
+                  <li>Set "Post Only" for sensitive information that shouldn't be shared during bidding</li>
+                  <li>Use appropriate field types for better user experience when collecting data</li>
+                  <li>Add clear descriptions and example values to guide proper data entry</li>
+                  <li>Configure validation rules to ensure data quality before submission</li>
+                </ol>
+                
+                <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 my-6">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                        <strong>Important:</strong> Once leads start flowing into your campaign, be cautious about modifying existing fields, especially changing data types or making fields required that weren't before. Consider creating new fields instead.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <p class="mt-8">
+                  For more detailed information or advanced configuration options, please refer to the complete documentation 
+                  or contact our support team.
+                </p>
+              </div>
+              
+              <div class="mt-8 flex justify-end">
+                <button type="button" class="btn btn-primary" data-action="click->turbo-modal#close">
+                  Close Documentation
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

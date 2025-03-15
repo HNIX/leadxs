@@ -119,7 +119,10 @@ class DistributionsController < ApplicationController
       :authentication_method, :username, :password, :api_key_name, :api_key_location,
       :client_id, :client_secret, :token_url, :refresh_token, :post_endpoint_url,
       :bid_endpoint_url, :bidding_strategy, :base_bid_amount, :min_bid_amount, :max_bid_amount,
-      headers_attributes: [:id, :name, :value, :_destroy]
+      :ping_id_field, :ping_id_target_field,
+      headers_attributes: [:id, :name, :value, :_destroy],
+      response_mapping: {},
+      request_mapping: {}
     )
   end
   

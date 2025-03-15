@@ -4,17 +4,18 @@ export default class extends Controller {
   static targets = ["tab", "panel"]
 
   connect() {
+    console.log("Tabs controller connected", this.tabTargets, this.panelTargets);
+    
     // Check for tab parameter in URL
     const urlParams = new URLSearchParams(window.location.search)
     const tabId = urlParams.get('tab')
     
     // If tab parameter exists, find corresponding tab
     if (tabId) {
-      const tabs = this.element.querySelectorAll("[data-tabs-target='panel']")
       let tabIndex = -1
       
-      // Find index of tab matching the ID in URL
-      tabs.forEach((panel, index) => {
+      // Try to find the tab index from panels
+      this.panelTargets.forEach((panel, index) => {
         const panelId = this.getPanelId(panel)
         if (panelId === tabId) {
           tabIndex = index
@@ -29,7 +30,7 @@ export default class extends Controller {
     }
     
     // Otherwise make sure at least one tab is active
-    if (!this.activeTab) {
+    if (!this.activeTab && this.tabTargets.length > 0) {
       this.activate(this.tabTargets[0])
     }
   }
@@ -82,6 +83,8 @@ export default class extends Controller {
   }
 
   activate(tab) {
+    console.log("Activating tab", tab, tab.dataset.tabIndex);
+    
     // Deactivate all tabs
     this.tabTargets.forEach(t => {
       t.classList.remove("border-indigo-500", "text-indigo-600", "dark:text-indigo-400")
@@ -95,18 +98,31 @@ export default class extends Controller {
     // Get the tab index
     const index = parseInt(tab.dataset.tabIndex)
     
-    // Hide all panels
+    // Hide all panels with animation
     this.panelTargets.forEach(panel => {
-      panel.classList.add("hidden")
+      panel.classList.add("opacity-0")
+      // Use a slight delay before hiding to allow animation
+      setTimeout(() => {
+        panel.classList.add("hidden")
+      }, 200)
     })
 
     // Show the panel with matching index
     if (index >= 0 && index < this.panelTargets.length) {
-      this.panelTargets[index].classList.remove("hidden")
+      const panel = this.panelTargets[index]
+      
+      // Small delay to ensure previous panel hide animation has started
+      setTimeout(() => {
+        panel.classList.remove("hidden")
+        // Force a reflow to ensure transition works
+        panel.offsetHeight
+        panel.classList.remove("opacity-0")
+        panel.classList.add("opacity-100")
+      }, 250)
       
       // Update URL with tab ID if history API is available
       if (history.pushState) {
-        const panelId = this.getPanelId(this.panelTargets[index])
+        const panelId = this.getPanelId(panel)
         if (panelId) {
           const url = new URL(window.location)
           url.searchParams.set("tab", panelId)

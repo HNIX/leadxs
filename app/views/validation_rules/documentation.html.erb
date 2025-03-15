@@ -1,384 +1,387 @@
-<% content_for :title, "Validation Rules Documentation" %>
+<%= turbo_frame_tag "modal" do %>
 
-<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-  <div class="md:flex md:items-center md:justify-between mb-8">
-    <div class="min-w-0 flex-1">
-      <h1 class="text-3xl font-bold leading-tight text-gray-900 dark:text-white sm:text-4xl">
-        Validation Rules Documentation
-      </h1>
-      <p class="mt-2 text-lg text-gray-500 dark:text-gray-400">
-        Learn how to create, manage, and test validation rules to ensure data quality
-      </p>
-    </div>
-  </div>
+  <% content_for :title, "Validation Rules Documentation" %>
 
-  <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
-    <div class="px-4 py-5 sm:px-6">
-      <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
-        Introduction to Validation Rules
-      </h2>
-      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-        Validation rules help ensure your campaign data meets quality standards before submission
-      </p>
-    </div>
-    <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
-      <p class="text-base text-gray-700 dark:text-gray-300">
-        Validation rules allow you to define custom logic to validate field values in your campaigns. 
-        These rules help ensure data quality, consistency, and compliance before leads are submitted.
-      </p>
-      
-      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mt-6 mb-3">Key Features:</h3>
-      <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
-        <li>Create multiple validation rules for each field</li>
-        <li>Choose from various rule types for different validation scenarios</li>
-        <li>Set severity levels (info, warning, error) to control validation behavior</li>
-        <li>Customize error messages for each validation rule</li>
-        <li>Order rules to control evaluation sequence</li>
-        <li>Rules can be enabled or disabled as needed</li>
-        <li>Test rules with sample data before saving</li>
-      </ul>
-      
-      <div class="mt-5 border-t border-gray-100 dark:border-gray-800 pt-5">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          <strong>Note:</strong> Validation rules created at the vertical field level are automatically inherited by all campaign fields that use that vertical field.
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+      <div class="min-w-0 flex-1">
+        <h1 class="text-3xl font-bold leading-tight text-gray-900 dark:text-white sm:text-4xl">
+          Validation Rules Documentation
+        </h1>
+        <p class="mt-2 text-lg text-gray-500 dark:text-gray-400">
+          Learn how to create, manage, and test validation rules to ensure data quality
         </p>
       </div>
     </div>
-  </div>
 
-  <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
-    <div class="px-4 py-5 sm:px-6">
-      <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
-        Rule Types
-      </h2>
-      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-        Different validation rule types for various use cases
-      </p>
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Introduction to Validation Rules
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Validation rules help ensure your campaign data meets quality standards before submission
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <p class="text-base text-gray-700 dark:text-gray-300">
+          Validation rules allow you to define custom logic to validate field values in your campaigns. 
+          These rules help ensure data quality, consistency, and compliance before leads are submitted.
+        </p>
+        
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mt-6 mb-3">Key Features:</h3>
+        <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+          <li>Create multiple validation rules for each field</li>
+          <li>Choose from various rule types for different validation scenarios</li>
+          <li>Set severity levels (info, warning, error) to control validation behavior</li>
+          <li>Customize error messages for each validation rule</li>
+          <li>Order rules to control evaluation sequence</li>
+          <li>Rules can be enabled or disabled as needed</li>
+          <li>Test rules with sample data before saving</li>
+        </ul>
+        
+        <div class="mt-5 border-t border-gray-100 dark:border-gray-800 pt-5">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            <strong>Note:</strong> Validation rules created at the vertical field level are automatically inherited by all campaign fields that use that vertical field.
+          </p>
+        </div>
+      </div>
     </div>
-    <div class="border-t border-gray-200 dark:border-gray-700">
-      <div class="px-4 py-5 sm:p-6">
-        <div class="space-y-8">
-          <!-- Condition Rule -->
+
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Rule Types
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Different validation rule types for various use cases
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="space-y-8">
+            <!-- Condition Rule -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Condition
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                The most flexible rule type. Write custom Ruby expressions to validate field values. 
+                Use <code class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 font-mono text-sm">field('field_name')</code> to reference field values.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Example:</h4>
+              <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                <code>field('email').present? && String.matches?(field('email'), '^[\\w+\\-.]+@[a-z\\d\\-]+(\\.[a-z\\d\\-]+)*\\.[a-z]+$')</code>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                This example checks if the email field exists and matches a valid email pattern.
+              </p>
+            </div>
+            
+            <!-- Pattern Rule -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Pattern
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Validate field values against a regular expression pattern. Useful for format validation like emails, phone numbers, zip codes, etc.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
+              <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                <code>{"field_name": "email", "pattern": "^[\\w+\\-.]+@[a-z\\d\\-]+(\\.[a-z\\d\\-]+)*\\.[a-z]+$"}</code>
+              </div>
+            </div>
+            
+            <!-- Lookup Rule -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Lookup
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Check if a field value exists in a predefined list of valid values. Useful for validating state codes, countries, or any field with a fixed set of valid options.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
+              <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                <code>{"field_name": "state", "lookup_values": ["AL", "AK", "AZ", "AR", "CA", ...]}</code>
+              </div>
+            </div>
+            
+            <!-- Dependency Rule -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Dependency
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Enforce that when one field has a value, another field must also have a value. Useful for related fields or conditional requirements.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
+              <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                <code>{"primary_field": "has_mortgage", "dependent_field": "mortgage_amount"}</code>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                In this example, if "has_mortgage" has a value, then "mortgage_amount" must also have a value.
+              </p>
+            </div>
+            
+            <!-- Comparison Rule -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Comparison
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Compare a field value with another field or a constant value. Useful for validating ranges, relationships between fields, or thresholds.
+              </p>
+              <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
+              <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                <code>{"field_name": "income", "operator": ">", "comparison_value": "0"}</code>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                For comparing with another field:
+              </p>
+              <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto mt-2">
+                <code>{"field_name": "end_date", "operator": ">", "comparison_field": "start_date"}</code>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Supported operators: ==, !=, >, >=, <, <=, includes, starts_with, ends_with
+              </p>
+            </div>
+            
+            <!-- Custom Rule -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
+                <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
+                  Custom
+                </span>
+              </h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-3">
+                Similar to the condition rule but with more flexibility. Use for complex validations that don't fit into other rule types.
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                The implementation is the same as condition rules but may be extended in the future with additional capabilities.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Working with Helper Modules
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Use built-in helper modules in your condition rules
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
+          Condition rules have access to several helper modules that provide useful functions for validation:
+        </p>
+        
+        <div class="space-y-6">
+          <!-- String Module -->
           <div>
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
-              <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
-                Condition
-              </span>
-            </h3>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">String Module</h3>
             <p class="text-gray-700 dark:text-gray-300 mb-3">
-              The most flexible rule type. Write custom Ruby expressions to validate field values. 
-              Use <code class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 font-mono text-sm">field('field_name')</code> to reference field values.
+              Functions for working with string values:
             </p>
+            <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+              <li><code class="font-mono">String.contains?(str, substr)</code> - Checks if a string contains a substring</li>
+              <li><code class="font-mono">String.starts_with?(str, prefix)</code> - Checks if a string starts with a prefix</li>
+              <li><code class="font-mono">String.ends_with?(str, suffix)</code> - Checks if a string ends with a suffix</li>
+              <li><code class="font-mono">String.matches?(str, pattern)</code> - Checks if a string matches a regex pattern</li>
+              <li><code class="font-mono">String.empty?(str)</code> - Checks if a string is empty or nil</li>
+              <li><code class="font-mono">String.length(str)</code> - Returns the length of a string</li>
+            </ul>
             <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Example:</h4>
             <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-              <code>field('email').present? && String.matches?(field('email'), '^[\\w+\\-.]+@[a-z\\d\\-]+(\\.[a-z\\d\\-]+)*\\.[a-z]+$')</code>
+              <code>String.starts_with?(field('phone'), '+1') || String.length(field('phone')) == 10</code>
             </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              This example checks if the email field exists and matches a valid email pattern.
-            </p>
           </div>
           
-          <!-- Pattern Rule -->
+          <!-- Number Module -->
           <div>
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
-              <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
-                Pattern
-              </span>
-            </h3>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Number Module</h3>
             <p class="text-gray-700 dark:text-gray-300 mb-3">
-              Validate field values against a regular expression pattern. Useful for format validation like emails, phone numbers, zip codes, etc.
+              Functions for working with numeric values:
             </p>
-            <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
+            <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+              <li><code class="font-mono">Number.between?(num, min, max)</code> - Checks if a number is between min and max (inclusive)</li>
+              <li><code class="font-mono">Number.positive?(num)</code> - Checks if a number is positive</li>
+              <li><code class="font-mono">Number.negative?(num)</code> - Checks if a number is negative</li>
+              <li><code class="font-mono">Number.zero?(num)</code> - Checks if a number is zero</li>
+            </ul>
+            <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Example:</h4>
             <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-              <code>{"field_name": "email", "pattern": "^[\\w+\\-.]+@[a-z\\d\\-]+(\\.[a-z\\d\\-]+)*\\.[a-z]+$"}</code>
+              <code>Number.between?(field('age'), 18, 100) && Number.positive?(field('income'))</code>
             </div>
           </div>
           
-          <!-- Lookup Rule -->
+          <!-- Date Module -->
           <div>
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
-              <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
-                Lookup
-              </span>
-            </h3>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Date Module</h3>
             <p class="text-gray-700 dark:text-gray-300 mb-3">
-              Check if a field value exists in a predefined list of valid values. Useful for validating state codes, countries, or any field with a fixed set of valid options.
+              Functions for working with date values:
             </p>
-            <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
+            <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+              <li><code class="font-mono">Date.before?(date1, date2)</code> - Checks if date1 is before date2</li>
+              <li><code class="font-mono">Date.after?(date1, date2)</code> - Checks if date1 is after date2</li>
+              <li><code class="font-mono">Date.between?(date, start_date, end_date)</code> - Checks if date is between start_date and end_date</li>
+              <li><code class="font-mono">Date.today</code> - Returns today's date as a string</li>
+              <li><code class="font-mono">Date.years_ago(years)</code> - Returns the date that was X years ago</li>
+            </ul>
+            <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Example:</h4>
             <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-              <code>{"field_name": "state", "lookup_values": ["AL", "AK", "AZ", "AR", "CA", ...]}</code>
+              <code>Date.after?(field('birth_date'), Date.years_ago(100)) && Date.before?(field('birth_date'), Date.years_ago(18))</code>
             </div>
           </div>
-          
-          <!-- Dependency Rule -->
-          <div>
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
-              <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
-                Dependency
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Severity Levels
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Understanding validation severity and how it affects lead submission
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
+          Each validation rule can have one of three severity levels that determine how validation failures are handled:
+        </p>
+        
+        <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+          <!-- Info -->
+          <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+            <h3 class="text-lg font-medium text-blue-800 dark:text-blue-300 mb-2">
+              <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-800 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:text-blue-300 mr-2">
+                Info
               </span>
             </h3>
-            <p class="text-gray-700 dark:text-gray-300 mb-3">
-              Enforce that when one field has a value, another field must also have a value. Useful for related fields or conditional requirements.
+            <p class="text-blue-700 dark:text-blue-300">
+              Informational messages only. Does not block form submission but provides helpful context to the user.
             </p>
-            <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
-            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-              <code>{"primary_field": "has_mortgage", "dependent_field": "mortgage_amount"}</code>
-            </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              In this example, if "has_mortgage" has a value, then "mortgage_amount" must also have a value.
-            </p>
-          </div>
-          
-          <!-- Comparison Rule -->
-          <div>
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
-              <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
-                Comparison
-              </span>
-            </h3>
-            <p class="text-gray-700 dark:text-gray-300 mb-3">
-              Compare a field value with another field or a constant value. Useful for validating ranges, relationships between fields, or thresholds.
-            </p>
-            <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Parameters:</h4>
-            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-              <code>{"field_name": "income", "operator": ">", "comparison_value": "0"}</code>
-            </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              For comparing with another field:
-            </p>
-            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto mt-2">
-              <code>{"field_name": "end_date", "operator": ">", "comparison_field": "start_date"}</code>
-            </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Supported operators: ==, !=, >, >=, <, <=, includes, starts_with, ends_with
+            <p class="text-sm text-blue-600 dark:text-blue-400 mt-2">
+              Example: "This phone number doesn't include a country code"
             </p>
           </div>
           
-          <!-- Custom Rule -->
-          <div>
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-3">
-              <span class="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900 px-2 py-1 text-sm font-medium text-indigo-700 dark:text-indigo-300 mr-2">
-                Custom
+          <!-- Warning -->
+          <div class="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg">
+            <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-300 mb-2">
+              <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-800 px-2.5 py-0.5 text-sm font-medium text-yellow-800 dark:text-yellow-300 mr-2">
+                Warning
               </span>
             </h3>
-            <p class="text-gray-700 dark:text-gray-300 mb-3">
-              Similar to the condition rule but with more flexibility. Use for complex validations that don't fit into other rule types.
+            <p class="text-yellow-700 dark:text-yellow-300">
+              Warning messages that alert the user but still allow form submission. Requires user confirmation to proceed.
             </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              The implementation is the same as condition rules but may be extended in the future with additional capabilities.
+            <p class="text-sm text-yellow-600 dark:text-yellow-400 mt-2">
+              Example: "The provided income seems unusually high. Please confirm it's correct."
+            </p>
+          </div>
+          
+          <!-- Error -->
+          <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg">
+            <h3 class="text-lg font-medium text-red-800 dark:text-red-300 mb-2">
+              <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-800 px-2.5 py-0.5 text-sm font-medium text-red-800 dark:text-red-300 mr-2">
+                Error
+              </span>
+            </h3>
+            <p class="text-red-700 dark:text-red-300">
+              Critical validation errors that prevent form submission. The user must fix these issues before proceeding.
+            </p>
+            <p class="text-sm text-red-600 dark:text-red-400 mt-2">
+              Example: "Email address is invalid. Please enter a valid email."
             </p>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
-    <div class="px-4 py-5 sm:px-6">
-      <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
-        Working with Helper Modules
-      </h2>
-      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-        Use built-in helper modules in your condition rules
-      </p>
-    </div>
-    <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
-      <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
-        Condition rules have access to several helper modules that provide useful functions for validation:
-      </p>
-      
-      <div class="space-y-6">
-        <!-- String Module -->
-        <div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">String Module</h3>
-          <p class="text-gray-700 dark:text-gray-300 mb-3">
-            Functions for working with string values:
-          </p>
-          <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
-            <li><code class="font-mono">String.contains?(str, substr)</code> - Checks if a string contains a substring</li>
-            <li><code class="font-mono">String.starts_with?(str, prefix)</code> - Checks if a string starts with a prefix</li>
-            <li><code class="font-mono">String.ends_with?(str, suffix)</code> - Checks if a string ends with a suffix</li>
-            <li><code class="font-mono">String.matches?(str, pattern)</code> - Checks if a string matches a regex pattern</li>
-            <li><code class="font-mono">String.empty?(str)</code> - Checks if a string is empty or nil</li>
-            <li><code class="font-mono">String.length(str)</code> - Returns the length of a string</li>
-          </ul>
-          <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Example:</h4>
-          <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-            <code>String.starts_with?(field('phone'), '+1') || String.length(field('phone')) == 10</code>
-          </div>
-        </div>
-        
-        <!-- Number Module -->
-        <div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Number Module</h3>
-          <p class="text-gray-700 dark:text-gray-300 mb-3">
-            Functions for working with numeric values:
-          </p>
-          <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
-            <li><code class="font-mono">Number.between?(num, min, max)</code> - Checks if a number is between min and max (inclusive)</li>
-            <li><code class="font-mono">Number.positive?(num)</code> - Checks if a number is positive</li>
-            <li><code class="font-mono">Number.negative?(num)</code> - Checks if a number is negative</li>
-            <li><code class="font-mono">Number.zero?(num)</code> - Checks if a number is zero</li>
-          </ul>
-          <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Example:</h4>
-          <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-            <code>Number.between?(field('age'), 18, 100) && Number.positive?(field('income'))</code>
-          </div>
-        </div>
-        
-        <!-- Date Module -->
-        <div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">Date Module</h3>
-          <p class="text-gray-700 dark:text-gray-300 mb-3">
-            Functions for working with date values:
-          </p>
-          <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
-            <li><code class="font-mono">Date.before?(date1, date2)</code> - Checks if date1 is before date2</li>
-            <li><code class="font-mono">Date.after?(date1, date2)</code> - Checks if date1 is after date2</li>
-            <li><code class="font-mono">Date.between?(date, start_date, end_date)</code> - Checks if date is between start_date and end_date</li>
-            <li><code class="font-mono">Date.today</code> - Returns today's date as a string</li>
-            <li><code class="font-mono">Date.years_ago(years)</code> - Returns the date that was X years ago</li>
-          </ul>
-          <h4 class="text-md font-medium text-gray-800 dark:text-gray-300 mt-3 mb-2">Example:</h4>
-          <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto">
-            <code>Date.after?(field('birth_date'), Date.years_ago(100)) && Date.before?(field('birth_date'), Date.years_ago(18))</code>
-          </div>
-        </div>
+    <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6">
+        <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
+          Best Practices
+        </h2>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+          Tips for effective validation rule creation
+        </p>
+      </div>
+      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
+        <ul class="space-y-5 text-gray-700 dark:text-gray-300">
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Test thoroughly:</strong> Always use the test feature to validate your rules with different data before saving.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Order matters:</strong> Rules are evaluated in the order they appear in the list. Place simpler, more fundamental validations first.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Write clear error messages:</strong> Error messages should be concise and helpful, explaining what's wrong and how to fix it.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Use appropriate severity:</strong> Reserve "Error" severity for truly critical validation issues. Use "Warning" or "Info" for advisory messages.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Handle empty values:</strong> Many fields might be optional. Be sure to check for presence before validating content.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Add descriptions:</strong> Use the description field to document your rule's purpose for other team members.
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong class="text-gray-900 dark:text-gray-100">Vertical field rules:</strong> Create common validation rules at the vertical field level to ensure consistency across campaigns.
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
-  
-  <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-8">
-    <div class="px-4 py-5 sm:px-6">
-      <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
-        Severity Levels
-      </h2>
-      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-        Understanding validation severity and how it affects lead submission
-      </p>
-    </div>
-    <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
-      <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
-        Each validation rule can have one of three severity levels that determine how validation failures are handled:
-      </p>
-      
-      <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <!-- Info -->
-        <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
-          <h3 class="text-lg font-medium text-blue-800 dark:text-blue-300 mb-2">
-            <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-800 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:text-blue-300 mr-2">
-              Info
-            </span>
-          </h3>
-          <p class="text-blue-700 dark:text-blue-300">
-            Informational messages only. Does not block form submission but provides helpful context to the user.
-          </p>
-          <p class="text-sm text-blue-600 dark:text-blue-400 mt-2">
-            Example: "This phone number doesn't include a country code"
-          </p>
-        </div>
-        
-        <!-- Warning -->
-        <div class="bg-yellow-50 dark:bg-yellow-900/30 p-4 rounded-lg">
-          <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-300 mb-2">
-            <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-800 px-2.5 py-0.5 text-sm font-medium text-yellow-800 dark:text-yellow-300 mr-2">
-              Warning
-            </span>
-          </h3>
-          <p class="text-yellow-700 dark:text-yellow-300">
-            Warning messages that alert the user but still allow form submission. Requires user confirmation to proceed.
-          </p>
-          <p class="text-sm text-yellow-600 dark:text-yellow-400 mt-2">
-            Example: "The provided income seems unusually high. Please confirm it's correct."
-          </p>
-        </div>
-        
-        <!-- Error -->
-        <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg">
-          <h3 class="text-lg font-medium text-red-800 dark:text-red-300 mb-2">
-            <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-800 px-2.5 py-0.5 text-sm font-medium text-red-800 dark:text-red-300 mr-2">
-              Error
-            </span>
-          </h3>
-          <p class="text-red-700 dark:text-red-300">
-            Critical validation errors that prevent form submission. The user must fix these issues before proceeding.
-          </p>
-          <p class="text-sm text-red-600 dark:text-red-400 mt-2">
-            Example: "Email address is invalid. Please enter a valid email."
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 sm:px-6">
-      <h2 class="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-200">
-        Best Practices
-      </h2>
-      <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
-        Tips for effective validation rule creation
-      </p>
-    </div>
-    <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-6">
-      <ul class="space-y-5 text-gray-700 dark:text-gray-300">
-        <li class="flex gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <strong class="text-gray-900 dark:text-gray-100">Test thoroughly:</strong> Always use the test feature to validate your rules with different data before saving.
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <strong class="text-gray-900 dark:text-gray-100">Order matters:</strong> Rules are evaluated in the order they appear in the list. Place simpler, more fundamental validations first.
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <strong class="text-gray-900 dark:text-gray-100">Write clear error messages:</strong> Error messages should be concise and helpful, explaining what's wrong and how to fix it.
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <strong class="text-gray-900 dark:text-gray-100">Use appropriate severity:</strong> Reserve "Error" severity for truly critical validation issues. Use "Warning" or "Info" for advisory messages.
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <strong class="text-gray-900 dark:text-gray-100">Handle empty values:</strong> Many fields might be optional. Be sure to check for presence before validating content.
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <strong class="text-gray-900 dark:text-gray-100">Add descriptions:</strong> Use the description field to document your rule's purpose for other team members.
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <strong class="text-gray-900 dark:text-gray-100">Vertical field rules:</strong> Create common validation rules at the vertical field level to ensure consistency across campaigns.
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
+<% end %>

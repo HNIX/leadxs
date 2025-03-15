@@ -1,0 +1,92 @@
+<%= turbo_frame_tag "modal" do %>
+  <div data-controller="turbo-modal" class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center z-50">
+    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <!-- Close button -->
+      <button type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300" 
+              data-action="click->turbo-modal#hideModal">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <span class="sr-only">Close</span>
+      </button>
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          Test Validation Rule
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Add a new validation rule to <%= @validatable.name %>
+        </p>
+      </div>
+      
+      <!-- Modal Content -->
+      <div class="p-6 max-h-[calc(90vh-130px)] overflow-y-auto">
+        <%# Test Rule Card %>
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-6" data-controller="validation-rule-test">
+        <div class="px-4 py-5 sm:px-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Test This Rule</h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Try sample data to see how this rule validates
+            </p>
+        </div>
+        
+        <div class="border-t border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+            <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Test Data (JSON)</label>
+            <textarea 
+                data-validation-rule-test-target="testData" 
+                rows="3" 
+                class="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 dark:text-white dark:bg-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" 
+                placeholder='{"<%= @validatable.name.underscore %>": "test value", "other_field": 123}'></textarea>
+            </div>
+            
+            <button 
+            type="button" 
+            data-action="validation-rule-test#testRule"
+            data-rule-id="<%= @validation_rule.id %>"
+            data-rule-type="<%= @validation_rule.rule_type %>"
+            data-rule-condition="<%= @validation_rule.condition %>"
+            data-rule-parameters="<%= @validation_rule.parameters.to_json %>"
+            class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+            </svg>
+            Run Test
+            </button>
+            
+            <div data-validation-rule-test-target="results" class="mt-4 hidden">
+            <div data-validation-rule-test-target="valid" class="hidden">
+                <div class="bg-green-50 dark:bg-green-900 p-3 rounded-md">
+                <p class="text-sm text-green-700 dark:text-green-200 flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2 flex-shrink-0 text-green-500 dark:text-green-400">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                    <span>
+                    <span class="font-bold">Validation passed!</span>
+                    <span class="block mt-1">This data meets the rule requirements.</span>
+                    </span>
+                </p>
+                </div>
+            </div>
+            
+            <div data-validation-rule-test-target="invalid" class="hidden">
+                <div class="bg-red-50 dark:bg-red-900 p-3 rounded-md">
+                <p class="text-sm text-red-700 dark:text-red-200 flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2 flex-shrink-0 text-red-500 dark:text-red-400">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                    <span>
+                    <span class="font-bold">Validation failed:</span>
+                    <span data-validation-rule-test-target="errorMessage" class="block mt-1"></span>
+                    </span>
+                </p>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

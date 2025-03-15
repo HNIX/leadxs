@@ -1,4 +1,114 @@
 module SourcesHelper
+  # Generate breadcrumbs for the sources index page
+  def sources_index_breadcrumbs
+    # Set up breadcrumbs based on context
+    breadcrumbs = if @campaign.present?
+      # Campaign context
+      [
+        { title: "Home", path: root_path },
+        { title: "Campaigns", path: campaigns_path },
+        { title: @campaign.name, path: campaign_path(@campaign) },
+        { title: "Sources", path: nil }
+      ]
+    else
+      # Global sources context
+      [
+        { title: "Home", path: root_path },
+        { title: "Sources", path: nil }
+      ]
+    end
+  
+    # Render breadcrumbs partial with current context
+    render partial: "shared/breadcrumbs", locals: { breadcrumbs: breadcrumbs }
+  end
+  
+  # Generate breadcrumbs for the source show page
+  def source_show_breadcrumbs(source, options = {})
+    content_for :breadcrumbs do
+      from_campaign = options[:from_campaign] || false
+      
+      breadcrumbs = if from_campaign
+        # Coming from campaign context
+        [
+          { title: "Home", path: root_path },
+          { title: "Campaigns", path: campaigns_path },
+          { title: source.campaign.name, path: campaign_path(source.campaign) },
+          { title: "Sources", path: campaign_sources_path(source.campaign) },
+          { title: source.name, path: nil }
+        ]
+      else
+        # Coming from global sources
+        [
+          { title: "Home", path: root_path },
+          { title: "Sources", path: sources_path },
+          { title: source.name, path: nil }
+        ]
+      end
+      
+      render partial: "shared/breadcrumbs", locals: {
+        breadcrumbs: breadcrumbs
+      }
+    end
+  end
+  
+  # Generate breadcrumbs for the source edit page
+  def source_edit_breadcrumbs(source, options = {})
+    content_for :breadcrumbs do
+      from_campaign = options[:from_campaign] || false
+      
+      breadcrumbs = if from_campaign
+        # Coming from campaign context
+        [
+          { title: "Home", path: root_path },
+          { title: "Campaigns", path: campaigns_path },
+          { title: source.campaign.name, path: campaign_path(source.campaign) },
+          { title: "Sources", path: campaign_sources_path(source.campaign) },
+          { title: source.name, path: source_path(source, from_campaign: true) },
+          { title: "Edit", path: nil }
+        ]
+      else
+        # Coming from global sources
+        [
+          { title: "Home", path: root_path },
+          { title: "Sources", path: sources_path },
+          { title: source.name, path: source_path(source) },
+          { title: "Edit", path: nil }
+        ]
+      end
+      
+      render partial: "shared/breadcrumbs", locals: {
+        breadcrumbs: breadcrumbs
+      }
+    end
+  end
+  
+  # Generate breadcrumbs for the source new page
+  def source_new_breadcrumbs(campaign = nil)
+    content_for :breadcrumbs do
+      breadcrumbs = if campaign.present?
+        # Coming from campaign context
+        [
+          { title: "Home", path: root_path },
+          { title: "Campaigns", path: campaigns_path },
+          { title: campaign.name, path: campaign_path(campaign) },
+          { title: "Sources", path: campaign_sources_path(campaign) },
+          { title: "New Source", path: nil }
+        ]
+      else
+        # Coming from global sources
+        [
+          { title: "Home", path: root_path },
+          { title: "Sources", path: sources_path },
+          { title: "New Source", path: nil }
+        ]
+      end
+      
+      render partial: "shared/breadcrumbs", locals: {
+        breadcrumbs: breadcrumbs
+      }
+    end
+  end
+  
   def source_status_badge(status)
     case status
     when 'active'

@@ -1,4 +1,4 @@
-<%= form_with(model: [@campaign, @source].compact, local: true, class: "space-y-6", data: { controller: "source-form" }) do |form| %>
+<%= form_with(model: @campaign ? [@campaign, @source] : @source, local: true, class: "space-y-6", data: { controller: "source-form" }) do |form| %>
   <% if @source.errors.any? %>
     <div class="alert alert-danger mb-6 dark:bg-red-900 dark:border-red-700" role="alert">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="dark:text-red-300">
@@ -26,9 +26,19 @@
 
     <div>
       <%= form.label :company_id, class: "dark:text-gray-200" %>
-      <%= form.collection_select :company_id, current_account.companies.active.sorted, :id, :name, {include_blank: "Select a company"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
+      <%= form.collection_select :company_id, @companies.presence || current_account.companies.active.sorted, :id, :name, {include_blank: "Select a company"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"} %>
     </div>
   </div>
+
+  <% unless @campaign.present? %>
+    <div class="grid grid-cols-1 gap-6">
+      <div>
+        <%= form.label :campaign_id, "Campaign", class: "dark:text-gray-200" %>
+        <%= form.collection_select :campaign_id, @campaigns.presence || [], :id, :name, {include_blank: "Select a campaign"}, {class: "form-select w-full dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200", required: true} %>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select which campaign this source belongs to</p>
+      </div>
+    </div>
+  <% end %>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
@@ -131,8 +141,10 @@
   <div class="flex justify-between mt-8">
     <% if @source.persisted? %>
       <%= link_to "Back", source_path(@source), class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" %>
-    <% else %>
+    <% elsif @campaign.present? %>
       <%= link_to "Back", campaign_sources_path(@campaign), class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" %>
+    <% else %>
+      <%= link_to "Back", sources_path, class: "btn btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" %>
     <% end %>
 
     <%= form.submit class: "btn btn-primary" %>

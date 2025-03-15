@@ -123,6 +123,11 @@ class BidRequest < ApplicationRecord
     if campaign.multi_distribution_strategy == "single" || campaign.max_distributions <= 1
       # Use LeadDistributionService for a single distribution
       distribution_service = LeadDistributionService.new(lead)
+      
+      # Set the bid_request_id to indicate this is the post phase of ping-post
+      # This ensures correct endpoint URL selection
+      lead.update(bid_request_id: id) if lead.bid_request_id.nil?
+      
       result = distribution_service.distribute_to_specific!(primary_distribution)
       
       # Update lead status based on distribution result
@@ -135,11 +140,43 @@ class BidRequest < ApplicationRecord
       result[:success]
     else
       # Use MultiDistributionService for multi-distribution strategies
-      # The winning bid already determined which distributions to use
+      
+      # Set the bid_request_id to indicate this is the post phase of ping-post
+      lead.update(bid_request_id: id) if lead.bid_request_id.nil?
+      
+      # For multi-distribution, we need a list of winning distributions
+      # In some cases, we might have multiple winning bids (for parallel strategy)
+      winning_distributions = []
+      
+      # Add primary distribution first
+      winning_distributions << primary_distribution
+      
+      # Get additional distributions based on strategy
+      case campaign.multi_distribution_strategy
+      when "parallel"
+        # For parallel, we might get multiple high bids (top N by amount)
+        max_additional = (campaign.max_distributions || 1) - 1
+        if max_additional > 0
+          # Get additional top bids excluding the winning one
+          additional_bids = bids.where.not(id: winning_bid.id)
+                               .order(amount: :desc)
+                               .limit(max_additional)
+          
+          # Add their distributions
+          additional_bids.each do |bid|
+            dist = campaign.campaign_distributions.find_by(distribution: bid.distribution)
+            winning_distributions << dist if dist && dist.active?
+          end
+        end
+      when "sequential"
+        # Leave as is - just use the primary winning distribution
+      end
+      
+      # Create the distribution service 
       distribution_service = MultiDistributionService.new(lead)
       
-      # The service handles updating the lead status
-      result = distribution_service.distribute!
+      # Distribute to winning distributions
+      result = distribution_service.distribute_to_winners(winning_distributions)
       
       result[:success]
     end

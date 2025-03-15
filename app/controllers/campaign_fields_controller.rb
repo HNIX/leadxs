@@ -24,6 +24,7 @@ class CampaignFieldsController < ApplicationController
   
   def show
     # The view will access @campaign_field
+    @modal_title = "Field Details"
   end
 
   def new
@@ -44,10 +45,12 @@ class CampaignFieldsController < ApplicationController
         Rails.logger.debug("Campaign field saved successfully: #{@campaign_field.id}")
         format.html { redirect_to campaign_path(@campaign), notice: "Field was successfully added." }
         format.json { render :show, status: :created, location: @campaign_field }
+        format.turbo_stream { redirect_to campaign_configure_path(@campaign, anchor: "campaign-fields"), notice: "Field was successfully added." }
       else
         Rails.logger.debug("Failed to save campaign field. Errors: #{@campaign_field.errors.full_messages}")
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @campaign_field.errors, status: :unprocessable_entity }
+        format.turbo_stream { render :new, status: :unprocessable_entity }
       end
     end
   end
@@ -62,18 +65,26 @@ class CampaignFieldsController < ApplicationController
       if @campaign_field.update(campaign_field_params)
         format.html { redirect_to campaign_path(@campaign), notice: "Field was successfully updated." }
         format.json { render :show, status: :ok, location: @campaign_field }
+        format.turbo_stream { redirect_to campaign_configure_path(@campaign, anchor: "campaign-fields"), notice: "Field was successfully updated." }
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @campaign_field.errors, status: :unprocessable_entity }
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
       end
     end
   end
 
   def destroy
     if @campaign_field.destroy
-      redirect_to campaign_path(@campaign), notice: "Field was successfully deleted."
+      respond_to do |format|
+        format.html { redirect_to campaign_path(@campaign), notice: "Field was successfully deleted." }
+        format.turbo_stream { redirect_to campaign_configure_path(@campaign, anchor: "campaign-fields"), notice: "Field was successfully deleted." }
+      end
     else
-      redirect_to campaign_path(@campaign), alert: "Error deleting field."
+      respond_to do |format|
+        format.html { redirect_to campaign_path(@campaign), alert: "Error deleting field." }
+        format.turbo_stream { redirect_to campaign_configure_path(@campaign, anchor: "campaign-fields"), alert: "Error deleting field." }
+      end
     end
   end
 

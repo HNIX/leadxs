@@ -1,0 +1,78 @@
+<div class="mb-6 bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+  <!-- Header Content -->
+  <div class="p-4 md:p-6">
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+      <!-- Title and Subtitle Section -->
+      <div class="flex-1 min-w-0">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          <%= title %>
+          <% if defined?(status_badge) && status_badge.present? %>
+            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_badge[:class] %>">
+              <%= status_badge[:text] %>
+            </span>
+          <% end %>
+        </h1>
+        <% if defined?(subtitle) && subtitle.present? %>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <%= subtitle %>
+          </p>
+        <% end %>
+      </div>
+
+      <!-- Action Buttons -->
+      <% if defined?(actions) && actions.present? %>
+        <div class="flex space-x-2 flex-shrink-0">
+          <% actions.each do |action| %>
+            <%= link_to action[:path], class: "btn btn-#{action[:style] || 'primary'} #{'flex-shrink-0' if action[:style] == 'primary'}" do %>
+              <% if action[:icon].present? %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <% case action[:icon] %>
+                  <% when "plus" %>
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  <% when "download" %>
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  <% when "refresh" %>
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                  <% when "filter" %>
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                  <% when "share" %>
+                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                  <% when "edit" %>
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  <% when "archive" %>
+                    <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                    <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd" />
+                  <% when "document-text" %>
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                  <% else %>
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  <% end %>
+                </svg>
+              <% end %>
+              <%= action[:label] %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Metrics Cards -->
+  <% if defined?(metrics) && metrics.present? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-<%= metrics.length %> border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <% metrics.each_with_index do |metric, index| %>
+        <div class="p-4 <%= index < metrics.length - 1 ? 'border-r border-gray-200 dark:border-gray-700' : '' %>">
+          <p class="text-sm text-gray-500 dark:text-gray-400"><%= metric[:label] %></p>
+          <p class="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">
+            <%= metric[:value] %><% if metric[:unit].present? %><span class="ml-1 text-xl text-gray-500 dark:text-gray-400"><%= metric[:unit] %></span><% end %>
+          </p>
+          <% if metric[:chart_data].present? %>
+            <div class="h-10 mt-2">
+              <!-- Chart would go here -->
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

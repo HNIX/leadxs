@@ -84,6 +84,9 @@ Rails.application.routes.draw do
     end
   end
   
+  # Response testing endpoint
+  post 'test_connection/:id/evaluate_response', to: 'test_connection#evaluate_response', as: :evaluate_response
+  
   # Campaign Distributions mapping
   resources :campaign_distributions, except: [:index, :new, :create] do
     resources :mapped_fields, only: [:index] do
@@ -168,14 +171,17 @@ Rails.application.routes.draw do
       end
     end
     
-    # Sources for lead acquisition
-    resources :sources, shallow: true, only: [:index, :new, :create]
+    # Campaign-specific sources
+    resources :sources, only: [:new, :create, :index] 
   end
   
-  # Sources with their own routes for show, edit, update, delete actions
-  resources :sources, except: [:index, :new, :create] do
+  # Global sources listing and management
+  resources :sources do
     member do
       post :regenerate_token
+    end
+    collection do
+      post :bulk_update
     end
   end
   
@@ -290,6 +296,11 @@ Rails.application.routes.draw do
   
   # Form builder embed JavaScript
   get 'embed.js', to: 'form_builder_public#embed_js', as: :form_builder_embed_js
+  
+  # Static pages and documentation
+  get 'static/campaign_fields_docs', to: 'static#campaign_fields_docs', as: :campaign_fields_docs
+  get 'static/calculated_fields_docs', to: 'static#calculated_fields_docs', as: :calculated_fields_docs
+  get 'static/sources_docs', to: 'static#sources_docs', as: :sources_docs
   
   # Public marketing homepage
   root to: "static#index"

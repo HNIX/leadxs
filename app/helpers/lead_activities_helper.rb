@@ -25,6 +25,38 @@ module LeadActivitiesHelper
     end
   end
   
+  # Returns background color class for activity icon
+  def activity_icon_color(activity_type)
+    case activity_type.to_s
+    when "submission"
+      "bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400"
+    when "validation"
+      "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400"
+    when "anonymization"
+      "bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400"
+    when "bid_request"
+      "bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400"
+    when "bid_received"
+      "bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400"
+    when "bid_selected"
+      "bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400"
+    when "consent_requested"
+      "bg-cyan-100 text-cyan-600 dark:bg-cyan-900 dark:text-cyan-400"
+    when "consent_provided"
+      "bg-teal-100 text-teal-600 dark:bg-teal-900 dark:text-teal-400"
+    when "distribution"
+      "bg-pink-100 text-pink-600 dark:bg-pink-900 dark:text-pink-400"
+    when "buyer_response"
+      "bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400"
+    when "status_update"
+      "bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400"
+    when "data_access"
+      "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400"
+    else
+      "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400"
+    end
+  end
+  
   # Returns appropriate badge for each activity type
   def activity_badge(activity)
     base_classes = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
@@ -127,7 +159,7 @@ module LeadActivitiesHelper
   def lead_status_color(status)
     base_classes = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
     
-    case status.to_sym
+    case status.to_s.to_sym
     when :new_lead
       "#{base_classes} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
     when :processing
@@ -149,7 +181,7 @@ module LeadActivitiesHelper
   def bid_status_color(status)
     base_classes = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
     
-    case status.to_sym
+    case status.to_s.to_sym
     when :pending
       "#{base_classes} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
     when :accepted

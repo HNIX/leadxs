@@ -8,60 +8,157 @@ class ValidationRulesController < ApplicationController
   end
   
   def show
+
   end
   
   def new
     @validation_rule = @validatable.validation_rules.new
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
   
   def create
     @validation_rule = @validatable.validation_rules.new(validation_rule_params)
+    @validation_rule.account = current_account
 
     if @validation_rule.save
-      redirect_to polymorphic_path([@validatable, @validation_rule]), notice: "Validation rule was successfully created."  
+      respond_to do |format|
+        format.html { redirect_to polymorphic_path([@validatable, @validation_rule]), notice: "Validation rule was successfully created." }
+        format.turbo_stream do
+          if @validatable.is_a?(Campaign)
+            flash.now[:notice] = "Validation rule was successfully created."
+            render turbo_stream: [
+              turbo_stream.update("modal", ""),
+              turbo_stream.replace("validation-rules-container", 
+                partial: "validation_rules/validation_rules_table", 
+                locals: { validation_rules: @validatable.validation_rules.ordered }
+              ),
+              turbo_stream.replace("flash", partial: "application/flash")
+            ]
+          else
+            redirect_to polymorphic_path([@validatable, :validation_rules]), notice: "Validation rule was successfully created."
+          end
+        end
+      end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :new, status: :unprocessable_entity }
+      end
     end
   end
   
   def edit
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
   
   def update
     if @validation_rule.update(validation_rule_params)
-      redirect_to polymorphic_path([@validatable, @validation_rule]), notice: "Validation rule was successfully updated."                  
+      respond_to do |format|
+        format.html { redirect_to polymorphic_path([@validatable, @validation_rule]), notice: "Validation rule was successfully updated." }
+        format.turbo_stream do
+          if @validatable.is_a?(Campaign)
+            flash.now[:notice] = "Validation rule was successfully updated."
+            render turbo_stream: [
+              turbo_stream.update("modal", ""),
+              turbo_stream.replace("validation-rules-container", 
+                partial: "validation_rules/validation_rules_table", 
+                locals: { validation_rules: @validatable.validation_rules.ordered }
+              ),
+              turbo_stream.replace("flash", partial: "application/flash")
+            ]
+          else
+            redirect_to polymorphic_path([@validatable, :validation_rules]), notice: "Validation rule was successfully updated."
+          end
+        end
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
+      end
     end
   end
   
   def destroy
     @validation_rule.destroy
-    # For campaign or vertical validation rules, return to the appropriate index
-    if @validatable.is_a?(Campaign)
-      redirect_to campaign_validation_rules_path(@validatable), notice: "Validation rule was successfully deleted."
-    elsif @validatable.is_a?(Vertical)
-      redirect_to vertical_validation_rules_path(@validatable), notice: "Validation rule was successfully deleted."
-    else
-      # Legacy support for field-level rules
-      redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
-                  notice: "Validation rule was successfully deleted."
+    
+    respond_to do |format|
+      format.html do
+        # For campaign or vertical validation rules, return to the appropriate index
+        if @validatable.is_a?(Campaign)
+          redirect_to campaign_validation_rules_path(@validatable), notice: "Validation rule was successfully deleted."
+        elsif @validatable.is_a?(Vertical)
+          redirect_to vertical_validation_rules_path(@validatable), notice: "Validation rule was successfully deleted."
+        else
+          # Legacy support for field-level rules
+          redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
+                    notice: "Validation rule was successfully deleted."
+        end
+      end
+      
+      format.turbo_stream do
+        if @validatable.is_a?(Campaign)
+          # If deleted from campaign configure page via modal, update the table
+          flash.now[:notice] = "Validation rule was successfully deleted."
+          render turbo_stream: [
+            turbo_stream.update("modal", ""),
+            turbo_stream.replace("validation-rules-container", 
+              partial: "validation_rules/validation_rules_table", 
+              locals: { validation_rules: @validatable.validation_rules.ordered }
+            ),
+            turbo_stream.replace("flash", partial: "application/flash")
+          ]
+        else
+          # For other cases, redirect normally
+          redirect_to polymorphic_path([@validatable, :validation_rules]), notice: "Validation rule was successfully deleted."
+        end
+      end
     end
   end
   
   def toggle_active
     @validation_rule.update(active: !@validation_rule.active)
-    # For campaign or vertical validation rules, return to the appropriate index
-    if @validatable.is_a?(Campaign)
-      redirect_to campaign_validation_rules_path(@validatable), 
-                  notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
-    elsif @validatable.is_a?(Vertical)
-      redirect_to vertical_validation_rules_path(@validatable), 
-                  notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
-    else
-      # Legacy support for field-level rules
-      redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
-                  notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+    
+    respond_to do |format|
+      format.html do
+        # For campaign or vertical validation rules, return to the appropriate index
+        if @validatable.is_a?(Campaign)
+          redirect_to campaign_validation_rules_path(@validatable), 
+                    notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+        elsif @validatable.is_a?(Vertical)
+          redirect_to vertical_validation_rules_path(@validatable), 
+                    notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+        else
+          # Legacy support for field-level rules
+          redirect_to polymorphic_path([@validatable.is_a?(VerticalField) ? @validatable.vertical : @validatable.campaign, @validatable, :validation_rules]), 
+                    notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+        end
+      end
+      
+      format.turbo_stream do
+        if @validatable.is_a?(Campaign)
+          # If toggled from campaign configure page via modal, update the table
+          flash.now[:notice] = "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+          render turbo_stream: [
+            turbo_stream.update("modal", ""),
+            turbo_stream.replace("validation-rules-container", 
+              partial: "validation_rules/validation_rules_table", 
+              locals: { validation_rules: @validatable.validation_rules.ordered }
+            ),
+            turbo_stream.replace("flash", partial: "application/flash")
+          ]
+        else
+          # For other cases, redirect normally
+          redirect_to polymorphic_path([@validatable, :validation_rules]), notice: "Validation rule was successfully #{@validation_rule.active? ? 'activated' : 'deactivated'}."
+        end
+      end
     end
   end
   

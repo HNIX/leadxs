@@ -9,6 +9,11 @@ class CampaignDistributionsController < ApplicationController
   def new
     @campaign_distribution = @campaign.campaign_distributions.new
     @distributions = available_distributions
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def create
@@ -16,11 +21,19 @@ class CampaignDistributionsController < ApplicationController
 
     respond_to do |format|
       if @campaign_distribution.save
-        format.html { redirect_to campaign_campaign_distributions_path(@campaign), notice: "Distribution was successfully added to campaign." }
+        format.html { 
+          redirect_to configure_campaign_path(@campaign, anchor: 'distribution'), 
+          notice: "Distribution was successfully added to campaign." 
+        }
+        format.turbo_stream { 
+          redirect_to configure_campaign_path(@campaign, anchor: 'distribution'),
+          notice: "Distribution was successfully added to campaign."
+        }
         format.json { render :show, status: :created, location: @campaign_distribution }
       else
         @distributions = available_distributions
         format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :new, status: :unprocessable_entity }
         format.json { render json: @campaign_distribution.errors, status: :unprocessable_entity }
       end
     end
@@ -28,22 +41,40 @@ class CampaignDistributionsController < ApplicationController
 
   def show
     @mapped_fields = @campaign_distribution.mapped_fields
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def edit
     @campaign = @campaign_distribution.campaign
     @distributions = available_distributions_for_edit
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def update
     respond_to do |format|
       if @campaign_distribution.update(campaign_distribution_params)
-        format.html { redirect_to campaign_distribution_path(@campaign_distribution), notice: "Campaign distribution was successfully updated." }
+        format.html { 
+          redirect_to configure_campaign_path(@campaign_distribution.campaign, anchor: 'distribution'), 
+          notice: "Campaign distribution was successfully updated." 
+        }
+        format.turbo_stream { 
+          redirect_to configure_campaign_path(@campaign_distribution.campaign, anchor: 'distribution'),
+          notice: "Campaign distribution was successfully updated."
+        }
         format.json { render :show, status: :ok, location: @campaign_distribution }
       else
         @campaign = @campaign_distribution.campaign
         @distributions = available_distributions_for_edit
         format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
         format.json { render json: @campaign_distribution.errors, status: :unprocessable_entity }
       end
     end
@@ -54,7 +85,14 @@ class CampaignDistributionsController < ApplicationController
     @campaign_distribution.destroy
 
     respond_to do |format|
-      format.html { redirect_to campaign_campaign_distributions_path(campaign), notice: "Distribution was successfully removed from campaign." }
+      format.html { 
+        redirect_to configure_campaign_path(campaign, anchor: 'distribution'), 
+        notice: "Distribution was successfully removed from campaign." 
+      }
+      format.turbo_stream { 
+        redirect_to configure_campaign_path(campaign, anchor: 'distribution'),
+        notice: "Distribution was successfully removed from campaign."
+      }
       format.json { head :no_content }
     end
   end

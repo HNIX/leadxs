@@ -1,30 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["section", "content", "icon"]
+  static targets = ["content", "icon"]
 
   connect() {
-    // Optional: Automatically open the first section
-    if (this.sectionTargets.length > 0) {
-      this.toggle({ currentTarget: this.sectionTargets[0] })
-    }
+    // Initialize
   }
 
-  toggle(event) {
-    const sectionId = event.currentTarget.dataset.sectionId
-    
+  toggle() {
     // Toggle the content visibility
-    this.contentTargets.forEach(content => {
-      if (content.dataset.sectionId === sectionId) {
-        content.classList.toggle('hidden')
-      }
-    })
+    this.contentTarget.classList.toggle('hidden')
     
     // Rotate the icon
-    this.iconTargets.forEach(icon => {
-      if (icon.dataset.sectionId === sectionId) {
-        icon.classList.toggle('rotate-180')
-      }
-    })
+    this.iconTarget.classList.toggle('rotate-180')
   }
 }

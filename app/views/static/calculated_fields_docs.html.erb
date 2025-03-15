@@ -1,0 +1,195 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="fixed inset-0 bg-gray-700/75 bg-opacity-75 transition-opacity z-50"></div>
+
+  <%= tag.div data: { controller: "turbo-modal" }, class: "fixed inset-0 overflow-y-auto z-50" do %>
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-700 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
+        <div class="absolute top-0 right-0 p-4">
+          <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none" data-action="click->turbo-modal#close">
+            <span class="sr-only">Close</span>
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4 overflow-y-auto max-h-[80vh]">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 sm:mt-0 sm:ml-4 w-full">
+              <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Calculated Fields Documentation</h3>
+              
+              <div class="mt-4 prose prose-sm dark:prose-invert max-w-none">
+                <h2>Understanding Calculated Fields</h2>
+                <p>
+                  Calculated fields allow you to create new values derived from other fields in your campaign.
+                  These fields can be used to perform calculations, format data, or combine information from multiple fields.
+                </p>
+                
+                <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 dark:border-blue-600 p-4 my-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-blue-700 dark:text-blue-300">
+                        <strong>Note:</strong> Calculated fields are computed dynamically and don't store data. Their values are generated when leads are processed.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <h3 class="mt-6">Common Use Cases</h3>
+                <ul class="mt-2 space-y-2">
+                  <li><strong>Combining fields</strong> - Joining first and last name into a full name</li>
+                  <li><strong>Data formatting</strong> - Converting dates to specific formats</li>
+                  <li><strong>Calculations</strong> - Computing totals, percentages, or duration between dates</li>
+                  <li><strong>Data transformations</strong> - Uppercase/lowercase conversions, text manipulations</li>
+                  <li><strong>Conditional values</strong> - Setting different values based on conditions</li>
+                </ul>
+                
+                <h3 class="mt-6">Formula Language</h3>
+                <p>
+                  Calculated fields use a formula language that provides access to campaign fields and various functions.
+                  The formula is evaluated during lead processing to generate the calculated field's value.
+                </p>
+                
+                <h4 class="mt-4">Accessing Campaign Fields</h4>
+                <p>
+                  To reference the value of another field in your campaign, use the <code>field()</code> function:
+                </p>
+                <pre class="bg-gray-100 dark:bg-gray-700 p-3 rounded-md">field('field_name')</pre>
+                
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="border dark:border-gray-700 rounded-md p-4">
+                    <h4 class="text-base font-medium">Text Operations</h4>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                      <li><code>concat(a, b)</code> - Concatenate two values</li>
+                      <li><code>uppercase(text)</code> - Convert text to uppercase</li>
+                      <li><code>lowercase(text)</code> - Convert text to lowercase</li>
+                      <li><code>trim(text)</code> - Remove whitespace from start and end</li>
+                      <li><code>length(text)</code> - Get the length of a text string</li>
+                      <li><code>substring(text, start, length)</code> - Extract part of text</li>
+                    </ul>
+                  </div>
+                  
+                  <div class="border dark:border-gray-700 rounded-md p-4">
+                    <h4 class="text-base font-medium">Math Operations</h4>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                      <li><code>add(a, b)</code> - Add two numbers</li>
+                      <li><code>subtract(a, b)</code> - Subtract b from a</li>
+                      <li><code>multiply(a, b)</code> - Multiply two numbers</li>
+                      <li><code>divide(a, b)</code> - Divide a by b</li>
+                      <li><code>round(value, decimals)</code> - Round to specified decimals</li>
+                      <li><code>floor(value)</code> - Round down to nearest integer</li>
+                      <li><code>ceiling(value)</code> - Round up to nearest integer</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="border dark:border-gray-700 rounded-md p-4">
+                    <h4 class="text-base font-medium">Date Operations</h4>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                      <li><code>now()</code> - Current date and time</li>
+                      <li><code>today()</code> - Current date</li>
+                      <li><code>formatDate(date, format)</code> - Format a date</li>
+                      <li><code>dateDiff(date1, date2, unit)</code> - Calculate difference</li>
+                      <li><code>addDays(date, days)</code> - Add days to date</li>
+                      <li><code>addMonths(date, months)</code> - Add months to date</li>
+                    </ul>
+                  </div>
+                  
+                  <div class="border dark:border-gray-700 rounded-md p-4">
+                    <h4 class="text-base font-medium">Logical Operations</h4>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                      <li><code>if(condition, trueValue, falseValue)</code> - Conditional result</li>
+                      <li><code>and(condition1, condition2)</code> - Logical AND</li>
+                      <li><code>or(condition1, condition2)</code> - Logical OR</li>
+                      <li><code>not(condition)</code> - Logical NOT</li>
+                      <li><code>equal(a, b)</code> - Check if a equals b</li>
+                      <li><code>greaterThan(a, b)</code> - Check if a > b</li>
+                      <li><code>lessThan(a, b)</code> - Check if a < b</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <h3 class="mt-6">Formula Examples</h3>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 mt-4">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Purpose</th>
+                        <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Formula</th>
+                        <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                      <tr>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Full Name</td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400"><code>concat(concat(field('first_name'), ' '), field('last_name'))</code></td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Combines first and last name with a space between</td>
+                      </tr>
+                      <tr>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Age Calculation</td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400"><code>subtract(toNumber(formatDate(today(), 'YYYY')), toNumber(formatDate(toDate(field('date_of_birth')), 'YYYY')))</code></td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Calculates age by subtracting birth year from current year</td>
+                      </tr>
+                      <tr>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Total Price</td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400"><code>multiply(field('quantity'), field('unit_price'))</code></td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Calculates total by multiplying quantity and unit price</td>
+                      </tr>
+                      <tr>
+                        <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Conditional Fee</td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400"><code>if(field('is_student'), 25, 50)</code></td>
+                        <td class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">Sets fee to $25 for students, $50 for non-students</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <h3 class="mt-6">Best Practices</h3>
+                <ol class="mt-2 space-y-2 list-decimal list-inside">
+                  <li>Use clear, descriptive names for calculated fields</li>
+                  <li>Keep formulas simple and readable when possible</li>
+                  <li>Test formulas with sample data to ensure they work correctly</li>
+                  <li>Use appropriate data type conversions when combining different types</li>
+                  <li>Add comments or documentation explaining complex formulas</li>
+                  <li>Consider performance impact for very complex calculations</li>
+                </ol>
+                
+                <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 my-6">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                        <strong>Important:</strong> Ensure that all fields referenced in your formula exist in the campaign and contain appropriate data types. Type mismatches can cause runtime errors.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <p class="mt-8">
+                  For more detailed information or advanced formula techniques, please refer to the complete documentation 
+                  or contact our support team.
+                </p>
+              </div>
+              
+              <div class="mt-8 flex justify-end">
+                <button type="button" class="btn btn-primary" data-action="click->turbo-modal#close">
+                  Close Documentation
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

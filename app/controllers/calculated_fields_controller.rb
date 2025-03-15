@@ -8,12 +8,24 @@ class CalculatedFieldsController < ApplicationController
   end
   
   def show
+    @modal_title = "Calculated Field Details"
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
   
   def new
     # Ensure campaign fields are loaded for the form
     @campaign_fields = @campaign.campaign_fields.ordered
     @calculated_field = @campaign.calculated_fields.new
+    @modal_title = "Add New Calculated Field"
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
   
   def create
@@ -21,26 +33,57 @@ class CalculatedFieldsController < ApplicationController
     @calculated_field.account = current_account
     
     if @calculated_field.save
-      redirect_to campaign_calculated_field_path(@campaign, @calculated_field), notice: "Calculated field was successfully created."
+      respond_to do |format|
+        format.html { redirect_to campaign_calculated_field_path(@campaign, @calculated_field), notice: "Calculated field was successfully created." }
+        format.turbo_stream { redirect_to campaign_configure_path(@campaign, anchor: 'calculated-fields'), notice: "Calculated field was successfully created." }
+      end
     else
-      render :new, status: :unprocessable_entity
+      # Set up any needed vars for the form
+      @campaign_fields = @campaign.campaign_fields.ordered
+      @modal_title = "Add New Calculated Field"
+      
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :new, status: :unprocessable_entity }
+      end
     end
   end
   
   def edit
+    @campaign_fields = @campaign.campaign_fields.ordered
+    @modal_title = "Edit Calculated Field"
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
   
   def update
     if @calculated_field.update(calculated_field_params)
-      redirect_to campaign_calculated_field_path(@campaign, @calculated_field), notice: "Calculated field was successfully updated."
+      respond_to do |format|
+        format.html { redirect_to campaign_calculated_field_path(@campaign, @calculated_field), notice: "Calculated field was successfully updated." }
+        format.turbo_stream { redirect_to campaign_configure_path(@campaign, anchor: 'calculated-fields'), notice: "Calculated field was successfully updated." }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      # Set up any needed vars for the form
+      @campaign_fields = @campaign.campaign_fields.ordered
+      @modal_title = "Edit Calculated Field"
+      
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
+      end
     end
   end
   
   def destroy
     @calculated_field.destroy
-    redirect_to campaign_calculated_fields_path(@campaign), notice: "Calculated field was successfully deleted."
+    
+    respond_to do |format|
+      format.html { redirect_to campaign_calculated_fields_path(@campaign), notice: "Calculated field was successfully deleted." }
+      format.turbo_stream { redirect_to campaign_configure_path(@campaign, anchor: 'calculated-fields'), notice: "Calculated field was successfully deleted." }
+    end
   end
   
   # Validate a formula without saving it to the database

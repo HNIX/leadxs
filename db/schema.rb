@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_13_210534) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_14_211316) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -529,6 +529,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_210534) do
     t.string "access_token"
     t.datetime "token_expires_at"
     t.string "post_endpoint_url"
+    t.text "ping_response_data"
+    t.jsonb "response_mapping", default: {}, null: false
+    t.jsonb "request_mapping", default: {}, null: false
+    t.string "ping_id_field"
+    t.string "ping_id_target_field"
     t.index ["account_id", "name"], name: "index_distributions_on_account_id_and_name", unique: true
     t.index ["account_id"], name: "index_distributions_on_account_id"
     t.index ["company_id", "name"], name: "index_distributions_on_company_id_and_name", unique: true
@@ -963,6 +968,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_210534) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "form_builder_id"
+    t.string "webhook_url"
+    t.string "webhook_secret"
+    t.string "success_postback_url"
+    t.string "failure_postback_url"
+    t.string "ip_whitelist"
+    t.string "allowed_domains"
     t.index ["account_id"], name: "index_sources_on_account_id"
     t.index ["campaign_id"], name: "index_sources_on_campaign_id"
     t.index ["company_id"], name: "index_sources_on_company_id"

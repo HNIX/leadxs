@@ -1,105 +1,348 @@
-<div class="container mx-auto px-4 py-6">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold dark:text-white">
-      <%= link_to @campaign.name, campaign_path(@campaign), class: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300" %>
-      <span class="text-gray-500 dark:text-gray-400">/</span>
-      Sources
-    </h1>
-    
-    <div class="flex space-x-2">
-      <%= link_to lead_bidding_docs_path, class: "btn btn-outline flex-shrink-0", target: "_blank" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        API Docs
-      <% end %>
-      
-      <%= link_to new_campaign_source_path(@campaign), class: "btn btn-primary" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clip-rule="evenodd" />
-        </svg>
-        Add Source
-      <% end %>
-    </div>
-  </div>
 
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-    <% if @sources.any? %>
-      <div class="overflow-x-auto">
-        <table class="w-full table-auto">
-          <thead class="bg-gray-50 dark:bg-gray-700 text-xs font-semibold uppercase text-gray-500 dark:text-gray-300">
-            <tr>
-              <th class="px-4 py-3 text-left">Name</th>
-              <th class="px-4 py-3 text-left">Company</th>
-              <th class="px-4 py-3 text-left">Integration Type</th>
-              <th class="px-4 py-3 text-left">Status</th>
-              <th class="px-4 py-3 text-right">Payout/Margin</th>
-              <th class="px-4 py-3 text-right">Min. Bid</th>
-              <th class="px-4 py-3 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <% @sources.each do |source| %>
-              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <%= link_to source.name, source_path(source), class: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium" %>
-                </td>
-                <td class="px-4 py-3 dark:text-gray-200">
-                  <%= source.company.name %>
-                </td>
-                <td class="px-4 py-3 dark:text-gray-200">
-                  <%= source.integration_type.humanize %>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-1 text-xs rounded-full <%= 
-                    case source.status
-                    when 'active' then 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                    when 'paused' then 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                    when 'archived' then 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                    end 
-                  %>">
-                    <%= source.status.humanize %>
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-right dark:text-gray-200">
-                  <%= source.display_payout %>
-                </td>
-                <td class="px-4 py-3 text-right dark:text-gray-200">
-                  <%= number_to_currency(source.minimum_acceptable_bid) if source.minimum_acceptable_bid.present? %>
-                </td>
-                <td class="px-4 py-3 text-center space-x-1 whitespace-nowrap">
-                  <%= link_to source_path(source), class: "btn btn-sm btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" do %>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                    </svg>
-                  <% end %>
-                  
-                  <%= link_to edit_source_path(source), class: "btn btn-sm btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200" do %>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+<% sources_index_breadcrumbs %>
+
+
+<%= render partial: "shared/context_header", locals: {
+  title: "Sources",
+  subtitle: "Manage lead sources and their configurations",
+  metrics: [
+    { label: "Total Sources", value: @total_sources, unit: "", chart_data: nil },
+    { label: "Active", value: @active_sources, unit: "", chart_data: nil },
+    { label: "Paused", value: @paused_sources, unit: "", chart_data: nil },
+    { label: "Archived", value: @archived_sources, unit: "", chart_data: nil }
+  ],
+  actions: [
+    { label: "API Documentation", path: lead_bidding_docs_path, icon: "document-text", style: "outline" },
+    { label: "Add Source", path: params[:campaign_id] ? new_campaign_source_path(params[:campaign_id]) : new_source_path, icon: "plus", style: "primary", data: { turbo_frame: "source_modal" } }
+  ], style: "mt-3 mb-3"
+} %>
+
+<div class="container mx-auto mt-3 mb-3 pb-8">
+  <!-- Filters Section -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden">
+    <%= form_with url: sources_path, method: :get, data: { turbo_frame: "_top" }, class: "p-4 border-b border-gray-200 dark:border-gray-700" do |f| %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <%= f.label :query, "Search", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+          <div class="relative rounded-md shadow-sm">
+            <%= f.text_field :query, value: params[:query], placeholder: "Search sources", class: "block w-full pl-10 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <%= f.label :company_id, "Company", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+          <%= f.select :company_id, @companies.map { |c| [c.name, c.id] }, { include_blank: "All Companies", selected: params[:company_id] }, class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
+        </div>
+        
+        <div>
+          <%= f.label :campaign_id, "Campaign", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+          <%= f.select :campaign_id, @campaigns.map { |c| [c.name, c.id] }, { include_blank: "All Campaigns", selected: params[:campaign_id] }, class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
+        </div>
+        
+        <div>
+          <%= f.label :status, "Status", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+          <%= f.select :status, Source::STATUSES.map { |s| [s.humanize, s] }, { include_blank: "All Statuses", selected: params[:status] }, class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
+        </div>
       </div>
-    <% else %>
-      <div class="flex flex-col items-center justify-center py-12 px-4 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">No sources found</h3>
-        <p class="text-gray-500 dark:text-gray-400 mb-6">This campaign doesn't have any sources yet.</p>
-        <%= link_to new_campaign_source_path(@campaign), class: "btn btn-primary" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
-          Add your first source
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
+        <div>
+          <%= f.label :integration_type, "Integration Type", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+          <%= f.select :integration_type, Source::INTEGRATION_TYPES.map { |t| [t.humanize, t] }, { include_blank: "All Types", selected: params[:integration_type] }, class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
+        </div>
+        
+        <div>
+          <%= f.label :sort, "Sort By", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+          <%= f.select :sort, [
+            ["Newest First", "newest"],
+            ["Oldest First", "oldest"],
+            ["Name (A-Z)", "name_asc"],
+            ["Name (Z-A)", "name_desc"],
+            ["Company", "company"]
+          ], { selected: params[:sort] || "newest" }, class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
+        </div>
+        
+        <div>
+          <%= f.label :per_page, "Items Per Page", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+          <%= f.select :per_page, [10, 20, 50, 100], { selected: params[:per_page] || 20 }, class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm" %>
+        </div>
+        
+        <div class="flex items-end">
+          <%= f.submit "Apply Filters", class: "btn btn-primary w-full" %>
+        </div>
+      </div>
+    <% end %>
+    
+    <% if params[:query].present? || params[:company_id].present? || params[:campaign_id].present? || params[:status].present? || params[:integration_type].present? %>
+      <div class="bg-gray-50 dark:bg-gray-900 px-4 py-3 flex flex-wrap items-center gap-2">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+        
+        <% if params[:query].present? %>
+          <div class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 py-1 pl-3 pr-2 text-sm text-blue-700 dark:text-blue-300">
+            Search: <%= params[:query] %>
+            <%= link_to sources_path(params.permit(:company_id, :campaign_id, :status, :integration_type, :sort, :per_page)), class: "ml-1 text-blue-500 hover:text-blue-700 dark:hover:text-blue-200" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            <% end %>
+          </div>
         <% end %>
+        
+        <% if params[:company_id].present? %>
+          <div class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 py-1 pl-3 pr-2 text-sm text-blue-700 dark:text-blue-300">
+            Company: <%= @companies.find { |c| c.id == params[:company_id].to_i }&.name %>
+            <%= link_to sources_path(params.permit(:query, :campaign_id, :status, :integration_type, :sort, :per_page)), class: "ml-1 text-blue-500 hover:text-blue-700 dark:hover:text-blue-200" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <% if params[:campaign_id].present? %>
+          <div class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 py-1 pl-3 pr-2 text-sm text-blue-700 dark:text-blue-300">
+            Campaign: <%= @campaigns.find { |c| c.id == params[:campaign_id].to_i }&.name %>
+            <%= link_to sources_path(params.permit(:query, :company_id, :status, :integration_type, :sort, :per_page)), class: "ml-1 text-blue-500 hover:text-blue-700 dark:hover:text-blue-200" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <% if params[:status].present? %>
+          <div class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 py-1 pl-3 pr-2 text-sm text-blue-700 dark:text-blue-300">
+            Status: <%= params[:status].humanize %>
+            <%= link_to sources_path(params.permit(:query, :company_id, :campaign_id, :integration_type, :sort, :per_page)), class: "ml-1 text-blue-500 hover:text-blue-700 dark:hover:text-blue-200" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <% if params[:integration_type].present? %>
+          <div class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900 py-1 pl-3 pr-2 text-sm text-blue-700 dark:text-blue-300">
+            Type: <%= params[:integration_type].humanize %>
+            <%= link_to sources_path(params.permit(:query, :company_id, :campaign_id, :status, :sort, :per_page)), class: "ml-1 text-blue-500 hover:text-blue-700 dark:hover:text-blue-200" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <%= link_to "Clear All Filters", sources_path, class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 ml-2" %>
       </div>
     <% end %>
   </div>
+
+  <% if @sources.any? %>
+    <!-- Bulk Actions -->
+    <%= form_with url: bulk_update_sources_path, method: :post, data: { turbo: false }, class: "mb-4" do |f| %>
+      <div class="flex flex-wrap gap-2 items-center">
+        <div>
+          <%= f.select :bulk_action, [
+            ["Bulk Actions...", ""],
+            ["Activate Selected", "activate"],
+            ["Pause Selected", "pause"],
+            ["Archive Selected", "archive"]
+          ], {}, { class: "rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white py-2 text-sm" } %>
+        </div>
+        
+        <%= f.submit "Apply", class: "btn btn-sm btn-secondary" %>
+        
+        <div class="ml-auto text-sm text-gray-500 dark:text-gray-400">
+          <span id="selected-count">0</span> of <%= @sources.count %> selected
+        </div>
+      </div>
+      
+      <!-- Grid View for Sources -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+        <% @sources.each do |source| %>
+          <div class="relative">
+            <div class="absolute top-3 left-3 z-10">
+              <%= f.check_box :source_ids, { multiple: true, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded source-checkbox" }, source.id, false %>
+            </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <!-- Card Header -->
+          <div class="px-4 py-3 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+              <%= link_to source.name, source_path(source), class: "hover:text-blue-600 dark:hover:text-blue-400" %>
+            </h3>
+            <span class="px-2 py-1 text-xs rounded-full <%= 
+              case source.status
+              when 'active' then 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+              when 'paused' then 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+              when 'archived' then 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+              end 
+            %>">
+              <%= source.status.humanize %>
+            </span>
+          </div>
+          
+          <!-- Card Content -->
+          <div class="px-4 py-3">
+            <div class="flex items-center mb-2">
+              <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div class="ml-2 truncate">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Company:</span>
+                <span class="text-sm font-medium text-gray-900 dark:text-white ml-1"><%= source.company.name %></span>
+              </div>
+            </div>
+            
+            <div class="flex items-center mb-2">
+              <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </div>
+              <div class="ml-2 truncate">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Campaign:</span>
+                <span class="text-sm font-medium text-gray-900 dark:text-white ml-1">
+                  <%= link_to source.campaign.name, campaign_path(source.campaign), class: "hover:text-blue-600 dark:hover:text-blue-400" %>
+                </span>
+              </div>
+            </div>
+            
+            <div class="flex items-center mb-2">
+              <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </div>
+              <div class="ml-2 truncate">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Integration:</span>
+                <span class="text-sm font-medium text-gray-900 dark:text-white ml-1"><%= source.integration_type.humanize %></span>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div class="ml-2 truncate">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Payout:</span>
+                <span class="text-sm font-medium text-gray-900 dark:text-white ml-1"><%= source.display_payout %></span>
+              </div>
+            </div>
+            
+            <% if source.leads.present? %>
+              <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Performance</h4>
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="rounded-md bg-gray-50 dark:bg-gray-900 px-3 py-2">
+                    <div class="text-xs text-gray-500 dark:text-gray-400">Total Leads</div>
+                    <div class="text-lg font-medium text-gray-900 dark:text-white"><%= source.leads.count %></div>
+                  </div>
+                  <div class="rounded-md bg-gray-50 dark:bg-gray-900 px-3 py-2">
+                    <div class="text-xs text-gray-500 dark:text-gray-400">Last 30 Days</div>
+                    <div class="text-lg font-medium text-gray-900 dark:text-white"><%= source.leads.where("created_at >= ?", 30.days.ago).count %></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+          <!-- Card Footer -->
+          <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+            <div class="flex space-x-1">
+              <%= link_to edit_source_path(source), class: "btn btn-sm btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200", title: "Edit" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+              <% end %>
+              
+              <%= link_to source_path(source), class: "btn btn-sm btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200", title: "View Details" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                </svg>
+              <% end %>
+            </div>
+            
+            <div class="flex space-x-1">
+              <%= link_to campaign_path(source.campaign, anchor: "sources"), class: "btn btn-sm btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200", title: "View in Campaign Context" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                </svg>
+                <span class="text-xs">View in Campaign</span>
+              <% end %>
+              
+              <%= link_to source_path(source, from_campaign: true), class: "btn btn-sm btn-outline dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:text-gray-200", title: "Campaign Context View" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              <% end %>
+            </div>
+          </div>
+          </div>
+        </div>
+      <% end %>
+      </div>
+    <% end %>
+    
+    <!-- Pagination -->
+    <% if @pagy.pages > 1 %>
+      <div class="mt-6 flex justify-center">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% end %>
+    
+  <% else %>
+    <!-- Empty State -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">No sources found</h3>
+      
+      <% if params[:query].present? || params[:company_id].present? || params[:campaign_id].present? || params[:status].present? || params[:integration_type].present? %>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">No sources match your current filters. Try adjusting your filters or create a new source.</p>
+        <%= link_to "Clear Filters", sources_path, class: "btn btn-outline mr-2" %>
+      <% else %>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">Get started by creating your first source to start collecting leads.</p>
+      <% end %>
+      
+      <%= link_to new_source_path, class: "btn btn-primary" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        Add your first source
+      <% end %>
+    </div>
+  <% end %>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.source-checkbox');
+    const selectedCount = document.getElementById('selected-count');
+    
+    function updateSelectedCount() {
+      const checked = document.querySelectorAll('.source-checkbox:checked').length;
+      selectedCount.textContent = checked;
+    }
+    
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateSelectedCount);
+    });
+    
+    // Initial count
+    updateSelectedCount();
+  });
+</script>
+
+<!-- Modal container for new source creation -->
+<%= turbo_frame_tag "source_modal" %>

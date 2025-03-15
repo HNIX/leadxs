@@ -1,170 +1,406 @@
-<div class="container mx-auto p-4">
-  <!-- Documentation Banner -->
-  <div class="my-6 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-800 dark:to-indigo-800 rounded-lg shadow-lg overflow-hidden">
-    <div class="px-6 py-5">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 bg-white dark:bg-gray-800 rounded-md p-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <h2 class="text-xl font-bold text-white">Lead Submission & Bidding System</h2>
-            <p class="text-blue-100">Manage bid requests, monitor performance, and view real-time analytics</p>
-          </div>
-        </div>
-        <div class="flex space-x-2">
-          <%= link_to dashboard_bid_requests_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:border-gray-700" do %>
-            Bid Requests
-            <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-          <% end %>
-          <%= link_to real_time_bid_dashboard_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700 dark:border-gray-700" do %>
-            Real-time Dashboard
-            <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Quick Access to Bidding System -->
-  <div class="my-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-      <div class="flex items-center">
-        <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+<div class="container mx-auto">
+  <!-- System Health Card -->
+  <div class="my-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        System Health
+      </h2>
+      
+      <% if @system_health[:api_success_rate] < 95 %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-        </div>
-        <div class="ml-4">
-          <h2 class="text-lg font-medium">Bid Requests</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Manage active bid requests</p>
-        </div>
-      </div>
-      <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">Create new bid requests, view active bids, and manage distribution settings.</p>
-      <div class="mt-6">
-        <%= link_to "View Bid Requests", dashboard_bid_requests_path, class: "btn btn-sm btn-outline w-full" %>
-      </div>
+          Alert
+        </span>
+      <% else %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Healthy
+        </span>
+      <% end %>
     </div>
     
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-      <div class="flex items-center">
-        <div class="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- API Success Rate -->
+        <div class="p-4 rounded-lg <%= @system_health[:api_success_rate] < 95 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20' %>">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">API Success Rate</h3>
+            <% success_color = @system_health[:api_success_rate] >= 95 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400' %>
+            <span class="text-lg font-bold <%= success_color %>"><%= @system_health[:api_success_rate] %>%</span>
+          </div>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div class="bg-blue-600 h-2.5 rounded-full" style="width: <%= @system_health[:api_success_rate] %>%"></div>
+          </div>
+          <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Last 24 hours average
+          </p>
         </div>
-        <div class="ml-4">
-          <h2 class="text-lg font-medium">Real-time Dashboard</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Live bidding activity</p>
+        
+        <!-- Average Response Time -->
+        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Avg Response Time</h3>
+            <span class="text-lg font-bold text-blue-500 dark:text-blue-400"><%= @system_health[:average_response_time] %> ms</span>
+          </div>
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+              <%= @system_health[:average_response_time] < 200 ? 'Fast' : (@system_health[:average_response_time] < 500 ? 'Average' : 'Slow') %>
+            </span>
+          </div>
+          <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Target: < 200ms
+          </p>
         </div>
-      </div>
-      <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">Monitor real-time bid activity, track metrics, and see live bid feed.</p>
-      <div class="mt-6">
-        <%= link_to "Go to Real-time Dashboard", real_time_bid_dashboard_path, class: "btn btn-sm btn-outline w-full" %>
-      </div>
-    </div>
-    
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-      <div class="flex items-center">
-        <div class="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
+        
+        <!-- API Request Volume -->
+        <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">API Requests (24h)</h3>
+            <% request_count = ApiRequest.where('created_at >= ?', 24.hours.ago).count %>
+            <span class="text-lg font-bold text-purple-500 dark:text-purple-400"><%= request_count %></span>
+          </div>
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+              <%= current_account.api_requests.where('created_at >= ?', 24.hours.ago).where("response_code < 200 OR response_code >= 300 OR error IS NOT NULL").count %> errors
+            </span>
+          </div>
+          <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <% if current_account.api_requests.where('created_at >= ?', 24.hours.ago).where("response_code < 200 OR response_code >= 300 OR error IS NOT NULL").count > 0 %>
+              <%= link_to "View error details", api_requests_path(failed: true), class: "text-blue-600 dark:text-blue-400 hover:underline" %>
+            <% else %>
+              No errors detected
+            <% end %>
+          </p>
         </div>
-        <div class="ml-4">
-          <h2 class="text-lg font-medium">Analytics & Reports</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Historical performance data</p>
-        </div>
-      </div>
-      <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">View detailed analytics, generate reports, and analyze trends over time.</p>
-      <div class="mt-6">
-        <%= link_to "Activity Feed", activity_feed_index_path, class: "btn btn-sm btn-outline" %>
-        <%= link_to "Campaign Dashboard", campaign_dashboard_path, class: "btn btn-sm btn-outline ml-2" %>
-        <%= link_to "Bid Analytics", bid_dashboard_path, class: "btn btn-sm btn-outline ml-2" %>
-        <%= link_to "View Reports", bid_reports_path, class: "btn btn-sm btn-outline ml-2" %>
       </div>
     </div>
   </div>
 
-  <!-- Data Management Overview -->
-  <div class="my-6">
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Data Management</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Standard Fields Card -->
-      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div class="flex items-center">
-          <div class="bg-indigo-100 dark:bg-indigo-900 p-3 rounded-full">
+  <!-- Main Dashboard Content -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-10">
+    <!-- Key Metrics Cards -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-blue-500">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Active Campaigns</p>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white"><%= @active_campaigns_count %></h3>
+        </div>
+        <span class="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded-full">Campaign</span>
+      </div>
+      <div class="mt-2">
+        <%= link_to "View all campaigns", campaigns_path, class: "text-xs text-blue-600 dark:text-blue-400 hover:underline" %>
+      </div>
+    </div>
+
+  
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-green-500">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Leads (30 days)</p>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white"><%= @leads_count %></h3>
+        </div>
+        <span class="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 text-xs font-medium px-2.5 py-0.5 rounded-full">Leads</span>
+      </div>
+      <div class="mt-2">
+        <%= link_to "View all leads", leads_path, class: "text-xs text-blue-600 dark:text-blue-400 hover:underline" %>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-yellow-500">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Distribution Rate</p>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white"><%= @distribution_success_rate %>%</h3>
+        </div>
+        <span class="bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100 text-xs font-medium px-2.5 py-0.5 rounded-full">Performance</span>
+      </div>
+      <div class="mt-2">
+        <%= link_to "View distribution metrics", bid_reports_path, class: "text-xs text-blue-600 dark:text-blue-400 hover:underline" %>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-l-4 border-indigo-500">
+      <div class="flex justify-between items-start">
+        <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Avg Bid Amount</p>
+            <p class="text-2xl font-bold dark:text-white">$<%= @metrics[:bids][:average_amount] %></p>
+          </div>
+          <div class="bg-indigo-100 dark:bg-indigo-900 h-12 w-12 rounded-full flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <div class="ml-4">
-            <h2 class="text-lg font-medium">Standard Fields</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              <%= current_account.standard_fields.count %> fields configured
-            </p>
-          </div>
         </div>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-          Manage fields that will be automatically added to all new verticals. Setup once, apply everywhere.
-        </p>
-        <div class="mt-6">
-          <%= link_to "Manage Standard Fields", standard_fields_path, class: "btn btn-sm btn-outline w-full" %>
+        <div class="mt-4">
+          <p class="text-sm text-gray-500 dark:text-gray-400">Total Bids: <%= @metrics[:bids][:total] %></p>
         </div>
       </div>
-      
-      <!-- Verticals Card -->
-      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div class="flex items-center">
-          <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+  </div>
+  
+  <!-- Main Content Grid - Revised Layout -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-6"> 
+    <div class="col-span-2 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Activity Stream Section -->
+        <div class="col-span-4 bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center">
+              Activity Stream
+            </h2>
+            <div class="flex space-x-2">
+              <select 
+                class="text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                data-action="change->activity-feed#filter"
+                data-activity-feed-target="durationFilter">
+                <option value="all">All Time</option>
+                <option value="hour">Last Hour</option>
+                <option value="day" selected>Today</option>
+                <option value="week">This Week</option>
+              </select>
+              <button 
+                class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                data-action="click->activity-feed#refresh">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+          <div id="activity-stream" class="p-4 max-h-[500px] overflow-y-auto" data-controller="activity-feed">
+            <div class="mb-2 bg-gray-50 dark:bg-gray-700 rounded p-2 text-sm text-gray-500 dark:text-gray-300 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Showing most recent activities first. New activities will appear at the top automatically.</span>
+            </div>
+            <% if @recent_activities.any? %>
+              <div class="space-y-4">
+                <% @recent_activities.each do |activity| %>
+                  <%= render partial: "lead_activities/activity", locals: { activity: activity, compact: false } %>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>No recent activities found. Activities will appear here as leads are processed.</p>
+              </div>
+            <% end %>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 text-right rounded-b-lg">
+            <%= link_to activity_feed_index_path, class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" do %>
+              View All Activity
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            <% end %>
+          </div>
+        </div>
+
+
+        <!-- Recent Leads -->
+        <div class="col-span-2 bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center justify-between">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Recent Leads
+              </div>
+              <span class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1">
+                <%= @recent_leads.count %> of <%= @leads_count %> leads
+              </span>
+            </h2>
+          </div>
+          <div id="recent-leads" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+            <% if @recent_leads.any? %>
+              <% @recent_leads.each do |lead| %>
+                <%= link_to lead_path(lead), class: "block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition" do %>
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <p class="font-medium text-gray-800 dark:text-white"><%= lead.unique_id.first(8) %></p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <span class="font-medium"><%= lead.campaign&.name %></span> 
+                        via <%= lead.source&.name %>
+                      </p>
+                    </div>
+                    <div>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= lead_status_color(lead.status) %>">
+                        <%= lead.status.humanize %>
+                      </span>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <%= time_ago_in_words(lead.created_at) %> ago
+                  </p>
+                <% end %>
+              <% end %>
+            <% else %>
+              <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>No leads found.</p>
+              </div>
+            <% end %>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 text-right rounded-b-lg">
+            <%= link_to leads_path, class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" do %>
+              View All Leads
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Recent Bids -->
+        <div class="col-span-2 bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center justify-between">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Recent Bids
+              </div>
+              <span class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1">
+                <%= @recent_bids.count %> of <%= @bid_count %> bids
+              </span>
+            </h2>
+          </div>
+          <div id="recent-bids" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+            <%= render partial: "activity_feed/bids", locals: { bids: @recent_bids } %>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 text-right rounded-b-lg">
+            <%= link_to bid_reports_path, class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" do %>
+              View Bid Reports
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            <% end %>
+          </div>
+        </div>
+
+    </div>
+
+    <!-- Quick Links -->
+    <div class="col-span-1">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-medium text-gray-800 dark:text-white flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-          </div>
-          <div class="ml-4">
-            <h2 class="text-lg font-medium">Verticals</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              <%= current_account.verticals.count %> verticals configured
-            </p>
+            Quick Links
+          </h2>
+        </div>
+        
+        <div class="p-4">
+          <div class="grid grid-cols-1 gap-3">
+            <!-- Main Navigation Links with icons and counts -->
+            <% [
+              { 
+                title: "Campaigns", 
+                description: "Manage your lead gen campaigns",
+                icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2", 
+                path: campaigns_path, 
+                count: @metrics[:campaigns][:total],
+                color: "blue"
+              },
+              { 
+                title: "Leads", 
+                description: "View and manage collected leads",
+                icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z", 
+                path: leads_path, 
+                count: @metrics[:leads][:total],
+                color: "green"
+              },
+              { 
+                title: "Bid Reports", 
+                description: "Analytics for your bidding activity",
+                icon: "M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", 
+                path: bid_reports_path, 
+                count: @metrics[:bids][:total],
+                color: "purple"
+              },
+              { 
+                title: "Distributions", 
+                description: "Set up and configure lead buyers",
+                icon: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4", 
+                path: distributions_path, 
+                count: @metrics[:distributions][:total],
+                color: "amber"
+              },
+              { 
+                title: "Compliance", 
+                description: "Monitor regulatory compliance",
+                icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", 
+                path: compliance_path, 
+                count: nil,
+                color: "red"
+              },
+              { 
+                title: "Settings", 
+                description: "Configure your account",
+                icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z", 
+                path: edit_account_path(current_account), 
+                count: nil,
+                color: "gray"
+              }
+            ].each do |link| %>
+              <%= link_to link[:path], class: "block p-3 rounded-lg hover:bg-#{link[:color]}-50 dark:hover:bg-#{link[:color]}-900/10 border border-gray-100 dark:border-gray-700 transition-colors duration-150" do %>
+                <div class="flex items-start justify-between">
+                  <div class="flex items-center">
+                    <div class="rounded-full bg-<%= link[:color] %>-100 dark:bg-<%= link[:color] %>-900/40 p-2 mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-<%= link[:color] %>-600 dark:text-<%= link[:color] %>-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= link[:icon] %>" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-medium text-gray-900 dark:text-white"><%= link[:title] %></h3>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"><%= link[:description] %></p>
+                    </div>
+                  </div>
+                  <% if link[:count] %>
+                    <span class="bg-<%= link[:color] %>-100 dark:bg-<%= link[:color] %>-900/40 text-<%= link[:color] %>-800 dark:text-<%= link[:color] %>-200 text-xs font-medium px-2.5 py-0.5 rounded-full"><%= link[:count] %></span>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
           </div>
         </div>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-          Manage your industry verticals, field templates, and validation rules.
-        </p>
-        <div class="mt-6">
-          <%= link_to "Manage Verticals", verticals_path, class: "btn btn-sm btn-outline w-full" %>
-        </div>
-      </div>
-      
-      <!-- Campaigns Card -->
-      <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div class="flex items-center">
-          <div class="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-            </svg>
+        
+        <!-- Additional Tools Section -->
+        <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 rounded-b-lg">
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Additional Tools</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <% [
+              { title: "API Documentation", path: lead_submission_process_path, icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" },
+              { title: "Bid Dashboard", path: real_time_bid_dashboard_path, icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
+              { title: "System Status", path: api_requests_path, icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+              { title: "Activity Feed", path: activity_feed_index_path, icon: "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" }
+            ].each do |tool| %>
+              <%= link_to tool[:path], class: "flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-gray-600 dark:text-gray-300" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= tool[:icon] %>" />
+                </svg>
+                <%= tool[:title] %>
+              <% end %>
+            <% end %>
           </div>
-          <div class="ml-4">
-            <h2 class="text-lg font-medium">Campaigns</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              <%= current_account.campaigns.count %> campaigns configured
-            </p>
-          </div>
-        </div>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-          Manage your campaigns, fields, and distribution settings.
-        </p>
-        <div class="mt-6">
-          <%= link_to "Manage Campaigns", campaigns_path, class: "btn btn-sm btn-outline w-full" %>
         </div>
       </div>
     </div>
+
   </div>
 </div>

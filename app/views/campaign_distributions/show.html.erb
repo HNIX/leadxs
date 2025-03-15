@@ -1,67 +1,135 @@
-<div class="container mx-auto px-4 py-6 md:py-8 max-w-5xl">
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Campaign Distribution</h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Connection between campaign and distribution</p>
-    </div>
-    <div class="flex space-x-2">
-      <%= link_to campaign_campaign_distributions_path(@campaign_distribution.campaign), class: "btn btn-white" do %>
-        <i class="fas fa-arrow-left mr-1"></i> Back to Campaign
-      <% end %>
-      
-      <%= link_to edit_campaign_distribution_path(@campaign_distribution), class: "btn btn-white" do %>
-        <i class="fas fa-edit mr-1"></i> Edit
-      <% end %>
-      
-      <%= button_to campaign_distribution_path(@campaign_distribution), method: :delete, form: { data: { turbo_confirm: "Are you sure you want to remove this distribution from the campaign?" } }, class: "btn btn-danger" do %>
-        <i class="fas fa-trash-alt mr-1"></i> Remove
-      <% end %>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden col-span-2">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-          Configuration
-        </h3>
+<%= turbo_frame_tag "modal" do %>
+  <div class="container mx-auto px-4 py-6 md:py-8 max-w-5xl" data-controller="turbo-modal">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Campaign Distribution</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Connection between campaign and distribution</p>
       </div>
-      <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-0">
-        <dl class="sm:divide-y sm:divide-gray-200 dark:sm:divide-gray-700">
-          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Campaign</dt>
-            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-              <%= link_to @campaign_distribution.campaign.name, campaign_path(@campaign_distribution.campaign), class: "text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" %>
-            </dd>
-          </div>
-          
-          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution</dt>
-            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-              <%= link_to @campaign_distribution.distribution.name, distribution_path(@campaign_distribution.distribution), class: "text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" %>
-              <span class="ml-2 text-gray-500 dark:text-gray-400">
-                (<%= @campaign_distribution.distribution.company.name %>)
-              </span>
-            </dd>
-          </div>
-          
-          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Endpoint</dt>
-            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-              <div class="flex items-center">
-                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 mr-2">
-                  <%= @campaign_distribution.distribution.request_method.upcase %>
+      <div class="flex space-x-2">
+        <button type="button" class="btn btn-white" data-action="turbo-modal#close">
+          <i class="fas fa-times mr-1"></i> Close
+        </button>
+
+        <%= link_to edit_campaign_distribution_path(@campaign_distribution), class: "btn btn-white", data: { turbo_frame: "modal" } do %>
+          <i class="fas fa-edit mr-1"></i> Edit
+        <% end %>
+        
+        <%= button_to campaign_distribution_path(@campaign_distribution), method: :delete, form: { data: { turbo_confirm: "Are you sure you want to remove this distribution from the campaign?" } }, class: "btn btn-danger" do %>
+          <i class="fas fa-trash-alt mr-1"></i> Remove
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden col-span-2">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+            Configuration
+          </h3>
+        </div>
+        <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-0">
+          <dl class="sm:divide-y sm:divide-gray-200 dark:sm:divide-gray-700">
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Campaign</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                <%= @campaign_distribution.campaign.name %>
+              </dd>
+            </div>
+            
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                <%= @campaign_distribution.distribution.name %>
+                <span class="ml-2 text-gray-500 dark:text-gray-400">
+                  (<%= @campaign_distribution.distribution.company.name %>)
                 </span>
-                <span class="break-all">
-                  <%= @campaign_distribution.distribution.endpoint_url %>
+              </dd>
+            </div>
+            
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Endpoint</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                <div class="flex items-center">
+                  <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 mr-2">
+                    <%= @campaign_distribution.distribution.request_method.upcase %>
+                  </span>
+                  <span class="break-all">
+                    <%= @campaign_distribution.distribution.endpoint_url %>
+                  </span>
+                </div>
+              </dd>
+            </div>
+            
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                <% if @campaign_distribution.active? %>
+                  <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    Active
+                  </span>
+                <% else %>
+                  <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                    Inactive
+                  </span>
+                <% end %>
+              </dd>
+            </div>
+            
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Priority</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                <%= @campaign_distribution.priority || "Not set" %>
+                <% if @campaign_distribution.priority %>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    (lower is higher priority)
+                  </span>
+                <% end %>
+              </dd>
+            </div>
+            
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Format</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                  <%= @campaign_distribution.distribution.request_format.upcase %>
                 </span>
-              </div>
-            </dd>
-          </div>
-          
-          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
-            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+              </dd>
+            </div>
+            
+            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Required Fields</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                <% required_field_count = @campaign_distribution.campaign.campaign_fields.where(required: true).count %>
+                <% if required_field_count > 0 %>
+                  <% campaign_fields_by_id = @campaign_distribution.campaign.campaign_fields.index_by(&:id) %>
+                  <% mapped_required_fields = @campaign_distribution.mapped_fields.count { |field| field.campaign_field_id && campaign_fields_by_id[field.campaign_field_id]&.required? } %>
+                  <span class="<%= mapped_required_fields == required_field_count ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>">
+                    <%= mapped_required_fields %>/<%= required_field_count %> mapped
+                    <% if mapped_required_fields < required_field_count %>
+                      <i class="fas fa-exclamation-triangle ml-1"></i>
+                    <% else %>
+                      <i class="fas fa-check-circle ml-1"></i>
+                    <% end %>
+                  </span>
+                <% else %>
+                  <span>No required fields</span>
+                <% end %>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+            Status Summary
+          </h3>
+        </div>
+        <div class="p-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-3">
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
               <% if @campaign_distribution.active? %>
                 <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                   Active
@@ -71,185 +139,96 @@
                   Inactive
                 </span>
               <% end %>
-            </dd>
-          </div>
-          
-          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Priority</dt>
-            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-              <%= @campaign_distribution.priority || "Not set" %>
-              <% if @campaign_distribution.priority %>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
-                  (lower is higher priority)
-                </span>
-              <% end %>
-            </dd>
-          </div>
-          
-          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Format</dt>
-            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-              <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                <%= @campaign_distribution.distribution.request_format.upcase %>
+            </div>
+            
+            <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-3">
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Fields Mapped</span>
+              <span class="font-medium text-gray-900 dark:text-white">
+                <%= @campaign_distribution.mapped_fields.count %>
               </span>
-            </dd>
-          </div>
-          
-          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Required Fields</dt>
-            <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-              <% required_field_count = @campaign_distribution.campaign.campaign_fields.where(required: true).count %>
-              <% if required_field_count > 0 %>
-                <% campaign_fields_by_id = @campaign_distribution.campaign.campaign_fields.index_by(&:id) %>
-                <% mapped_required_fields = @campaign_distribution.mapped_fields.count { |field| field.campaign_field_id && campaign_fields_by_id[field.campaign_field_id]&.required? } %>
-                <span class="<%= mapped_required_fields == required_field_count ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>">
-                  <%= mapped_required_fields %>/<%= required_field_count %> mapped
-                  <% if mapped_required_fields < required_field_count %>
-                    <i class="fas fa-exclamation-triangle ml-1"></i>
-                  <% else %>
-                    <i class="fas fa-check-circle ml-1"></i>
-                  <% end %>
-                </span>
-              <% else %>
-                <span>No required fields</span>
+            </div>
+            
+            <div class="flex items-center justify-between pb-3">
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Field Mappings</span>
+              <%= link_to campaign_distribution_mapped_fields_path(@campaign_distribution), class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300", data: { turbo_frame: "modal" } do %>
+                Edit Mappings <i class="fas fa-arrow-right ml-1"></i>
               <% end %>
-            </dd>
+            </div>
           </div>
-        </dl>
+        </div>
       </div>
     </div>
+
+    <div class="mb-6 flex justify-between items-center">
+      <h2 class="text-xl font-medium text-gray-900 dark:text-white">Field Mappings</h2>
+      
+      <%= link_to campaign_distribution_mapped_fields_path(@campaign_distribution), class: "btn btn-primary", data: { turbo_frame: "modal" } do %>
+        <i class="fas fa-exchange-alt mr-1"></i> Edit Field Mappings
+      <% end %>
+    </div>
     
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-      <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-          Recent Activity
-        </h3>
-      </div>
-      <div class="p-4">
-        <% api_requests = ApiRequest.where(requestable: @campaign_distribution.distribution).order(created_at: :desc).limit(5) %>
-        <% if api_requests.any? %>
-          <div class="space-y-3">
-            <% api_requests.each do |request| %>
-              <div class="border rounded-md p-3 border-gray-200 dark:border-gray-700">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <span class="px-2 py-1 text-xs rounded-full <%= request.successful? ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' %>">
-                      <%= request.successful? ? "Success" : "Failed" %>
-                    </span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                      <%= time_ago_in_words(request.created_at) %> ago
-                    </span>
-                  </div>
-                  <div>
-                    <%= link_to api_request_path(request), class: "text-xs text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" do %>
-                      View Details
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Campaign Field</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Distribution Field</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Required</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <% if @mapped_fields.any? %>
+              <% @mapped_fields.each do |mapped_field| %>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <% if mapped_field.campaign_field %>
+                      <%= mapped_field.campaign_field.name %>
+                    <% else %>
+                      <span class="text-gray-400 dark:text-gray-500">Static value</span>
                     <% end %>
-                  </div>
-                </div>
-                <% if request.response_code %>
-                  <div class="mt-1 text-sm">
-                    <span class="font-mono px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded">
-                      HTTP <%= request.response_code %>
-                    </span>
-                    <% if request.duration_ms %>
-                      <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                        <%= request.duration_ms %>ms
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <% if mapped_field.value_type == 'dynamic' %>
+                      <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        Dynamic
+                      </span>
+                    <% else %>
+                      <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                        Static
+                      </span>
+                      <span class="ml-2 font-mono text-xs">
+                        "<%= mapped_field.static_value %>"
                       </span>
                     <% end %>
-                  </div>
-                <% end %>
-                <% if request.error.present? %>
-                  <div class="mt-1 text-sm text-red-600 dark:text-red-400 truncate">
-                    Error: <%= request.error %>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-          
-          <div class="mt-4 text-center">
-            <%= link_to api_requests_path, class: "text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300" do %>
-              View All API Requests <i class="fas fa-arrow-right ml-1"></i>
-            <% end %>
-          </div>
-        <% else %>
-          <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-6">
-            No API requests recorded yet
-          </p>
-        <% end %>
-      </div>
-    </div>
-  </div>
-
-  <div class="mb-6 flex justify-between items-center">
-    <h2 class="text-xl font-medium text-gray-900 dark:text-white">Field Mappings</h2>
-    
-    <%= link_to campaign_distribution_mapped_fields_path(@campaign_distribution), class: "btn btn-primary" do %>
-      <i class="fas fa-exchange-alt mr-1"></i> Edit Field Mappings
-    <% end %>
-  </div>
-  
-  <div class="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-700">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Campaign Field</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Distribution Field</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Required</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-          <% if @mapped_fields.any? %>
-            <% @mapped_fields.each do |mapped_field| %>
-              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  <% if mapped_field.campaign_field %>
-                    <%= mapped_field.campaign_field.name %>
-                  <% else %>
-                    <span class="text-gray-400 dark:text-gray-500">Static value</span>
-                  <% end %>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  <% if mapped_field.value_type == 'dynamic' %>
-                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      Dynamic
-                    </span>
-                  <% else %>
-                    <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                      Static
-                    </span>
-                    <span class="ml-2 font-mono text-xs">
-                      "<%= mapped_field.static_value %>"
-                    </span>
-                  <% end %>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900 dark:text-white">
-                  <%= mapped_field.distribution_field_name %>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  <% if mapped_field.required? %>
-                    <span class="text-red-600 dark:text-red-400">
-                      <i class="fas fa-check-circle"></i>
-                    </span>
-                  <% else %>
-                    <span class="text-gray-400 dark:text-gray-600">
-                      <i class="fas fa-minus-circle"></i>
-                    </span>
-                  <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900 dark:text-white">
+                    <%= mapped_field.distribution_field_name %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <% if mapped_field.required? %>
+                      <span class="text-red-600 dark:text-red-400">
+                        <i class="fas fa-check-circle"></i>
+                      </span>
+                    <% else %>
+                      <span class="text-gray-400 dark:text-gray-600">
+                        <i class="fas fa-minus-circle"></i>
+                      </span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            <% else %>
+              <tr>
+                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                  No field mappings configured
                 </td>
               </tr>
             <% end %>
-          <% else %>
-            <tr>
-              <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                No field mappings configured
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
+<% end %>

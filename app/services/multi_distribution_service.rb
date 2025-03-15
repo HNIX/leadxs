@@ -17,9 +17,9 @@ class MultiDistributionService
   end
   
   # Main method to distribute lead based on campaign's multi-distribution strategy
-  def distribute!
-    # Get active distributions for this campaign
-    distributions = active_distributions
+  def distribute!(custom_distributions = nil)
+    # Get active distributions for this campaign, or use provided ones
+    distributions = custom_distributions || active_distributions
     return no_distributions_result if distributions.empty?
     
     # Only use up to max_distributions
@@ -43,6 +43,11 @@ class MultiDistributionService
     
     # Return the distribution results
     @results
+  end
+  
+  # Distribute to custom list of distributions (useful for limiting to bid-winning distributions)
+  def distribute_to_winners(winning_distributions)
+    distribute!(winning_distributions)
   end
   
   private
